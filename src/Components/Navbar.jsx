@@ -21,9 +21,9 @@ const Navbar = () => {
                 <a href="/portfolio" className="hover:text-gray-400">Portfolio Tracker</a>
             </div>
 
-            <div className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
+            <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
                 Username@gmail.com
-            </div>
+            </button>
 
             <div className="md:hidden text-white" onClick={toggleMenu}>
                 {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -34,9 +34,9 @@ const Navbar = () => {
                     <a href="/dashboard" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
                     <a href="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</a>
                     <a href="/portfolio" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</a>
-                    <div className="bg-white text-black rounded-full px-4 py-2">
+                    <button className="bg-white text-black rounded-full px-4 py-2">
                         Username@gmail.com
-                    </div>
+                    </button>
                 </div>
             )}
         </nav>
