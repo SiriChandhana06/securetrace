@@ -1,7 +1,7 @@
 import React from 'react';
-import { FaCopy, FaRegCopy, FaShare, FaShareAlt } from 'react-icons/fa';
+import {FaRegCopy,} from 'react-icons/fa';
 import img from '../Assests/person.png';
-import { FaShareNodes, FaSquareShareNodes } from 'react-icons/fa6';
+import { FaShareNodes } from 'react-icons/fa6';
 
 const AddressCard = () => {
   const address = "0xd2F63453ABd30C2C4496580f8d68ec38C7490D37";
