@@ -30,7 +30,7 @@ const Navbar = () => {
             </div>
 
             {isOpen && (
-                <div className="absolute top-16 left-0 right-0 bg-[#303030] mt-10 text-white flex flex-col items-center space-y-4 py-4 rounded-lg">
+                <div className="absolute top-16 left-0 right-0 bg-[#303030] mt-6 mx-4 text-white flex flex-col items-center space-y-4 py-4 rounded-lg">
                     <a href="/dashboard" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
                     <a href="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</a>
                     <a href="/portfoliotracker" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</a>

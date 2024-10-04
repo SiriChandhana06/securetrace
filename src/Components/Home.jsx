@@ -17,7 +17,7 @@ const Home = () => {
                         SecureTrace analyzes transaction data using specialized blockchain forensic techniques,
                         enhancing the detection of intricate patterns and potential vulnerabilities.
                     </p>
-                    <div className="flex flex-col sm:flex-row items-center w-full max-w-xl">
+                    <div className="flex flex-col sm:flex-row items-center w-full md:max-w-xl ">
                         <input
                             type="text"
                             placeholder="Search for funds, exchange, transactions..."

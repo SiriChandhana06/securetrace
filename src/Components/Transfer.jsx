@@ -261,7 +261,7 @@ const Transfer = () => {
                                         <td>{transfer.from}</td>
                                         <td>{transfer.to}</td>
                                         {/* <td className='text-green-500'>{transfer.value}</td> */}
-                                        <td className={`text-${parseFloat(transfer.value.replace('K', '')) <= 1 ? 'gray' : 'green'}-500`}>
+                                        <td className={`text-${parseFloat(transfer.value.replace('K', '')) <= 1 ? 'red' : 'green'}-500`}>
                                             {transfer.value}
                                         </td>
                                         <td>{transfer.token}</td>
