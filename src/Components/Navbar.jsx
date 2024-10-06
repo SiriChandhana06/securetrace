@@ -9,14 +9,14 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-[#303030] p-4 rounded-full flex justify-between items-center mx-10 my-4">
+        <nav className="bg-[#303030] p-4 rounded-full flex justify-between items-center mx-4 lg:mx-32 my-4">
             <div className="text-white font-bold text-2xl ml-4 ">
                 SecureTrace
             </div>
 
 
             <div className="hidden md:flex space-x-8 text-white">
-                <a href="/dashboard" className="hover:text-gray-400">Dashboard</a>
+                <a href="/" className="hover:text-gray-400">Dashboard</a>
                 <a href="/visualizer" className="hover:text-gray-400">Visualizer</a>
                 <a href="/portfoliotracker" className="hover:text-gray-400">Portfolio Tracker</a>
             </div>
@@ -31,7 +31,7 @@ const Navbar = () => {
 
             {isOpen && (
                 <div className="absolute top-16 left-0 right-0 bg-[#303030] mt-6 mx-4 text-white flex flex-col items-center space-y-4 py-4 rounded-lg">
-                    <a href="/dashboard" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
+                    <a href="/" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
                     <a href="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</a>
                     <a href="/portfoliotracker" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</a>
                     <button className="bg-white text-black rounded-full px-4 py-2">

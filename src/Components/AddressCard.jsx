@@ -14,9 +14,9 @@ const AddressCard = () => {
   };
 
   return (
-    <div className="mx-4 md:mx-12 my-10 border rounded-lg shadow-lg p-4 bg-white flex flex-col md:flex-row items-center gap-4">
-      <img src={img} alt='img'/>
-      <div className="flex-1">
+    <div className="mx-4 md:mx-32 my-10 border border-black rounded-lg shadow-lg shadow-gray-500 p-4 bg-white flex flex-col md:flex-row items-center gap-4">
+     
+      <div className="flex-1 ml-0 md:ml-4">
         <div className="flex items-center">
           <span className='text-sm md:text-xl text-black font-semibold'>{address}</span>
           <button onClick={copyToClipboard} className="ml-2 text-sm md:text-xl text-black hover:text-gray-600">
@@ -34,6 +34,7 @@ const AddressCard = () => {
           Ethereum First Funder: <span className='text-black font-semibold text-sm md:text-xl'>{address}</span>
         </p>
       </div>
+      <img src={img} alt='img'/>
     </div>
   );
 };

@@ -13,11 +13,11 @@ const PortfolioTracker = () => {
             <div>
                 <AddressCard/>
             </div>
-            <div className='lg:flex gap-10 mx-4 md:mx-12'>
-                <div className="">
+            <div className=''>
+                <div className="md:mx-32 mx-4">
                     <Portfolio/>
                 </div>
-                <div className="w-full mt-10 lg:mt-0">
+                <div className="md:mx-32 mx-4 mt-10">
                     <Transfer/>
                 </div>
             </div>
