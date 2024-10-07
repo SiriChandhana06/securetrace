@@ -1,8 +1,9 @@
 import React from 'react';
 import time from '../Assests/time.png';
 import audio from '../Assests/audio.png';
-import Transfer from './Transfer';
+// import Transfer from './Transfer';
 import Portfolio from './Portfolio';
+import Transactions from './Transactions';
 
 const Dashboard = () => {
     return (
@@ -11,7 +12,8 @@ const Dashboard = () => {
                 <Portfolio />
 
                 <div className="w-full">
-                    <Transfer />
+                    {/* <Transfer /> */}
+                    <Transactions/>
                 </div>
 
                <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-10'>
