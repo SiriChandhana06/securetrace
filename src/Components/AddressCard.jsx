@@ -14,7 +14,7 @@ const AddressCard = () => {
   };
 
   return (
-    <div className="mx-4 md:mx-32 my-10 border border-black rounded-lg shadow-lg shadow-gray-500 p-4 bg-white flex flex-col md:flex-row items-center gap-4">
+    <div className="mx-4 md:mx-32 my-10 border border-black rounded-lg shadow-lg shadow-gray-500 p-4 bg-white flex flex-col lg:flex-row items-center gap-4">
      
       <div className="flex-1 ml-0 md:ml-4">
         <div className="flex items-center">

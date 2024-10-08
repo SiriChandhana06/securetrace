@@ -49,19 +49,7 @@ const Portfolio = () => {
                                 <td>Berry</td>
                                 <td>$52.00K <span className="text-green-500">+0.02</span></td>
                                 <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
+                                <td className='px-4'>$52.00K <span className="text-green-500">+0.02</span></td>
                             </tr>
                             <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
                                 <td>USDI</td>
