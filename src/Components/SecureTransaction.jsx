@@ -5,18 +5,33 @@ import eth from "../Assests/eth.png";
 import ens from "../Assests/ens.png";
 import eth1 from "../Assests/eth1.png";
 import usdc from "../Assests/usdc.png";
-import arbi from "../Assests/Arbi.png";
-import arbi2 from "../Assests/arbi2.png";
-import retn from "../Assests/return.png";
-import usdt from "../Assests/usdt.png";
-import leaf from "../Assests/leaf.png";
-import plus from "../Assests/plus.png";
-import weth from "../Assests/weth.png";
+// import arbi from "../Assests/Arbi.png";
+// import arbi2 from "../Assests/arbi2.png";
+// import retn from "../Assests/return.png";
+// import usdt from "../Assests/usdt.png";
+// import leaf from "../Assests/leaf.png";
+// import plus from "../Assests/plus.png";
+// import weth from "../Assests/weth.png";
 import twitter from "../Assests/twitter.png";
 import world from "../Assests/world.png";
 import share from "../Assests/share.png";
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const SecureTransaction = () => {
+    const [inputValue, setInputValue] = useState('');
+    const navigate = useNavigate();  
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        navigate('/portfoliotracker');  
+    }
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    }
+
+
     return (
         <div>
             <div>
@@ -31,18 +46,21 @@ const SecureTransaction = () => {
                         SecureTrace analyzes transaction data using specialized blockchain forensic techniques,
                         enhancing the detection of intricate patterns and potential vulnerabilities.
                     </p>
-                    <div className=" w-full md:max-w-4xl ">
+                    
+                    <form onSubmit={handleSubmit} className=" w-full md:max-w-4xl ">
                         <input
                             type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
                             placeholder="Search for funds, exchange, transactions..."
                             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full placeholder:text-center"
                         />
                         <div className='flex justify-center'>
-                            <button className="bg-green-500 w-60 mt-6 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+                            <button type='submit' disabled={!inputValue} className="bg-green-500 w-60 mt-6 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
                                 Scan Now
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
             </div>
