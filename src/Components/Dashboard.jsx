@@ -2,21 +2,21 @@ import React from 'react';
 import time from '../Assests/time.png';
 import audio from '../Assests/audio.png';
 // import Transfer from './Transfer';
-import Portfolio from './Portfolio';
-import Transactions from './Transactions';
+// import Portfolio from './Portfolio';
+// import Transactions from './Transactions';
 
 const Dashboard = () => {
     return (
         <div className=" grid grid-cols-1 gap-10">
-            <div className="space-y-10 mx-4 md:mx-32">
-                <Portfolio />
+            <div className="space-y-10 mx-4 md:mx-14">
+                {/* <Portfolio /> */}
 
-                <div className="w-full">
+                {/* <div className="w-full"> */}
                     {/* <Transfer /> */}
-                    <Transactions/>
-                </div>
+                    {/* <Transactions/> */}
+                {/* </div> */}
 
-               <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-10'>
+               <div className='grid grid-cols-1 lg:grid-cols-2 md:gap-16'>
                 <div className="bg-white p-6 w-full rounded-xl border border-black shadow-md shadow-gray-500">
                     <div className="flex gap-2">
                         <img className="h-6 w-6" src={time} alt="time" />

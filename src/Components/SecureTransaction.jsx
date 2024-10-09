@@ -5,13 +5,13 @@ import eth from "../Assests/eth.png";
 import ens from "../Assests/ens.png";
 import eth1 from "../Assests/eth1.png";
 import usdc from "../Assests/usdc.png";
-// import arbi from "../Assests/Arbi.png";
-// import arbi2 from "../Assests/arbi2.png";
-// import retn from "../Assests/return.png";
-// import usdt from "../Assests/usdt.png";
-// import leaf from "../Assests/leaf.png";
-// import plus from "../Assests/plus.png";
-// import weth from "../Assests/weth.png";
+import arbi from "../Assests/Arbi.png";
+import arbi2 from "../Assests/arbi2.png";
+import retn from "../Assests/return.png";
+import usdt from "../Assests/usdt.png";
+import leaf from "../Assests/leaf.png";
+import plus from "../Assests/plus.png";
+import weth from "../Assests/weth.png";
 import twitter from "../Assests/twitter.png";
 import world from "../Assests/world.png";
 import share from "../Assests/share.png";
@@ -66,13 +66,13 @@ const SecureTransaction = () => {
             </div>
 
 
-            <div className="mx-4 md:mx-20 lg:mx-32 px-4 py-10">
-                {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-80"> */}
-                <div className="grid grid-cols-1">
+            <div className="container px-4 py-10">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-80">
+                {/* <div className="grid grid-cols-1"> */}
                     <div className="lg:col-span-1 flex flex-col gap-10">
-                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] lg:w-full">
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] mx-2 md:ml-20 lg:ml-12 md:mr-0">
                             <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
-                            <div className='md:flex justify-between mx-4 lg:mx-10'>
+                            <div className='md:flex gap-10'>
                                 <div className='mt-6'>
                                     <div className="flex items-center gap-4">
                                         <img
@@ -89,7 +89,7 @@ const SecureTransaction = () => {
                                         <p className="text-lg text-[#3C704F] font-semibold">+0.28</p>
                                     </div>
                                 </div>
-                                <div className='flex gap-10 md:gap-16 lg:gap-24'>
+                                <div className='flex justify-between gap-10 md:gap-24'>
                                     <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
                                         <li>24H Volume</li>
                                         <li>Market Cap</li>
@@ -112,7 +112,7 @@ const SecureTransaction = () => {
 
                         <div>
                             <h3 className="text-xl font-semibold text-green-500 mb-4 ml-12">TOP ENTITIES</h3>
-                            <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] lg:w-full">
+                            <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
                                 <div className="flex items-center gap-4">
                                     <img
                                         className="h-12 w-12"
@@ -218,9 +218,9 @@ const SecureTransaction = () => {
                         </div>
                     </div>
 
-                    {/* <div className=''>
+                    <div className=''>
                         <h3 className="text-xl font-semibold text-green-500 mb-4 ml-20 lg:ml-28 ">TRANSACTIONS</h3>
-                        <div className="rounded-xl px-6 py-8 shadow-md mx-4 lg:ml-28 md:mr-0 w-[350px] md:w-[750px]">
+                        <div className="rounded-xl px-6 py-8 shadow-md mx-1 md:ml-4 lg:ml-28 md:mr-0 w-[350px] md:w-[750px]">
                             <div className="overflow-x-auto">
                                 <table className="table-auto w-full text-sm">
                                     <thead>
@@ -497,7 +497,7 @@ const SecureTransaction = () => {
                                 </table>
                             </div>
                         </div>
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </div>

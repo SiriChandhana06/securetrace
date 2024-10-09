@@ -1,11 +1,12 @@
 import React from 'react'
-import Navbar from './Navbar'
+// import Navbar from './Navbar'
+import SecureTransaction from './SecureTransaction';
 import Dashboard from './Dashboard';
 
 const Home = () => {
     return (
         <div>
-            <div>
+            {/* <div>
                 <Navbar />
             </div>
             <div>
@@ -29,8 +30,11 @@ const Home = () => {
                     </div>
                 </div>
 
-            </div>
+            </div> */}
 
+            <div>
+                <SecureTransaction/>
+            </div>
             <div>
                 <Dashboard />
             </div>
