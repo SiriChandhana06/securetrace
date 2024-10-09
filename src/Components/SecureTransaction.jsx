@@ -70,7 +70,8 @@ const SecureTransaction = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-80">
                 {/* <div className="grid grid-cols-1"> */}
                     <div className="lg:col-span-1 flex flex-col gap-10">
-                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] mx-2 md:ml-20 lg:ml-12 md:mr-0">
+                        <div className='flex justify-center md:block'>
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
                             <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
                             <div className='md:flex gap-10'>
                                 <div className='mt-6'>
@@ -109,9 +110,11 @@ const SecureTransaction = () => {
                                 </div>
                             </div>
                         </div>
+                        </div>
 
                         <div>
-                            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-12">TOP ENTITIES</h3>
+                            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 md:ml-12 text-center md:text-left">TOP ENTITIES</h3>
+                            <div className='flex justify-center md:block'>
                             <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
                                 <div className="flex items-center gap-4">
                                     <img
@@ -215,12 +218,13 @@ const SecureTransaction = () => {
                                 </table>
                                 </div>
                             </div>
+                            </div>
                         </div>
                     </div>
 
                     <div className=''>
-                        <h3 className="text-xl font-semibold text-green-500 mb-4 ml-20 lg:ml-28 ">TRANSACTIONS</h3>
-                        <div className="rounded-xl px-6 py-8 shadow-md mx-1 md:ml-4 lg:ml-28 md:mr-0 w-[350px] md:w-[750px]">
+                        <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 md:ml-20 lg:ml-28 text-center md:text-left">TRANSACTIONS</h3>
+                        <div className="rounded-xl px-6 py-8 shadow-md ml-0 md:ml-4 lg:ml-28 md:mr-0 w-[350px] md:w-[750px] flex justify-center md:block">
                             <div className="overflow-x-auto">
                                 <table className="table-auto w-full text-sm">
                                     <thead>
