@@ -115,7 +115,7 @@ const SecureTransaction = () => {
                         <div>
                             <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 md:ml-12 text-center md:text-left">TOP ENTITIES</h3>
                             <div className='flex justify-center md:block'>
-                            <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                            <div className="border border-green-500 rounded-xl p-4 md:p-6 shadow-md w-[350px] md:w-[640px] ml-0 md:ml-20 lg:ml-12">
                                 <div className="flex items-center gap-4">
                                     <img
                                         className="h-12 w-12"
