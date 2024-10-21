@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [userEmail, setUserEmail] = useState('');
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
+
+    useEffect(() => {
+        const storedEmail = localStorage.getItem('userEmail');
+        if (storedEmail) {
+          setUserEmail(storedEmail);
+        }
+      }, []);
+
 
     return (
         <nav className="bg-[#303030] p-4 rounded-full flex justify-between items-center mx-4 lg:mx-32 my-4">
@@ -20,10 +30,15 @@ const Navbar = () => {
                 <a href="/visualizer" className="hover:text-gray-400">Visualizer</a>
                 <a href="/portfoliotracker" className="hover:text-gray-400">Portfolio Tracker</a>
             </div>
-
-            <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
-                Username@gmail.com
-            </button>
+            {userEmail ? (
+                 <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">{userEmail}</button>
+             ) : (
+            <Link to='/loginpage'>
+                <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
+                    Login
+                </button>
+            </Link>
+        )}
 
             <div className="md:hidden text-white" onClick={toggleMenu}>
                 {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -34,9 +49,11 @@ const Navbar = () => {
                     <a href="/" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
                     <a href="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</a>
                     <a href="/portfoliotracker" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</a>
+                    <Link to='/loginpage'>
                     <button className="bg-white text-black rounded-full px-4 py-2">
-                        Username@gmail.com
+                        Login
                     </button>
+                    </Link>
                 </div>
             )}
         </nav>
