@@ -10,15 +10,16 @@ const PortfolioTracker = () => {
             <div>
                 <Navbar />
             </div>
+            
             <div>
-                <AddressCard/>
+                <AddressCard />
             </div>
             <div className='mx-4 md:mx-32 lg:flex lg:gap-10 lg:justify-center'>
                 <div className="">
-                    <Portfolio/>
+                    <Portfolio />
                 </div>
                 <div className="mt-10 lg:mt-0">
-                    <Transfer/>
+                    <Transfer />
                 </div>
             </div>
             <div className='text-black my-10'>
