@@ -70,6 +70,7 @@ const SecureTransaction = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-80">
                 {/* <div className="grid grid-cols-1"> */}
                     <div className="lg:col-span-1 flex flex-col gap-10">
+                    <div className="h-[500px] md:h-[780px] md:w-[780px] lg:w-[710px] overflow-y-auto" id='hide-scrollbar'>
                         <div className='flex justify-center md:block'>
                         <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
                             <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
@@ -112,7 +113,177 @@ const SecureTransaction = () => {
                         </div>
                         </div>
 
-                        <div>
+                        <div className='flex justify-center mt-5 md:block'>
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                            <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
+                            <div className='md:flex gap-10'>
+                                <div className='mt-6'>
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            className="h-12 w-12"
+                                            src={layerzero}
+                                            alt="Token"
+                                        />
+                                        <div>
+                                            <h4 className="text-2xl font-bold">LayerZero</h4>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl mt-5 text-green-500 font-bold">$5.05</h4>
+                                        <p className="text-lg text-[#3C704F] font-semibold">+0.28</p>
+                                    </div>
+                                </div>
+                                <div className='flex justify-between gap-10 md:gap-24'>
+                                    <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                        <li>24H Volume</li>
+                                        <li>Market Cap</li>
+                                        <li>All Time High</li>
+                                        <li>All Time Low</li>
+                                        <li>Circulating Supply</li>
+                                        <li>Total Supply</li>
+                                    </ul>
+                                    <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                        <li>$322,161,329.00</li>
+                                        <li>$566,596,228.95</li>
+                                        <li>$5.53</li>
+                                        <li>$2.48</li>
+                                        <li>112,152,856.088</li>
+                                        <li>1,000,000,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className='flex justify-center mt-5 md:block'>
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                            <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
+                            <div className='md:flex gap-10'>
+                                <div className='mt-6'>
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            className="h-12 w-12"
+                                            src={layerzero}
+                                            alt="Token"
+                                        />
+                                        <div>
+                                            <h4 className="text-2xl font-bold">LayerZero</h4>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl mt-5 text-green-500 font-bold">$5.05</h4>
+                                        <p className="text-lg text-[#3C704F] font-semibold">+0.28</p>
+                                    </div>
+                                </div>
+                                <div className='flex justify-between gap-10 md:gap-24'>
+                                    <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                        <li>24H Volume</li>
+                                        <li>Market Cap</li>
+                                        <li>All Time High</li>
+                                        <li>All Time Low</li>
+                                        <li>Circulating Supply</li>
+                                        <li>Total Supply</li>
+                                    </ul>
+                                    <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                        <li>$322,161,329.00</li>
+                                        <li>$566,596,228.95</li>
+                                        <li>$5.53</li>
+                                        <li>$2.48</li>
+                                        <li>112,152,856.088</li>
+                                        <li>1,000,000,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className='flex justify-center mt-5 md:block'>
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                            <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
+                            <div className='md:flex gap-10'>
+                                <div className='mt-6'>
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            className="h-12 w-12"
+                                            src={layerzero}
+                                            alt="Token"
+                                        />
+                                        <div>
+                                            <h4 className="text-2xl font-bold">LayerZero</h4>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl mt-5 text-green-500 font-bold">$5.05</h4>
+                                        <p className="text-lg text-[#3C704F] font-semibold">+0.28</p>
+                                    </div>
+                                </div>
+                                <div className='flex justify-between gap-10 md:gap-24'>
+                                    <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                        <li>24H Volume</li>
+                                        <li>Market Cap</li>
+                                        <li>All Time High</li>
+                                        <li>All Time Low</li>
+                                        <li>Circulating Supply</li>
+                                        <li>Total Supply</li>
+                                    </ul>
+                                    <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                        <li>$322,161,329.00</li>
+                                        <li>$566,596,228.95</li>
+                                        <li>$5.53</li>
+                                        <li>$2.48</li>
+                                        <li>112,152,856.088</li>
+                                        <li>1,000,000,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div className='flex justify-center mt-5 md:block'>
+                        <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                            <h3 className="text-xl font-semibold text-green-500 mb-4">TRENDING TOKEN PAGES</h3>
+                            <div className='md:flex gap-10'>
+                                <div className='mt-6'>
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            className="h-12 w-12"
+                                            src={layerzero}
+                                            alt="Token"
+                                        />
+                                        <div>
+                                            <h4 className="text-2xl font-bold">LayerZero</h4>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl mt-5 text-green-500 font-bold">$5.05</h4>
+                                        <p className="text-lg text-[#3C704F] font-semibold">+0.28</p>
+                                    </div>
+                                </div>
+                                <div className='flex justify-between gap-10 md:gap-24'>
+                                    <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                        <li>24H Volume</li>
+                                        <li>Market Cap</li>
+                                        <li>All Time High</li>
+                                        <li>All Time Low</li>
+                                        <li>Circulating Supply</li>
+                                        <li>Total Supply</li>
+                                    </ul>
+                                    <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                        <li>$322,161,329.00</li>
+                                        <li>$566,596,228.95</li>
+                                        <li>$5.53</li>
+                                        <li>$2.48</li>
+                                        <li>112,152,856.088</li>
+                                        <li>1,000,000,000</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                        </div>
+
+                        {/* <div>
                             <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 md:ml-12 text-center md:text-left">TOP ENTITIES</h3>
                             <div className='flex justify-center md:block'>
                             <div className="border border-green-500 rounded-xl p-4 md:p-6 shadow-md w-[350px] md:w-[640px] ml-0 md:ml-20 lg:ml-12">
@@ -219,7 +390,7 @@ const SecureTransaction = () => {
                                 </div>
                             </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className=''>
