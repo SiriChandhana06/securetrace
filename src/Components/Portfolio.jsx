@@ -1,8 +1,18 @@
 import React from 'react';
+import { useState } from 'react';
 import Port from "../Assests/Portfolio.png";
 import { TiArrowSortedDown } from "react-icons/ti";
 
+
 const Portfolio = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const chains = ['Ethereum', 'Binance Smart Chain', 'Polygon', 'Avalanche'];
+
+    const data = [
+        { asset: 'Berry', price: '$52.00K', change: '+0.02', holdings: '52.005 Berry', value: '$52.00K' },
+        { asset: 'USDI', price: '$12.00K', change: '+0.02', holdings: '12.00K USDI', value: '$12.00K' },
+    ];
+
     return (
         <div>
             <div className="bg-white p-6 sm:w-[300px] md:w-full rounded-xl border border-black shadow-md shadow-gray-500">
@@ -12,10 +22,26 @@ const Portfolio = () => {
                         <h3 className="text-xl lg:text-2xl font-semibold">Portfolio</h3>
                     </div>
                     <div>
-                        <button className="flex gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
+                        <button onClick={() => setIsOpen(!isOpen)} className="flex gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
                             <span className="font-semibold">Filter by Chain</span>
                             <TiArrowSortedDown />
                         </button>
+                        {isOpen && (
+                            <div className="absolute mt-2 bg-white border border-gray-300 rounded-lg shadow-lg">
+                                {chains.map((chain, index) => (
+                                    <div
+                                        key={index}
+                                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                                        onClick={() => {
+                                            console.log(`Selected chain: ${chain}`);
+                                            setIsOpen(false); // Close dropdown on select
+                                        }}
+                                    >
+                                        {chain}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -45,66 +71,14 @@ const Portfolio = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td className='px-4'>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$52.005 Berry</td>
-                                <td>$52.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
-                            <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                <td>USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                                <td>$12.00K USDI</td>
-                                <td>$12.00K <span className="text-green-500">+0.02</span></td>
-                            </tr>
+                        {data.map((item, index) => (
+                        <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
+                            <td>{item.asset}</td>
+                            <td>{item.price} <span className="text-green-500">{item.change}</span></td>
+                            <td>{item.holdings}</td>
+                            <td>{item.value} <span className="text-green-500">{item.change}</span></td>
+                        </tr>
+                    ))}
                         </tbody>
                     </table>
                 </div>
