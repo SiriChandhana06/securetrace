@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import btc from '../Assests/Bitcoin.png';
+import axios from "axios";
 
 
 const Transfer = () => {
@@ -8,166 +9,14 @@ const Transfer = () => {
     const transferData = [
         {
             icon: btc,
-            time: '1 day ago',
+            time: '0 day ago',
             from: '0xD78...35Cx',
             to: '0xD78...35Cx',
-            value: '3.56K',
+            value: '0.00K',
             token: 'USDT',
-            usd: '$4.00K',
+            usd: '$0.00K',
         },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '3.56K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
-        {
-            icon: btc,
-            time: '1 day ago',
-            from: '0xD78...35Cx',
-            to: '0xD78...35Cx',
-            value: '1K',
-            token: 'USDT',
-            usd: '$4.00K',
-        },
+        
     ];
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -185,6 +34,43 @@ const Transfer = () => {
         }
     };
 
+    const [transfers, setTransfers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        const fetchTransfers = async () => {
+          setLoading(true);
+    
+          try {
+            const response = await axios.get(
+              "https://caiman-wanted-fox.ngrok-free.app/token-transfers/0x04b21735E93Fa3f8df70e2Da89e6922616891a88",
+              {
+                headers: {
+                  "ngrok-skip-browser-warning": "true",
+    
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+    
+            setTransfers(response.data);
+    
+            setLoading(false);
+          } catch (error) {
+            console.log("error", error);
+    
+            setLoading(false);
+          }
+        };
+    
+        fetchTransfers();
+      }, []);
+
+      useEffect(
+        ()=>{
+            console.log("Transfres from:",transfers.from);   
+        },[transfers]
+      )
+      
 
     return (
         <div>
@@ -253,21 +139,50 @@ const Transfer = () => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {currentRows.map((transfer, index) => (
-                                    <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white text-center">
-                                        <td className='flex justify-center items-center mt-2'><img src={transfer.icon} alt={transfer.token} /></td>
-                                        <td className="text-green-500">{transfer.time}</td>
-                                        <td>{transfer.from}</td>
-                                        <td>{transfer.to}</td>
-                                        {/* <td className='text-green-500'>{transfer.value}</td> */}
-                                        <td className={`text-${parseFloat(transfer.value.replace('K', '')) <= 1 ? 'red' : 'green'}-500`}>
-                                            {transfer.value}
+                            <tbody className="bg-red-600">
+
+
+
+
+                                
+                                {transfers.from && transfers.from.length>0 ?
+                                (transfers.from[0].map((transfer, index) => {
+                                    const {icon, timestamp, from, to, value, tokenName, tokenPrice} = transfer;
+                                    return (
+                                        <tr key={index} className="border-t  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
+                                            <td className='flex justify-center items-center mt-2 '><img src={icon} alt={tokenName} /></td>
+                                            <td className="text-green-500 me-3">{timestamp}</td>
+                                            <td className="me-3">{from}</td>
+                                            <td className="me-3">{to}</td>
+                                            {/* <td className='text-green-500'>{transfer.value}</td> */}
+                                            <td className="text-green-500">
+                                                {tokenPrice}
+                                            </td>
+                                            <td>{tokenName}</td>
+                                            <td>{value}</td>
+                                        </tr>
+                                    );
+                                }))
+                                :
+                                (
+                                    <tr  className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white text-center">
+                                        <td className='flex justify-center items-center mt-2'><img src={btc} alt="Token Name" /></td>
+                                        <td className="text-green-500">0 days ago</td>
+                                        <td>0000....000</td>
+                                        <td>0000....000</td>
+                                        <td className='text-green-500'>0.00</td>
+                                        <td className="text-green-500">
+                                            0.00
                                         </td>
-                                        <td>{transfer.token}</td>
-                                        <td>{transfer.usd}</td>
+                                        <td>BTC</td>
+                                        <td>$0.00</td>
                                     </tr>
-                                ))}
+                                )
+                            }
+
+
+
+
                             </tbody>
                         </table>
                     </div>

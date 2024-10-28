@@ -93,7 +93,8 @@ const SecureTransaction = () => {
 
 
   useEffect(() => {
-    // console.log("Transactions:", transactions);
+    console.log("Transactions:", transactions);
+    console.log("trendingTokens",trendingTokens);
     console.log("Trending Tokens:", trendingTokens);
   }, [trendingTokens]);
 
@@ -148,7 +149,8 @@ const SecureTransaction = () => {
             >
 
               <div className="flex justify-center md:block gap-4">
-              {trendingTokens && trendingTokens.length > 0 ? (
+              {trendingTokens && trendingTokens.length > 0 ? 
+              (
                   trendingTokens.map((token, index) => {
                     const { image, name,price_change_24h, current_price,ath, atl,market_cap,total_supply, circulating_supply,total_volume } = token;
                     return (
