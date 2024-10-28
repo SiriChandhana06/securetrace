@@ -176,8 +176,6 @@ const Transfer = () => {
                             }
 
 
-
-
                             </tbody>
                         </table>
                     </div>
