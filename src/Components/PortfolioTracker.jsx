@@ -6,7 +6,7 @@ import AddressCard from './AddressCard';
 
 const PortfolioTracker = () => {
     return (
-        <div>
+        <div className='overflow-x-hidden'>
             <div>
                 <Navbar />
             </div>
@@ -14,7 +14,7 @@ const PortfolioTracker = () => {
             <div>
                 <AddressCard />
             </div>
-            <div className='mx-4 md:mx-32 lg:flex lg:gap-10 lg:justify-center'>
+            <div className='mx-4 md:mx-32 grid grid-cols-1 lg:grid-cols-2 lg:gap-10 lg:justify-center'>
                 <div className="">
                     <Portfolio />
                 </div>

@@ -73,7 +73,7 @@ const Transfer = () => {
       
 
     return (
-        <div>
+        <div className="overflow-x-hidden">
            <div className="bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500">
                     <div className='flex'>
                     <h3 className="text-2xl font-semibold mt-1 mb-4">Transfers</h3>
@@ -97,7 +97,7 @@ const Transfer = () => {
                         </button>
                     </div>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-scroll">
                         <table className="w-full text-center">
                             <thead className=''>
                                 <tr className="text-gray-500 ">
@@ -140,11 +140,6 @@ const Transfer = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-red-600">
-
-
-
-
-                                
                                 {transfers.from && transfers.from.length>0 ?
                                 (transfers.from[0].map((transfer, index) => {
                                     const {icon, timestamp, from, to, value, tokenName, tokenPrice} = transfer;
@@ -171,9 +166,9 @@ const Transfer = () => {
                                         <td>0000....000</td>
                                         <td>0000....000</td>
                                         <td className='text-green-500'>0.00</td>
-                                        <td className="text-green-500">
+                                        {/* <td className="text-green-500">
                                             0.00
-                                        </td>
+                                        </td> */}
                                         <td>BTC</td>
                                         <td>$0.00</td>
                                     </tr>
