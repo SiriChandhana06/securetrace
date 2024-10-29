@@ -1,17 +1,54 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Port from "../Assests/Portfolio.png";
 import { TiArrowSortedDown } from "react-icons/ti";
-
+import axios from "axios";
 
 const Portfolio = () => {
     const [isOpen, setIsOpen] = useState(false);
     const chains = ['Ethereum', 'Binance Smart Chain', 'Polygon', 'Avalanche'];
+    const [loading, setLoading] = useState(false);
+    const [portfolioData, SetPortfolioData] = useState([]);
 
     const data = [
         { asset: 'Berry', price: '$52.00K', change: '+0.02', holdings: '52.005 Berry', value: '$52.00K' },
         { asset: 'USDI', price: '$12.00K', change: '+0.02', holdings: '12.00K USDI', value: '$12.00K' },
     ];
+
+    useEffect(() => {
+        const fetchPortfolioTracker = async () => {
+            setLoading(true);
+
+            try {
+                const response = await axios.get(
+                    "https://caiman-wanted-fox.ngrok-free.app/fetch-address-details/0x04b21735E93Fa3f8df70e2Da89e6922616891a88",
+                    {
+                        headers: {
+                            "ngrok-skip-browser-warning": "true",
+
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                SetPortfolioData(response.data);
+
+                setLoading(false);
+            } catch (error) {
+                console.log("error", error);
+
+                setLoading(false);
+            }
+        };
+
+        fetchPortfolioTracker();
+    }, []);
+
+    useEffect(
+        () => {
+            console.log("portfolio from:", portfolioData.from);
+        }, [portfolioData]
+    )
 
     return (
         <div>
@@ -71,15 +108,34 @@ const Portfolio = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {data.map((item, index) => (
-                        <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                            <td>{item.asset}</td>
-                            <td>{item.price} <span className="text-green-500">{item.change}</span></td>
-                            <td>{item.holdings}</td>
-                            <td>{item.value} <span className="text-green-500">{item.change}</span></td>
-                        </tr>
-                    ))}
+                            {portfolioData.from && portfolioData.from.length > 0 ? (
+                                portfolioData.from.map((item, index) => {
+                                    const asset = item.tokenName;
+                                    const price = parseFloat(item.tokenPrice).toFixed(2);
+                                    const holdings = parseFloat(item.tokenBalance).toFixed(4);
+                                    const value = (price * holdings).toFixed(2); // Calculate value as price * balance
+
+                                    return (
+                                        <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
+                                            <td>{asset}</td>
+                                            <td>${price}</td>
+                                            <td>{holdings}</td>
+                                            <td>${value}</td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                data.map((item, index) => (
+                                    <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
+                                        <td>{item.asset}</td>
+                                        <td>{item.price} <span className="text-green-500">{item.change}</span></td>
+                                        <td>{item.holdings}</td>
+                                        <td>{item.value}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
+
                     </table>
                 </div>
             </div>
