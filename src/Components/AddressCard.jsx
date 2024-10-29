@@ -40,7 +40,7 @@ const AddressCard = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(cardData.address);
-    alert('Address copied to clipboard!');
+    // alert('Address copied to clipboard!');
   };
 
   const handleScanNow = () => {

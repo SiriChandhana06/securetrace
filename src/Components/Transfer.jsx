@@ -21,6 +21,8 @@ const Transfer = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;
+    const [transfers, setTransfers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
 
     const totalPages = Math.ceil(transferData.length / rowsPerPage);
@@ -34,8 +36,8 @@ const Transfer = () => {
         }
     };
 
-    const [transfers, setTransfers] = useState([]);
-    const [loading, setLoading] = useState(false);
+
+
     useEffect(() => {
         const fetchTransfers = async () => {
             setLoading(true);
@@ -73,7 +75,7 @@ const Transfer = () => {
 
 
     return (
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-hidden" id="hide-scrollbar">
             <div className="bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500">
                 <div className='flex'>
                     <h3 className="text-2xl font-semibold mt-1 mb-4">Transfers</h3>
@@ -97,7 +99,7 @@ const Transfer = () => {
                         </button>
                     </div>
                 </div>
-                <div className="overflow-x-scroll">
+                <div className="overflow-x-scroll"  id="hide-scrollbar">
                     <table className="w-full text-center">
                         <thead className=''>
                             <tr className="text-gray-500 ">
@@ -113,7 +115,7 @@ const Transfer = () => {
                                         <h1>From</h1>
                                     </div>
                                 </th>
-                                <th className=' px-6'>
+                                <th className='px-6'>
                                     <div className="flex justify-center items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
                                         <h1>To</h1>
@@ -139,7 +141,7 @@ const Transfer = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-red-600">
+                        <tbody className="bg-red-600 text-center">
                             {transfers.from && transfers.from.length > 0 ?
                                 (transfers.from[0].map((transfer, index) => {
                                     const { icon, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
@@ -160,11 +162,11 @@ const Transfer = () => {
                                 }))
                                 :
                                 (
-                                    <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white text-center">
+                                    <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
                                         <td className='flex justify-center items-center mt-2'><img src={btc} alt="Token Name" /></td>
-                                        <td className="text-green-500">0 days ago</td>
-                                        <td>0000....000</td>
-                                        <td>0000....000</td>
+                                        <td className="text-green-500 text-center">0 days ago</td>
+                                        <td className="text-center">0000....000</td>
+                                        <td className="text-center">0000....000</td>
                                         <td className='text-green-500'>0.00</td>
                                         {/* <td className="text-green-500">
                                             0.00

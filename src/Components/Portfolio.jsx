@@ -11,8 +11,8 @@ const Portfolio = () => {
     const [portfolioData, SetPortfolioData] = useState([]);
 
     const data = [
-        { asset: 'Berry', price: '$52.00K', change: '+0.02', holdings: '52.005 Berry', value: '$52.00K' },
-        { asset: 'USDI', price: '$12.00K', change: '+0.02', holdings: '12.00K USDI', value: '$12.00K' },
+        { asset: 'Berry', price: '$00.00K', change: '+0.00', holdings: '00.000 Berry', value: '$00.00K' },
+        { asset: 'USDI', price: '$00.00K', change: '+0.00', holdings: '00.00K USDI', value: '$00.00K' },
     ];
 
     useEffect(() => {
