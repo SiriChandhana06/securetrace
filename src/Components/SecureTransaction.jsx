@@ -22,7 +22,7 @@ import axios from "axios";
 const SecureTransaction = () => {
   const [inputValue, setInputValue] = useState("");
   const [transactions, setTransactions] = useState([]);
-  const [trendingTokens , setTrendingTokens] = useState([]);
+  const [trendingTokens, setTrendingTokens] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -94,7 +94,7 @@ const SecureTransaction = () => {
 
   useEffect(() => {
     console.log("Transactions:", transactions);
-    console.log("trendingTokens",trendingTokens);
+    console.log("trendingTokens", trendingTokens);
     console.log("Trending Tokens:", trendingTokens);
   }, [trendingTokens]);
 
@@ -144,124 +144,131 @@ const SecureTransaction = () => {
 
           <div className="lg:col-span-1 flex flex-col gap-10">
             <div
-              className="h-[500px] md:h-[780px] md:w-[780px] lg:w-[710px] overflow-y-auto"
+              className="h-[500px] md:h-[780px] lg:h-[850px] md:w-[780px] lg:w-[710px] overflow-y-auto"
               id="hide-scrollbar"
             >
 
-              <div className="flex justify-center md:block gap-4">
-              {trendingTokens && trendingTokens.length > 0 ? 
-              (
-                  trendingTokens.map((token, index) => {
-                    const { image, name,price_change_24h, current_price,ath, atl,market_cap,total_supply, circulating_supply,total_volume } = token;
-                    return (
-                      <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12 mb-4">
-                        <h3 className="text-xl font-semibold text-green-500 mb-4">
+              <div className="block">
+                <h3 className="text-xl font-semibold text-green-500 mb-4  ml-0 lg:ml-12 text-center lg:text-left">
+                  TRENDING TOKEN PAGES
+                </h3>
+                {trendingTokens && trendingTokens.length > 0 ?
+                  (
+                    trendingTokens.map((token, index) => {
+                      const { image, name, price_change_24h, current_price, ath, atl, market_cap, total_supply, circulating_supply, total_volume } = token;
+                      return (
+                        <div>
+                          <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12 mb-4">
+                            {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
                           TRENDING TOKEN PAGES
-                        </h3>
+                        </h3> */}
 
-                        <div className="md:flex gap-10">
-                          <div className="mt-6">
-                            <div className="flex items-center gap-4">
-                              <img
-                                className="h-12 w-12"
-                                src={image}
-                                alt="Token"
-                              />
+                            <div className="md:flex gap-10">
+                              <div className="mt-6">
+                                <div className="flex items-center gap-4">
+                                  <img
+                                    className="h-12 w-12"
+                                    src={image}
+                                    alt="Token"
+                                  />
 
-                              <div>
-                                <h4 className="text-2xl font-bold">
-                                  {name}
-                                </h4>
+                                  <div>
+                                    <h4 className="text-2xl font-bold">
+                                      {name}
+                                    </h4>
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <h4 className="text-2xl mt-5 text-green-500 font-bold">
+                                    ${current_price}
+                                  </h4>
+                                  <p className="text-lg text-[#3C704F] font-semibold">
+                                    {price_change_24h.toFixed(2)}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-between gap-10 md:gap-24">
+                                <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                  <li className="text-nowrap">24H Volume</li>
+                                  <li className="text-nowrap">Market Cap</li>
+                                  <li className="text-nowrap">All Time High</li>
+                                  <li className="text-nowrap">All Time Low</li>
+                                  <li className="text-nowrap">Circulating Supply</li>
+                                  <li className="text-nowrap">Total Supply</li>
+                                </ul>
+
+                                <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                  <li>${total_volume}</li>
+                                  <li>${market_cap}</li>
+                                  <li>${ath}</li>
+                                  <li>${atl}</li>
+                                  <li>{circulating_supply}</li>
+                                  <li>{total_supply}</li>
+                                </ul>
                               </div>
                             </div>
-
-                            <div>
-                              <h4 className="text-2xl mt-5 text-green-500 font-bold">
-                                ${current_price}
-                              </h4>
-                              <p className="text-lg text-[#3C704F] font-semibold">
-                                {price_change_24h.toFixed(2)}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-between gap-10 md:gap-24">
-                            <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
-                              <li className="text-nowrap">24H Volume</li>
-                              <li className="text-nowrap">Market Cap</li>
-                              <li className="text-nowrap">All Time High</li>
-                              <li className="text-nowrap">All Time Low</li>
-                              <li className="text-nowrap">Circulating Supply</li>
-                              <li className="text-nowrap">Total Supply</li>
-                            </ul>
-
-                            <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
-                              <li>${total_volume}</li>
-                              <li>${market_cap}</li>
-                              <li>${ath}</li>
-                              <li>${atl}</li>
-                              <li>{circulating_supply}</li>
-                              <li>{total_supply}</li>
-                            </ul>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="border border-green-500 rounded-xl p-6 shadow-md w-[350px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
-                        <h3 className="text-xl font-semibold text-green-500 mb-4">
-                          TRENDING TOKEN PAGES
-                        </h3>
+                      );
+                    })
+                  ) : (
+                    <div className="flex justify-center">
+                    <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
+                      {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
+                        TRENDING TOKEN PAGES
+                      </h3> */}
 
-                        <div className="md:flex gap-10">
-                          <div className="mt-6">
-                            <div className="flex items-center gap-4">
-                              <img
-                                className="h-12 w-12"
-                                src={layerzero}
-                                alt="Token"
-                              />
-
-                              <div>
-                                <h4 className="text-2xl font-bold">
-                                  LayerZero
-                                </h4>
-                              </div>
-                            </div>
+                      <div className="md:flex gap-10">
+                        <div className="mt-6">
+                          <div className="flex items-center gap-4">
+                            <img
+                              className="h-12 w-12"
+                              src={layerzero}
+                              alt="Token"
+                            />
 
                             <div>
-                              <h4 className="text-2xl mt-5 text-green-500 font-bold">
-                                $0.00
+                              <h4 className="text-2xl font-bold">
+                                LayerZero
                               </h4>
-                              <p className="text-lg text-[#3C704F] font-semibold">
-                                0.00
-                              </p>
                             </div>
                           </div>
 
-                          <div className="flex justify-between gap-10 md:gap-24">
-                            <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
-                              <li>24H Volume</li>
-                              <li>Market Cap</li>
-                              <li>All Time High</li>
-                              <li>All Time Low</li>
-                              <li>Circulating Supply</li>
-                              <li>Total Supply</li>
-                            </ul>
-
-                            <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
-                              <li>$000,00,000.00</li>
-                              <li>$00,000,000.00</li>
-                              <li>$0.00</li>
-                              <li>$0.00</li>
-                              <li>000,000,000.000</li>
-                              <li>0,000,000</li>
-                            </ul>
+                          <div>
+                            <h4 className="text-2xl mt-5 text-green-500 font-bold">
+                              $0.00
+                            </h4>
+                            <p className="text-lg text-[#3C704F] font-semibold">
+                              0.00
+                            </p>
                           </div>
                         </div>
+
+                        <div className="flex justify-between gap-10 md:gap-24">
+                          <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                            <li>24H Volume</li>
+                            <li>Market Cap</li>
+                            <li>All Time High</li>
+                            <li>All Time Low</li>
+                            <li>Circulating Supply</li>
+                            <li>Total Supply</li>
+                          </ul>
+
+                          <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                            <li>$000,00,000.00</li>
+                            <li>$00,000,000.00</li>
+                            <li>$0.00</li>
+                            <li>$0.00</li>
+                            <li>000,000,000.000</li>
+                            <li>0,000,000</li>
+                          </ul>
+                        </div>
                       </div>
-                )}
+                    </div>
+                    </div>
+                  )}
 
 
 
@@ -270,14 +277,14 @@ const SecureTransaction = () => {
 
               </div>
 
-              
+
             </div>
 
-           
+
           </div>
 
           <div className="">
-            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 md:ml-20 lg:ml-28 text-center md:text-left">
+            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0  lg:ml-28 text-center lg:text-left">
               TRANSACTIONS
             </h3>
 
@@ -412,23 +419,23 @@ const SecureTransaction = () => {
                   </thead>
 
                   <tbody>
-                {transactions?.txs && transactions?.txs.length > 0 ? (
-                  transactions.txs[0].map((transaction, index) => {
-                    const { from, to, asset, tokenPrice } = transaction;
-                    return (
-                      <tr key={index} className='h-12 text-center'>
-                        <td className='flex justify-center items-center mt-2 px-4'><img className='h-6 w-6' src={arbi} alt='img' /></td>
-                        <td className='px-4 text-start'>{from}</td>
-                        <td className='px-4 text-start'>{to}</td>
-                        <td className='px-4 flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
-                        <td className='text-[#808183] font-semibold text-lg px-4 text-start'>${tokenPrice}</td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr><td colSpan="5" className="text-center py-4">No transactions available</td></tr>
-                )}
-              </tbody>
+                    {transactions?.txs && transactions?.txs.length > 0 ? (
+                      transactions.txs[0].map((transaction, index) => {
+                        const { from, to, asset, tokenPrice } = transaction;
+                        return (
+                          <tr key={index} className='h-12 text-center'>
+                            <td className='flex justify-center items-center mt-2 px-4'><img className='h-6 w-6' src={arbi} alt='img' /></td>
+                            <td className='px-4 text-start'>{from}</td>
+                            <td className='px-4 text-start'>{to}</td>
+                            <td className='px-4 flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
+                            <td className='text-[#808183] font-semibold text-lg px-4 text-start'>${tokenPrice}</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr><td colSpan="5" className="text-center py-4">No transactions available</td></tr>
+                    )}
+                  </tbody>
                 </table>
               </div>
             </div>

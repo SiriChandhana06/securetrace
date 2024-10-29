@@ -7,7 +7,7 @@ import { useState } from 'react';
 const AddressCard = () => {
 
   const defaultCardData = {
-    address: "0xd2F63453ABd30C2C4496580f8d68ec38C7490D37",
+    address: "0xd2F6345330C2C4496580f8d68ec38C7490D37",
     amount: "$10,491.48",
     greenAmount: "$10,491.48",
   };
@@ -16,7 +16,7 @@ const AddressCard = () => {
   const [inputValue, setInputValue] = useState("");
 
   const jsonData = {
-    "0xd2F63453ABd30C2C4496580f8d68ec38C7490D37": {
+    "0xd2F6345330C2C4496580f8d68ec38C7490D37": {
       amount: "$10,491.48",
       greenAmount: "$10,491.48",
     },
@@ -74,13 +74,13 @@ const AddressCard = () => {
   return (
     <div>
       <div className='flex justify-center mt-6'>
-        <div className="flex flex-col sm:flex-row items-center w-full md:max-w-3xl ">
+        <div className="flex flex-col sm:flex-row items-center w-80 md:w-full md:max-w-3xl ">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Enter transaction hash or address value"
-            className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
+            className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 mx-2 w-full"
           />
           <button onClick={handleScanNow} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
             Scan Now

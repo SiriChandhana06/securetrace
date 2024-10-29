@@ -141,22 +141,22 @@ const Transfer = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-red-600 text-center">
+                        <tbody className=" text-center">
                             {transfers.from && transfers.from.length > 0 ?
                                 (transfers.from[0].map((transfer, index) => {
                                     const { icon, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
                                     return (
                                         <tr key={index} className="border-t  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
-                                            <td className='flex justify-center items-center mt-2 '><img src={icon} alt={tokenName} /></td>
-                                            <td className="text-green-500 me-3">{timestamp}</td>
-                                            <td className="me-3">{from}</td>
-                                            <td className="me-3">{to}</td>
+                                            <td className='flex justify-center items-center mt-2 px-4'><img src={icon} alt={tokenName} /></td>
+                                            <td className="text-green-500 me-3 px-4">{timestamp}</td>
+                                            <td className="me-3 px-4">{from}</td>
+                                            <td className="me-3 px-4">{to}</td>
                                             {/* <td className='text-green-500'>{transfer.value}</td> */}
-                                            <td className="text-green-500">
+                                            <td className="text-green-500 px-4">
                                                 {tokenPrice}
                                             </td>
-                                            <td>{tokenName}</td>
-                                            <td>{value}</td>
+                                            <td className="px-4">{tokenName}</td>
+                                            <td className="px-4">{value}</td>
                                         </tr>
                                     );
                                 }))

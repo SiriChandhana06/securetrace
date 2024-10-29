@@ -31,7 +31,8 @@ const Portfolio = () => {
                     }
                 );
 
-                SetPortfolioData(response.data);
+                SetPortfolioData(response.data.tokens[0]);
+                console.log(response.data.tokens[0]);
 
                 setLoading(false);
             } catch (error) {
@@ -53,13 +54,13 @@ const Portfolio = () => {
     return (
         <div>
             <div className="bg-white p-6 sm:w-[300px] md:w-full rounded-xl border border-black shadow-md shadow-gray-500">
-                <div className='flex  lg:flex-row justify-between items-start lg:items-center'>
+                <div className='flex gap-1 lg:flex-row justify-between items-start lg:items-center'>
                     <div className='flex gap-2 items-center mb-4 lg:mb-0'>
                         <img className='h-8 w-8' src={Port} alt='portfolio' />
                         <h3 className="text-xl lg:text-2xl font-semibold">Portfolio</h3>
                     </div>
                     <div>
-                        <button onClick={() => setIsOpen(!isOpen)} className="flex gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
+                        <button onClick={() => setIsOpen(!isOpen)} className="flex gap-2 md:gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
                             <span className="font-semibold">Filter by Chain</span>
                             <TiArrowSortedDown />
                         </button>
@@ -83,7 +84,7 @@ const Portfolio = () => {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-center">
+                    <table className="w-full mt-2 text-center">
                         <thead>
                             <tr className="h-10">
                                 <th className=' px-4'>Asset</th>
@@ -108,8 +109,8 @@ const Portfolio = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {portfolioData.from && portfolioData.from.length > 0 ? (
-                                portfolioData.from.map((item, index) => {
+                            {portfolioData && portfolioData.length > 0 ? (
+                                portfolioData.map((item, index) => {
                                     const asset = item.tokenName;
                                     const price = parseFloat(item.tokenPrice).toFixed(2);
                                     const holdings = parseFloat(item.tokenBalance).toFixed(4);
@@ -117,10 +118,10 @@ const Portfolio = () => {
 
                                     return (
                                         <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                                            <td>{asset}</td>
-                                            <td>${price}</td>
-                                            <td>{holdings}</td>
-                                            <td>${value}</td>
+                                            <td className='px-4'>{asset}</td>
+                                            <td className='px-4'>${price}</td>
+                                            <td className='px-4'>{holdings}</td>
+                                            <td className='px-4'>${value}</td>
                                         </tr>
                                     );
                                 })
