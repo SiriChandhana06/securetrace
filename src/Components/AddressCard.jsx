@@ -3,17 +3,20 @@ import { FaRegCopy, } from 'react-icons/fa';
 import img from '../Assests/person.png';
 import { FaShareNodes } from 'react-icons/fa6';
 import { useState } from 'react';
+import Portfolio from './Portfolio';
+import Transfer from './Transfer';
 
 const AddressCard = () => {
 
-  const defaultCardData = {
-    address: "0x04b21735E93Fa3f8df70e2Da89e6922616891a88",
-    amount: "$10,491.48",
-    greenAmount: "$10,491.48",
-  };
+  // const defaultCardData = {
+  //   address: "0x04b21735E93Fa3f8df70e2Da89e6922616891a88",
+  //   amount: "$10,491.48",
+  //   greenAmount: "$10,491.48",
+  // };
 
-  const [cardData, setCardData] = useState(defaultCardData);
+  const [cardData, setCardData] = useState(null);
   const [inputValue, setInputValue] = useState("");
+  const [isPortfolioVisible, setIsPortfolioVisible] = useState(false);
 
   const jsonData = {
     "0x04b21735E93Fa3f8df70e2Da89e6922616891a88": {
@@ -45,35 +48,45 @@ const AddressCard = () => {
 
   const handleScanNow = () => {
     if (!inputValue) {
-      alert('Please enter a transaction hash or contract address.');
+      alert('Please enter a contract address.');
       return;
     }
 
     if (!isValidEthereumAddressOrTxHash(inputValue)) {
-      alert('Invalid Ethereum address or transaction hash. Please enter a valid input.');
+      alert('Invalid Ethereum address. Please enter a valid input.');
       return;
     }
 
     const foundData = jsonData[inputValue];
-
     if (foundData) {
-      // Update the card with the found data
       setCardData({
         address: inputValue,
         amount: foundData.amount,
         greenAmount: foundData.greenAmount,
       });
+    setIsPortfolioVisible(true);
     } else {
-      alert('Data not found for the given address or transaction hash.');
+      alert('Data not found for the given address value.');
     }
-
-    // Clear the input after searching
     setInputValue('');
   };
 
   return (
     <div>
-      <div className='flex justify-center mt-6'>
+      <div className='flex items-center justify-center'>
+      <div className=' mt-10 md:mt-20'>
+      <h1 className="text-3xl font-bold text-center mb-4">
+            SecureTrace PortfolioTracker
+          </h1>
+
+          <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+            SecureTrace analyzes transaction data using specialized blockchain
+            forensic techniques, enhancing the detection of intricate patterns
+            and potential vulnerabilities.
+          </p>
+      </div>
+      </div>
+      <div className='flex items-center justify-center mt-6'>
         <div className="flex flex-col sm:flex-row items-center w-80 md:w-full md:max-w-3xl ">
           <input
             type="text"
@@ -87,6 +100,7 @@ const AddressCard = () => {
           </button>
         </div>
       </div>
+      {cardData && (
         <div className="mx-4 md:mx-32 my-10 border border-black rounded-lg shadow-lg shadow-gray-500 p-4 bg-white flex flex-col lg:flex-row items-center gap-4">
 
           <div className="flex-1 ml-0 md:ml-4">
@@ -109,6 +123,18 @@ const AddressCard = () => {
           </div>
           <img src={img} alt='img' />
         </div>
+      )}
+
+      {isPortfolioVisible && (
+        <div className='mx-4 md:mx-32 '>
+        <div className="">
+            <Portfolio />
+        </div>
+        <div className="mt-10 ">
+            <Transfer />
+        </div>
+    </div>
+      )}
     </div>
   );
 };
