@@ -139,14 +139,14 @@ const SecureTransaction = () => {
 
       <div className="flex justify-center items-center xl:items-start flex-wrap">
 
-        <div className=" w-full xl:w-[50%] flex justify-center items-center">
+        <div className=" w-full xl:w-[48%] flex justify-center items-center">
           <div
             className="overflow-y-auto w-full"
             id="hide-scrollbar"
           >
 
             <div className=" w-full">
-              <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-20 text-center xl:text-left ">
+              <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-16 text-center xl:text-left ">
                 TRENDING TOKEN PAGES
               </h3>
               {trendingTokens && trendingTokens.length > 0 ?
@@ -280,7 +280,7 @@ const SecureTransaction = () => {
 
         </div>
 
-        <div className="  w-full xl:w-[50%] ">
+        <div className=" w-full xl:w-[50%] ">
 
           <h3 className="text-xl font-semibold text-green-500 mb-4 text-center xl:text-left mt-10 md:mt-0">
             TRANSACTIONS
@@ -424,10 +424,10 @@ const SecureTransaction = () => {
                         return (
                           <tr key={index} className='h-12 text-center'>
                             <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={arbi} alt='img' /></td>
-                            <td className=' text-start'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
-                            <td className=' text-start'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
-                            <td className=' flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
-                            <td className='text-[#808183] font-semibold text-lg  text-start'>${tokenPrice}</td>
+                            <td className=' text-center'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
+                            <td className=' text-center'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
+                            <td className=' flex gap-2 justify-center items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
+                            <td className='text-[#808183] font-semibold text-lg  text-Center'>${tokenPrice}</td>
                           </tr>
                         );
                       })
