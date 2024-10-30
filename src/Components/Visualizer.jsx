@@ -221,9 +221,6 @@ const Visualizer = () => {
     return (
         <div>
             <div>
-                <Navbar />
-            </div>
-            <div>
                 <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
                     <h1 className="text-3xl font-bold text-center mb-4">
                         SecureTrace

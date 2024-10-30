@@ -99,12 +99,10 @@ const SecureTransaction = () => {
   }, [trendingTokens]);
 
   return (
-    <div>
-      <div>
-        <Navbar />
-      </div>
+    <div className="w-full bg-white">
+      
 
-      <div>
+      <div className="">
         <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
           <h1 className="text-3xl font-bold text-center mb-4">
             SecureTrace Transactions
@@ -138,18 +136,17 @@ const SecureTransaction = () => {
         </div>
       </div>
 
-      <div className="container px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-80">
-          {/* <div className="grid grid-cols-1"> */}
-
-          <div className="lg:col-span-1 flex flex-col gap-10">
+      
+        <div className="flex justify-center items-center xl:items-start flex-wrap">
+         
+          <div className=" w-full xl:w-[50%] flex justify-center items-center">
             <div
-              className="h-[500px] md:h-[780px] lg:h-[850px] md:w-[780px] lg:w-[710px] overflow-y-auto"
+              className="overflow-y-auto w-full"
               id="hide-scrollbar"
             >
 
-              <div className="block">
-                <h3 className="text-xl font-semibold text-green-500 mb-4  ml-0 lg:ml-12 text-center lg:text-left">
+              <div className=" w-full">
+                <h3 className="text-xl font-semibold text-green-500 mb-4  ml-0 lg:ml-12 text-center xl:text-left ">
                   TRENDING TOKEN PAGES
                 </h3>
                 {trendingTokens && trendingTokens.length > 0 ?
@@ -158,13 +155,13 @@ const SecureTransaction = () => {
                       const { image, name, price_change_24h, current_price, ath, atl, market_cap, total_supply, circulating_supply, total_volume } = token;
                       return (
                         <div>
-                          <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12 mb-4">
+                          <div className="border border-green-500 rounded-xl p-4 sm:p-6  shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
                             {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
                           TRENDING TOKEN PAGES
                         </h3> */}
 
-                            <div className="md:flex gap-10">
-                              <div className="mt-6">
+                            <div className="md:flex ">
+                              <div className=" md:mt-6 md:w-[30%] ">
                                 <div className="flex items-center gap-4">
                                   <img
                                     className="h-12 w-12"
@@ -189,7 +186,7 @@ const SecureTransaction = () => {
                                 </div>
                               </div>
 
-                              <div className="flex justify-between gap-10 md:gap-24">
+                              <div className="flex justify-between md:w-[70%]">
                                 <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
                                   <li className="text-nowrap">24H Volume</li>
                                   <li className="text-nowrap">Market Cap</li>
@@ -283,17 +280,19 @@ const SecureTransaction = () => {
 
           </div>
 
-          <div className="">
-            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0  lg:ml-28 text-center lg:text-left">
+          <div className="  w-full xl:w-[50%] ">
+            
+            <h3 className="text-xl font-semibold text-green-500 mb-4  text-center xl:text-left mt-10">
               TRANSACTIONS
             </h3>
 
-            <div className="rounded-xl px-6 py-8 shadow-md ml-0 md:ml-4 lg:ml-28 md:mr-0 w-[350px] md:w-[750px] flex justify-center md:block ">
-              <div className="overflow-x-auto">
-                <table className="table-auto w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#ADADAD] h-12">
-                      <th className="px-4">
+<div className=" w-full flex justify-center items-center pr-3 mx-auto">
+<div className="  w-[98%] md:w-[750px] flex justify-center items-center mx-auto ">
+              <div className="overflow-x-auto w-full">
+                <table className="table-auto w-full  text-sm  overflow-hidden ">
+                  <thead className="">
+                    <tr className="bg-[#ADADAD] h-12 ">
+                      <th className="pr-10 pl-10">
                         <div className="flex justify-center items-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -328,7 +327,7 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="px-6 md:px-4">
+                      <th className="pr-10 ">
                         <div className="flex justify-center items-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -350,7 +349,7 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="px-28 md:px-24">
+                      <th className="pr-10 pl-10 ">
                         <div className="flex justify-center items-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -372,7 +371,7 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="px-8 md:px-4">
+                      <th className="pr-10 pl-10">
                         <div className="flex justify-center items-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -394,7 +393,7 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="px-8 md:px-4">
+                      <th className="pr-10 pl-10">
                         <div className="flex justify-center items-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -424,11 +423,11 @@ const SecureTransaction = () => {
                         const { from, to, asset, tokenPrice } = transaction;
                         return (
                           <tr key={index} className='h-12 text-center'>
-                            <td className='flex justify-center items-center mt-2 px-4'><img className='h-6 w-6' src={arbi} alt='img' /></td>
-                            <td className='px-4 text-start'>{from}</td>
-                            <td className='px-4 text-start'>{to}</td>
-                            <td className='px-4 flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
-                            <td className='text-[#808183] font-semibold text-lg px-4 text-start'>${tokenPrice}</td>
+                            <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={arbi} alt='img' /></td>
+                            <td className=' text-start'>{from.slice(0,5)+"..."+from.slice(-4)}</td>
+                            <td className=' text-start'>{to.slice(0,5)+"..."+to.slice(-4)}</td>
+                            <td className=' flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
+                            <td className='text-[#808183] font-semibold text-lg  text-start'>${tokenPrice}</td>
                           </tr>
                         );
                       })
@@ -439,9 +438,13 @@ const SecureTransaction = () => {
                 </table>
               </div>
             </div>
+</div>
+
+            
           </div>
+
         </div>
-      </div>
+      
     </div>
   );
 };

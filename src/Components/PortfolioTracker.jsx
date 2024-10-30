@@ -8,10 +8,6 @@ const PortfolioTracker = () => {
     return (
         <div className='overflow-x-hidden'>
             <div>
-                <Navbar />
-            </div>
-            
-            <div>
                 <AddressCard />
             </div>
             {/* <div className='mx-4 md:mx-32 '>

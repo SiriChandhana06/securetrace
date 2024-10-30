@@ -52,9 +52,9 @@ const Navbar = () => {
 
 
             <div className="hidden md:flex space-x-8 text-white">
-                <a href="/" className="hover:text-gray-400">Dashboard</a>
-                <a href="/visualizer" className="hover:text-gray-400">Visualizer</a>
-                <a href="/portfoliotracker" className="hover:text-gray-400">Portfolio Tracker</a>
+                <Link to="/" className="hover:text-gray-400">Dashboard</Link>
+                <Link to="/visualizer" className="hover:text-gray-400">Visualizer</Link>
+                <Link to="/portfoliotracker" className="hover:text-gray-400">Portfolio Tracker</Link>
             </div>
             {userEmail ? (
                 <div className="relative hidden md:flex" ref={dropdownRef}>
@@ -84,9 +84,9 @@ const Navbar = () => {
 
             {isOpen && (
                 <div className="absolute top-16 left-0 right-0 bg-[#303030] mt-6 mx-4 text-white flex flex-col items-center space-y-4 py-4 rounded-lg">
-                    <a href="/" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</a>
-                    <a href="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</a>
-                    <a href="/portfoliotracker" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</a>
+                    <Link to="/" className="hover:text-gray-400" onClick={toggleMenu}>Dashboard</Link>
+                    <Link to="/visualizer" className="hover:text-gray-400" onClick={toggleMenu}>Visualizer</Link>
+                    <Link to="/portfoliotracker" className="hover:text-gray-400" onClick={toggleMenu}>Portfolio Tracker</Link>
                     {userEmail ? (
                         <div className="relative flex md:hidden" ref={dropdownRef}>
                             <button onClick={toggleLogout} className="md:hidden flex bg-white text-black rounded-full px-4 py-2">{userEmail}</button>
