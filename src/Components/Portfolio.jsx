@@ -9,11 +9,24 @@ const Portfolio = () => {
     const chains = ['Ethereum', 'Binance Smart Chain', 'Polygon', 'Avalanche'];
     const [loading, setLoading] = useState(false);
     const [portfolioData, SetPortfolioData] = useState([]);
+    const rowsPerPage = 10;
+    const [currentPage, setCurrentPage] = useState(1);
 
     const data = [
         { asset: 'Berry', price: '$00.00K', change: '+0.00', holdings: '00.000 Berry', value: '$00.00K' },
         { asset: 'USDI', price: '$00.00K', change: '+0.00', holdings: '00.00K USDI', value: '$00.00K' },
     ];
+
+    const totalPages = Math.ceil(portfolioData.length / rowsPerPage);
+
+
+    const currentRows = portfolioData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
 
     useEffect(() => {
         const fetchPortfolioTracker = async () => {
@@ -54,12 +67,32 @@ const Portfolio = () => {
     return (
         <div>
             <div className="bg-white p-6 sm:w-[300px] md:w-full rounded-xl border border-black shadow-md shadow-gray-500">
-                <div className='flex gap-1 lg:flex-row justify-between items-start lg:items-center'>
+                <div className='md:flex gap-1 lg:flex-row justify-between items-start lg:items-center'>
                     <div className='flex gap-2 items-center mb-4 lg:mb-0'>
                         <img className='h-8 w-8' src={Port} alt='portfolio' />
                         <h3 className="text-xl lg:text-2xl font-semibold">Portfolio</h3>
+                        <div className="flex items-center">
+                        <button
+                            className={`px-4 py-2 font-bold ${currentPage === 1 ? 'cursor-not-allowed opacity-50 ' : 'cursor-pointer'}`}
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024"><path fill="black" d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0" /></svg>
+                        </button>
+                        <span className='font-bold text-xl'>
+                            {currentPage} / {totalPages}
+                        </span>
+                        <button
+                            className={`px-4 py-2 font-bold ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 12 24"><path fill="black" fill-rule="evenodd" d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414" /></svg>
+                        </button>
                     </div>
-                    <div>
+                    </div>
+                
+                    <div className='flex justify-end'>
                         <button onClick={() => setIsOpen(!isOpen)} className="flex gap-2 md:gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
                             <span className="font-semibold">Filter by Chain</span>
                             <TiArrowSortedDown />
@@ -109,8 +142,8 @@ const Portfolio = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {portfolioData && portfolioData.length > 0 ? (
-                                portfolioData.map((item, index) => {
+                            {currentRows && currentRows.length > 0 ? (
+                                currentRows.map((item, index) => {
                                     const asset = item.tokenName;
                                     const price = parseFloat(item.tokenPrice).toFixed(2);
                                     const holdings = parseFloat(item.tokenBalance).toFixed(4);

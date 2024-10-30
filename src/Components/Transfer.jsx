@@ -25,10 +25,10 @@ const Transfer = () => {
     const [loading, setLoading] = useState(false);
 
 
-    const totalPages = Math.ceil(transferData.length / rowsPerPage);
+    const totalPages = Math.ceil(transfers.length / rowsPerPage);
 
 
-    const currentRows = transferData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+    const currentRows = transfers.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -54,7 +54,8 @@ const Transfer = () => {
                     }
                 );
 
-                setTransfers(response.data);
+                setTransfers(response.data.from[0]);
+                console.log("Transfres from:",response.data.from[0]);
 
                 setLoading(false);
             } catch (error) {
@@ -67,11 +68,11 @@ const Transfer = () => {
         fetchTransfers();
     }, []);
 
-    useEffect(
-        () => {
-            console.log("Transfres from:", transfers.from);
-        }, [transfers]
-    )
+    // useEffect(
+    //     () => {
+    //         console.log("Transfres from:", transfers.from);
+    //     }, [transfers]
+    // )
 
 
     return (
@@ -136,21 +137,21 @@ const Transfer = () => {
                                 <th className=' px-4'>
                                     <div className="flex justify-center items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
-                                        <h1>AMOUNT</h1>
+                                        <h1>USD</h1>
                                     </div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody className=" text-center">
-                            {transfers.from && transfers.from.length > 0 ?
-                                (transfers.from[0].map((transfer, index) => {
+                            {currentRows && currentRows.length > 0 ?
+                                (currentRows.map((transfer, index) => {
                                     const { icon, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
                                     return (
                                         <tr key={index} className="border-t  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                                             <td className='flex justify-center items-center mt-2 px-4'><img src={icon} alt={tokenName} /></td>
-                                            <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
-                                            <td className="me-3 px-4">{from.slice(0, 5) + "..." + from.slice(-4)}</td>
-                                            <td className="me-3 px-4">{to.slice(0, 5) + "..." + to.slice(-4)}</td>
+                                            <td className="text-green-500 me-3 px-4">{timestamp}</td>
+                                            <td className="me-3 px-4">{from}</td>
+                                            <td className="me-3 px-4">{to}</td>
                                             {/* <td className='text-green-500'>{transfer.value}</td> */}
                                             <td className="text-green-500 px-4">
                                                 {tokenPrice}
