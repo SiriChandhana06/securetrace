@@ -137,7 +137,7 @@ const Transfer = () => {
                                 <th className=' px-4'>
                                     <div className="flex justify-center items-center space-x-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
-                                        <h1>USD</h1>
+                                        <h1>Amount</h1>
                                     </div>
                                 </th>
                             </tr>
@@ -149,9 +149,12 @@ const Transfer = () => {
                                     return (
                                         <tr key={index} className="border-t  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                                             <td className='flex justify-center items-center mt-2 px-4'><img src={icon} alt={tokenName} /></td>
-                                            <td className="text-green-500 me-3 px-4">{timestamp}</td>
-                                            <td className="me-3 px-4">{from}</td>
-                                            <td className="me-3 px-4">{to}</td>
+                                            {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
+                                            <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
+                                            {/* <td className="me-3 px-4">{from}</td>
+                                            <td className="me-3 px-4">{to}</td> */}
+                                            <td className="me-3 px-4">{from.slice(0, 5) + "..." + from.slice(-4)}</td>
+                                            <td className="me-3 px-4">{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                                             {/* <td className='text-green-500'>{transfer.value}</td> */}
                                             <td className="text-green-500 px-4">
                                                 {tokenPrice}
