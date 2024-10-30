@@ -100,7 +100,7 @@ const SecureTransaction = () => {
 
   return (
     <div className="w-full bg-white">
-      
+
 
       <div className="">
         <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
@@ -136,82 +136,82 @@ const SecureTransaction = () => {
         </div>
       </div>
 
-      
-        <div className="flex justify-center items-center xl:items-start flex-wrap">
-         
-          <div className=" w-full xl:w-[50%] flex justify-center items-center">
-            <div
-              className="overflow-y-auto w-full"
-              id="hide-scrollbar"
-            >
 
-              <div className=" w-full">
-                <h3 className="text-xl font-semibold text-green-500 mb-4  ml-0 lg:ml-12 text-center xl:text-left ">
-                  TRENDING TOKEN PAGES
-                </h3>
-                {trendingTokens && trendingTokens.length > 0 ?
-                  (
-                    trendingTokens.map((token, index) => {
-                      const { image, name, price_change_24h, current_price, ath, atl, market_cap, total_supply, circulating_supply, total_volume } = token;
-                      return (
-                        <div>
-                          <div className="border border-green-500 rounded-xl p-4 sm:p-6  shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
-                            {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
+      <div className="flex justify-center items-center xl:items-start flex-wrap">
+
+        <div className=" w-full xl:w-[50%] flex justify-center items-center">
+          <div
+            className="overflow-y-auto w-full"
+            id="hide-scrollbar"
+          >
+
+            <div className=" w-full">
+              <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-20 text-center xl:text-left ">
+                TRENDING TOKEN PAGES
+              </h3>
+              {trendingTokens && trendingTokens.length > 0 ?
+                (
+                  trendingTokens.map((token, index) => {
+                    const { image, name, price_change_24h, current_price, ath, atl, market_cap, total_supply, circulating_supply, total_volume } = token;
+                    return (
+                      <div>
+                        <div className="border border-green-500 rounded-xl p-4 sm:p-6  shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
+                          {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
                           TRENDING TOKEN PAGES
                         </h3> */}
 
-                            <div className="md:flex ">
-                              <div className=" md:mt-6 md:w-[30%] ">
-                                <div className="flex items-center gap-4">
-                                  <img
-                                    className="h-12 w-12"
-                                    src={image}
-                                    alt="Token"
-                                  />
-
-                                  <div>
-                                    <h4 className="text-2xl font-bold">
-                                      {name}
-                                    </h4>
-                                  </div>
-                                </div>
+                          <div className="md:flex ">
+                            <div className=" md:mt-6 md:w-[30%] ">
+                              <div className="flex items-center gap-4">
+                                <img
+                                  className="h-12 w-12"
+                                  src={image}
+                                  alt="Token"
+                                />
 
                                 <div>
-                                  <h4 className="text-2xl mt-5 text-green-500 font-bold">
-                                    ${current_price}
+                                  <h4 className="text-2xl font-bold">
+                                    {name}
                                   </h4>
-                                  <p className="text-lg text-[#3C704F] font-semibold">
-                                    {price_change_24h.toFixed(2)}
-                                  </p>
                                 </div>
                               </div>
 
-                              <div className="flex justify-between md:w-[70%]">
-                                <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
-                                  <li className="text-nowrap">24H Volume</li>
-                                  <li className="text-nowrap">Market Cap</li>
-                                  <li className="text-nowrap">All Time High</li>
-                                  <li className="text-nowrap">All Time Low</li>
-                                  <li className="text-nowrap">Circulating Supply</li>
-                                  <li className="text-nowrap">Total Supply</li>
-                                </ul>
-
-                                <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
-                                  <li>${total_volume}</li>
-                                  <li>${market_cap}</li>
-                                  <li>${ath}</li>
-                                  <li>${atl}</li>
-                                  <li>{circulating_supply}</li>
-                                  <li>{total_supply}</li>
-                                </ul>
+                              <div>
+                                <h4 className="text-2xl mt-5 text-green-500 font-bold">
+                                  ${current_price}
+                                </h4>
+                                <p className="text-lg text-[#3C704F] font-semibold">
+                                  {price_change_24h.toFixed(2)}
+                                </p>
                               </div>
+                            </div>
+
+                            <div className="flex justify-between md:w-[70%]">
+                              <ul className="mt-4 text-sm md:text-lg font-semibold text-[#717175]">
+                                <li className="text-nowrap">24H Volume</li>
+                                <li className="text-nowrap">Market Cap</li>
+                                <li className="text-nowrap">All Time High</li>
+                                <li className="text-nowrap">All Time Low</li>
+                                <li className="text-nowrap">Circulating Supply</li>
+                                <li className="text-nowrap">Total Supply</li>
+                              </ul>
+
+                              <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
+                                <li>${total_volume}</li>
+                                <li>${market_cap}</li>
+                                <li>${ath}</li>
+                                <li>${atl}</li>
+                                <li>{circulating_supply}</li>
+                                <li>{total_supply}</li>
+                              </ul>
                             </div>
                           </div>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <div className="flex justify-center">
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="flex justify-center">
                     <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
                       {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
                         TRENDING TOKEN PAGES
@@ -264,15 +264,12 @@ const SecureTransaction = () => {
                         </div>
                       </div>
                     </div>
-                    </div>
-                  )}
+                  </div>
+                )}
 
 
 
 
-
-
-              </div>
 
 
             </div>
@@ -280,14 +277,17 @@ const SecureTransaction = () => {
 
           </div>
 
-          <div className="  w-full xl:w-[50%] ">
-            
-            <h3 className="text-xl font-semibold text-green-500 mb-4  text-center xl:text-left mt-10">
-              TRANSACTIONS
-            </h3>
 
-<div className=" w-full flex justify-center items-center pr-3 mx-auto">
-<div className="  w-[98%] md:w-[750px] flex justify-center items-center mx-auto ">
+        </div>
+
+        <div className="  w-full xl:w-[50%] ">
+
+          <h3 className="text-xl font-semibold text-green-500 mb-4 text-center xl:text-left mt-10 md:mt-0">
+            TRANSACTIONS
+          </h3>
+
+          <div className=" w-full flex justify-center items-center pr-3 mx-auto">
+            <div className="  w-[98%] md:w-[750px] flex justify-center items-center mx-auto ">
               <div className="overflow-x-auto w-full">
                 <table className="table-auto w-full  text-sm  overflow-hidden ">
                   <thead className="">
@@ -424,8 +424,8 @@ const SecureTransaction = () => {
                         return (
                           <tr key={index} className='h-12 text-center'>
                             <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={arbi} alt='img' /></td>
-                            <td className=' text-start'>{from.slice(0,5)+"..."+from.slice(-4)}</td>
-                            <td className=' text-start'>{to.slice(0,5)+"..."+to.slice(-4)}</td>
+                            <td className=' text-start'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
+                            <td className=' text-start'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                             <td className=' flex gap-2 items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
                             <td className='text-[#808183] font-semibold text-lg  text-start'>${tokenPrice}</td>
                           </tr>
@@ -438,13 +438,13 @@ const SecureTransaction = () => {
                 </table>
               </div>
             </div>
-</div>
-
-            
           </div>
 
+
         </div>
-      
+
+      </div>
+
     </div>
   );
 };
