@@ -95,7 +95,7 @@ const AddressCard = () => {
             placeholder="Enter address value"
             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 mx-2 w-full"
           />
-          <button onClick={handleScanNow} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+          <button onClick={handleScanNow} className="bg-green-500 w-56 lg:w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
             Scan Now
           </button>
         </div>

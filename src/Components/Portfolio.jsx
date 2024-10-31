@@ -66,7 +66,7 @@ const Portfolio = () => {
 
     return (
         <div>
-            <div className="bg-white p-6 sm:w-[300px] md:w-full rounded-xl border border-black shadow-md shadow-gray-500">
+            <div className="bg-white p-6  w-full xl:w-[100%] rounded-xl border border-black shadow-md shadow-gray-500">
                 <div className='md:flex gap-1 lg:flex-row justify-between items-start lg:items-center'>
                     <div className='flex gap-2 items-center mb-4 lg:mb-0'>
                         <img className='h-8 w-8' src={Port} alt='portfolio' />

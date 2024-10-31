@@ -155,7 +155,7 @@ const SecureTransaction = () => {
                     const { image, name, price_change_24h, current_price, ath, atl, market_cap, total_supply, circulating_supply, total_volume } = token;
                     return (
                       <div>
-                        <div className="border border-green-500 rounded-xl p-4 sm:p-6  shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
+                        <div className="border border-green-500 rounded-xl p-4 sm:p-6 shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
                           {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
                           TRENDING TOKEN PAGES
                         </h3> */}
