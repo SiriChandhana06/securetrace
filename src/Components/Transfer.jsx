@@ -76,8 +76,8 @@ const Transfer = () => {
 
 
     return (
-        <div className="overflow-x-hidden" id="hide-scrollbar">
-            <div className="bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500">
+        <div className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500" id="hide-scrollbar">
+            <div className="">
                 <div className='flex'>
                     <h3 className="text-2xl font-semibold mt-1 mb-4">Transfers</h3>
                     <div className="flex items-center mb-4">
@@ -103,7 +103,7 @@ const Transfer = () => {
                 <div className="overflow-x-scroll"  id="hide-scrollbar">
                     <table className="w-full text-center">
                         <thead className=''>
-                            <tr className="text-gray-500 ">
+                            <tr className="text-gray-500 h-10">
                                 <th className='flex justify-center items-center space-x-2 px-4'><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="black" d="M14.78 3.653a3.936 3.936 0 1 1 5.567 5.567l-3.627 3.627a3.936 3.936 0 0 1-5.88-.353a.75.75 0 0 0-1.18.928a5.436 5.436 0 0 0 8.12.486l3.628-3.628a5.436 5.436 0 1 0-7.688-7.688l-3 3a.75.75 0 0 0 1.06 1.061z" /><path fill="black" d="M7.28 11.153a3.936 3.936 0 0 1 5.88.353a.75.75 0 0 0 1.18-.928a5.436 5.436 0 0 0-8.12-.486L2.592 13.72a5.436 5.436 0 1 0 7.688 7.688l3-3a.75.75 0 1 0-1.06-1.06l-3 3a3.936 3.936 0 0 1-5.567-5.568z" /></svg></th>
                                 <th className=' px-4'>
                                     <div className="flex justify-center items-center space-x-2"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="black" fill-rule="evenodd" d="m12.6 11.503l3.891 3.891l-.848.849L11.4 12V6h1.2zM12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-1.2a8.8 8.8 0 1 0 0-17.6a8.8 8.8 0 0 0 0 17.6" /></svg>
@@ -147,7 +147,7 @@ const Transfer = () => {
                                 (currentRows.map((transfer, index) => {
                                     const { icon, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
                                     return (
-                                        <tr key={index} className="border-t  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
+                                        <tr key={index} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                                             <td className='flex justify-center items-center mt-2 px-4'><img src={icon} alt={tokenName} /></td>
                                             {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
                                             <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
