@@ -11,6 +11,7 @@ const Portfolio = () => {
     const [portfolioData, SetPortfolioData] = useState([]);
     const rowsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalValue, setTotalValue] = useState(0);
 
     const data = [
         { asset: 'Berry', price: '$00.00K', change: '+0.00', holdings: '00.000 Berry', value: '$00.00K' },
@@ -46,6 +47,19 @@ const Portfolio = () => {
 
                 SetPortfolioData(response.data.tokens[0]);
                 console.log(response.data.tokens[0]);
+
+                const tokens = response.data.tokens[0];
+                // setPortfolioData(tokens);
+                
+                // Calculate total value
+                const total = tokens.reduce((sum, item) => {
+                    const price = parseFloat(item.tokenPrice);
+                    const holdings = parseFloat(item.tokenBalance);
+                    return sum + (price * holdings);
+                }, 0);
+                
+                setTotalValue(total.toFixed(2));
+ 
 
                 setLoading(false);
             } catch (error) {
