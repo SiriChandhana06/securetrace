@@ -162,8 +162,7 @@ const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
   };
 
   const data = [
-    { asset: 'Berry', price: '$00.00K', change: '+0.00', holdings: '00.000 Berry', value: '$00.00K' },
-    { asset: 'USDI', price: '$00.00K', change: '+0.00', holdings: '00.00K USDI', value: '$00.00K' },
+    { asset: 'Btc', price: '$00.00K', change: '+0.00', holdings: '00.000 Btc', value: '$00.00K' },
   ];
 
   const totalPages = Math.ceil(portfolioData.length / rowsPerPage);
@@ -240,7 +239,7 @@ const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
 
 
       {isPortfolioVisible && !loading && (
-        <div className='mx-4 md:mx-32'>
+        <div className='mx-4 md:mx-32 mt-10'>
           {/* <div className="">
             <Portfolio />
           </div> */}
