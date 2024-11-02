@@ -157,10 +157,10 @@ const Transfer = () => {
                                             <td className="me-3 px-4">{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                                             {/* <td className='text-green-500'>{transfer.value}</td> */}
                                             <td className="text-green-500 px-4">
-                                                 {parseFloat(transfer.tokenPrice).toFixed(2)}
+                                                {tokenPrice}
                                             </td>
                                             <td className="px-4">{tokenName}</td>
-                                            <td className="px-4"> {parseFloat(transfer.value).toFixed(2)}</td>
+                                            <td className="px-4">{value}</td>
                                         </tr>
                                     );
                                 }))

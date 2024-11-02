@@ -281,9 +281,9 @@ const AddressCard = () => {
                     {currentRows && currentRows.length > 0 ? (
                       currentRows.map((item, index) => {
                         const asset = item.tokenName;
-                        const price = parseFloat(item.tokenPrice).toFixed(2);
-                        const holdings = parseFloat(item.tokenBalance).toFixed(2);
-                        const value = (price * holdings).toFixed(2); // Calculate value as price * balance
+                        const price = item.tokenPrice;
+                        const holdings = item.tokenBalance;
+                        const value = (price * holdings); 
 
                         return (
                           <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
