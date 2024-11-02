@@ -177,9 +177,9 @@ const SecureTransaction = () => {
                           TRENDING TOKEN PAGES
                         </h3> */}
 
-                          <div className="md:flex ">
+                          <div className="md:flex gap-2 ">
                             <div className=" md:mt-6 md:w-[30%] ">
-                              <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
                                 <img
                                   className="h-12 w-12"
                                   src={image}
@@ -187,7 +187,7 @@ const SecureTransaction = () => {
                                 />
 
                                 <div>
-                                  <h4 className="text-2xl font-bold">
+                                  <h4 className="text-xl font-bold">
                                     {name}
                                   </h4>
                                 </div>

@@ -100,10 +100,10 @@ const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
         }
       );
 
-      SetPortfolioData(response.data.tokens[0]);
-      console.log("Portfolio data:", response.data.tokens[0]);
+      SetPortfolioData(response.data.tokens);
+      console.log("Portfolio data:", response.data.tokens);
 
-      const tokens = response.data.tokens[0];
+      const tokens = response.data.tokens;
       // setPortfolioData(tokens);
 
       // Calculate total value
