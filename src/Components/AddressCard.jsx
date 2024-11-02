@@ -282,7 +282,7 @@ const AddressCard = () => {
                       currentRows.map((item, index) => {
                         const asset = item.tokenName;
                         const price = parseFloat(item.tokenPrice).toFixed(2);
-                        const holdings = parseFloat(item.tokenBalance).toFixed(4);
+                        const holdings = parseFloat(item.tokenBalance).toFixed(2);
                         const value = (price * holdings).toFixed(2); // Calculate value as price * balance
 
                         return (

@@ -25,6 +25,8 @@ const SecureTransaction = () => {
   const [trendingTokens, setTrendingTokens] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +54,9 @@ const SecureTransaction = () => {
           }
         );
 
-        setTransactions(response.data);
+
+        setTransactions(response.data.txs[0]);
+        console.log('response:', response.data.txs[0]);
 
         setLoading(false);
       } catch (error) {
@@ -98,6 +102,20 @@ const SecureTransaction = () => {
     console.log("Trending Tokens:", trendingTokens);
   }, [trendingTokens]);
 
+
+  const totalPages = Math.ceil(transactions.length / rowsPerPage);
+
+
+  const currentRows = transactions.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+
+
   return (
     <div className="w-full bg-white">
 
@@ -141,14 +159,13 @@ const SecureTransaction = () => {
 
         <div className=" w-full xl:w-[48%] flex justify-center items-center">
           <div
-            className="overflow-y-auto w-full"
-            id="hide-scrollbar"
+            className=" w-full"
+            
           >
-
-            <div className=" w-full">
-              <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-16 text-center xl:text-left ">
-                TRENDING TOKEN PAGES
-              </h3>
+            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-16 text-center xl:text-left ">
+              TRENDING TOKEN PAGES
+            </h3>
+            <div className=" h-[520px] w-full overflow-y-auto" id="hide-scrollbar">
               {trendingTokens && trendingTokens.length > 0 ?
                 (
                   trendingTokens.map((token, index) => {
@@ -281,11 +298,32 @@ const SecureTransaction = () => {
         </div>
 
         <div className=" w-full xl:w-[50%] ">
+          <div className=" flex sm:justify-center sm:gap-40 md:gap-72 lg:gap-96 xl:justify-between xl:gap-0 mt-10 md:mt-0 ">
 
-          <h3 className="text-xl font-semibold text-green-500 mb-4 text-center xl:text-left mt-10 md:mt-0">
-            TRANSACTIONS
-          </h3>
+            <h3 className="text-xl font-semibold text-green-500 text-center mt-2 xl:text-left ">
+              TRANSACTIONS
+            </h3>
 
+            <div className="flex items-center">
+              <button
+                className={`px-4 py-2 font-bold ${currentPage === 1 ? 'cursor-not-allowed opacity-50 ' : 'cursor-pointer'}`}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024"><path fill="black" d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0" /></svg>
+              </button>
+              <span className='font-bold text-xl'>
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                className={`px-4 py-2 font-bold ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 12 24"><path fill="black" fill-rule="evenodd" d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414" /></svg>
+              </button>
+            </div>
+          </div>
           <div className=" w-full flex justify-center items-center pr-3 mx-auto">
             <div className="  w-[98%] md:w-[750px] flex justify-center items-center mx-auto ">
               <div className="overflow-x-auto w-full">
@@ -418,8 +456,8 @@ const SecureTransaction = () => {
                   </thead>
 
                   <tbody>
-                    {transactions?.txs && transactions?.txs.length > 0 ? (
-                      transactions.txs[0].map((transaction, index) => {
+                    {currentRows && currentRows.length > 0 ? (
+                      currentRows.map((transaction, index) => {
                         const { from, to, asset, tokenPrice } = transaction;
                         return (
                           <tr key={index} className='h-12 text-center'>
