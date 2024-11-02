@@ -179,7 +179,7 @@ const SecureTransaction = () => {
 
                           <div className="md:flex ">
                             <div className=" md:mt-6 md:w-[30%] ">
-                              <div className="flex items-center gap-4">
+                              <div className="flex items-center justify-start gap-1">
                                 <img
                                   className="h-12 w-12"
                                   src={image}

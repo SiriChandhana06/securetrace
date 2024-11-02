@@ -100,10 +100,10 @@ const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
         }
       );
 
-      SetPortfolioData(response.data.tokens[0]);
-      console.log("Portfolio data:", response.data.tokens[0]);
+      SetPortfolioData(response.data.tokens);
+      console.log("Portfolio data:", response.data);
 
-      const tokens = response.data.tokens[0];
+      const tokens = response.data.tokens;
       // setPortfolioData(tokens);
 
       // Calculate total value
@@ -192,7 +192,7 @@ const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
           </p>
         </div>
       </div>
-      <div className='flex items-center justify-center mt-6'>
+      <div className='flex items-center justify-center mt-6 mb-6'>
         <div className="flex flex-col sm:flex-row items-center w-80 md:w-full md:max-w-3xl ">
           <input
             type="text"
