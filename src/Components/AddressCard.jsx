@@ -182,14 +182,23 @@ const AddressCard = () => {
     { asset: 'Btc', price: '$00.00K', change: '+0.00', holdings: '00.000 Btc', value: '$00.00K' },
   ];
 
-  const totalPages = Math.ceil(portfolioData.length / rowsPerPage);
 
 
-  const currentRows = portfolioData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  const filteredData = selectedChain
+  ? portfolioData.filter(item => item.chain === selectedChain)
+  : portfolioData;
 
-  const filteredRows = selectedChain
-    ? currentRows.filter(item => item.chain === selectedChain)
-    : currentRows;
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+
+  const currentRows = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
+  const handleChainSelect = (chain) => {
+    setSelectedChain(chain);
+    setCurrentPage(1); 
+    setIsOpen(false);
+    toast.info(`Selected chain: ${chain.charAt(0).toUpperCase() + chain.slice(1)}`);
+  };
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -320,12 +329,7 @@ const AddressCard = () => {
                           <div
                             key={index}
                             className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                            onClick={() => {
-                              console.log(`Selected chain: ${chain}`);
-                              setSelectedChain(chain);
-                              toast.info(`Selected chain: ${chain}`); 
-                              setIsOpen(false); // Close dropdown on select
-                            }}
+                            onClick={() => handleChainSelect(chain)}
                           >
                             {chain.charAt(0).toUpperCase() + chain.slice(1)}
                           </div>
@@ -362,7 +366,7 @@ const AddressCard = () => {
                     </thead>
                     <tbody>
                       {currentRows && currentRows.length > 0 ? (
-                        filteredRows.map((item, index) => {
+                         currentRows.map((item, index) => {
                           const asset = item.tokenName;
                           const price = parseFloat(item.tokenPrice).toFixed(2);
                           const holdings = parseFloat(item.tokenBalance).toFixed(2);
