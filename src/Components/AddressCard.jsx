@@ -7,6 +7,8 @@ import Port from "../Assests/Portfolio.png";
 import { TiArrowSortedDown } from "react-icons/ti";
 import axios from "axios";
 import btc from '../Assests/Bitcoin.png';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddressCard = () => {
 
@@ -74,20 +76,21 @@ const AddressCard = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(localStorage.getItem('inputValue'));
+    toast.success('You Have Copied the Address');
   };
 
   const handleScanNow = async () => {
     setLoading(true);
 
     if (!inputValue) {
-      alert('Please enter a contract address.');
+      toast.error('Please enter a contract address.');
       setLoading(false);
       return;
     }
 
 
     if (!isValidEthereumAddressOrTxHash(inputValue)) {
-      alert('Invalid Ethereum address. Please enter a valid input.');
+      toast.error('Invalid Ethereum address. Please enter a valid input.');
       setLoading(false);
       return;
     }
@@ -184,9 +187,9 @@ const AddressCard = () => {
 
   const currentRows = portfolioData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
-  const filteredRows = selectedChain 
-  ? currentRows.filter(item => item.chain === selectedChain) 
-  : currentRows;
+  const filteredRows = selectedChain
+    ? currentRows.filter(item => item.chain === selectedChain)
+    : currentRows;
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -320,6 +323,7 @@ const AddressCard = () => {
                             onClick={() => {
                               console.log(`Selected chain: ${chain}`);
                               setSelectedChain(chain);
+                              toast.info(`Selected chain: ${chain}`); 
                               setIsOpen(false); // Close dropdown on select
                             }}
                           >
@@ -505,6 +509,17 @@ const AddressCard = () => {
           </div>
         )
       }
+
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        theme="colored"
+      />
     </div >
   );
 };

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,12 +12,12 @@ const LoginPage = () => {
   const handleSendOtp = (e) => {
     e.preventDefault();
     if (email) {
-      alert(`OTP sent to: ${email}`);
+      toast.success(`OTP sent to: ${email}`);
       console.log(`OTP sent to: ${email}`);
       localStorage.setItem('userEmail', email);
       setOtpSent(true); 
     } else {
-      alert('Please enter an email address');
+      toast.error('Please enter an email address');
     }
   };
 
@@ -25,6 +27,7 @@ const LoginPage = () => {
     setEmail('');
     setOtp('');
     navigate('/'); 
+    // toast.success('You Have Successfully LoggedIn');
     window.location.reload();
   };
 
@@ -76,6 +79,16 @@ const LoginPage = () => {
           </button>
         </form>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        theme="colored"
+      />
     </div>
   );
 };

@@ -18,6 +18,8 @@ import share from "../Assests/share.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SecureTransaction = () => {
   const [inputValue, setInputValue] = useState("");
@@ -41,14 +43,14 @@ const SecureTransaction = () => {
     // navigate("/portfoliotracker");
 
     if (!inputValue) {
-      alert('Please enter a contract address.');
+      toast.error('Please enter a contract address.');
       setLoading(false);
       return;
     }
     
 
     if (!isValidEthereumAddressOrTxHash(inputValue)) {
-      alert('Invalid Ethereum address. Please enter a valid input.');
+      toast.error('Invalid Ethereum address. Please enter a valid input.');
       setLoading(false);
       return;
     }
@@ -527,6 +529,16 @@ const SecureTransaction = () => {
 
       </div>
 
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        theme="colored"
+      />
     </div>
   );
 };
