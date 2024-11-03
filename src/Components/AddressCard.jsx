@@ -355,7 +355,7 @@ const AddressCard = () => {
                   currentRows.map((item, index) => {
                     const asset = item.tokenName;
                     const price = parseFloat(item.tokenPrice).toFixed(2);
-                    const holdings = parseFloat(item.tokenBalance).toFixed(4);
+                    const holdings = parseFloat(item.tokenBalance).toFixed(2);
                     const value = (price * holdings).toFixed(2);
 
                     return (
@@ -465,10 +465,10 @@ const AddressCard = () => {
                           <td className="me-3 px-4">{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                           {/* <td className='text-green-500'>{transfer.value}</td> */}
                           <td className="text-green-500 px-4">
-                            {tokenPrice}
+                            {parseFloat(tokenPrice).toFixed(2)}
                           </td>
                           <td className="px-4">{tokenName}</td>
-                          <td className="px-4">{value}</td>
+                          <td className="px-4"> {parseFloat(value).toFixed(2)}</td>
                         </tr>
                       );
                     }))
