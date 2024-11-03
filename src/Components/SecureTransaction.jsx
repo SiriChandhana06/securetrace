@@ -28,10 +28,31 @@ const SecureTransaction = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
+  const isValidEthereumAddressOrTxHash = (value) => {
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
+    const txHashRegex = /^0x([A-Fa-f0-9]{64})$/;  // For Transaction hash (66 characters, starts with 0x)
+
+    return ethAddressRegex.test(value) || txHashRegex.test(value);
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    // navigate("/portfoliotracker");
 
-    navigate("/portfoliotracker");
+    if (!inputValue) {
+      alert('Please enter a contract address.');
+      setLoading(false);
+      return;
+    }
+    
+
+    if (!isValidEthereumAddressOrTxHash(inputValue)) {
+      alert('Invalid Ethereum address. Please enter a valid input.');
+      setLoading(false);
+      return;
+    }
+
   };
 
   const handleInputChange = (e) => {
@@ -132,6 +153,8 @@ const SecureTransaction = () => {
   };
 
 
+
+  
 
 
   return (
@@ -486,7 +509,7 @@ const SecureTransaction = () => {
                             <td className=' text-center'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
                             <td className=' text-center'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                             <td className=' flex gap-2 justify-center items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
-                            <td className='text-[#808183] font-semibold text-lg  text-Center'>${tokenPrice}</td>
+                            <td className='text-[#808183] font-semibold text-lg  text-Center'>${parseFloat(tokenPrice).toFixed(2)}</td>
                           </tr>
                         );
                       })
