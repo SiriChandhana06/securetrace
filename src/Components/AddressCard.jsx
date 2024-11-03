@@ -2,7 +2,7 @@ import React from 'react';
 import { FaRegCopy, } from 'react-icons/fa';
 import img from '../Assests/person.png';
 import { FaShareNodes } from 'react-icons/fa6';
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useRef } from 'react';
 import Port from "../Assests/Portfolio.png";
 import { TiArrowSortedDown } from "react-icons/ti";
 import axios from "axios";
@@ -20,6 +20,7 @@ const AddressCard = () => {
   const [inputValue, setInputValue] = useState("");
   const [isPortfolioVisible, setIsPortfolioVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const chains = ['Ethereum', 'Binance Smart Chain', 'Polygon', 'Avalanche'];
   const [loading, setLoading] = useState(false);
   const [portfolioData, SetPortfolioData] = useState([]);
@@ -187,7 +188,22 @@ const AddressCard = () => {
       setCurrentPage(pageNumber);
     }
   };
-  
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false); // Close dropdown if click is outside
+    }
+  };
+
+  useEffect(() => {
+    // Add event listener for clicks outside the dropdown
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      // Clean up the event listener on component unmount
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div>
@@ -291,7 +307,7 @@ const AddressCard = () => {
                 <TiArrowSortedDown />
               </button>
               {isOpen && (
-                <div className="absolute mt-2 bg-white border border-gray-300 rounded-lg shadow-lg">
+                <div className="absolute mt-12 bg-white border border-gray-300 rounded-lg shadow-lg"  ref={dropdownRef} >
                   {chains.map((chain, index) => (
                     <div
                       key={index}
@@ -340,7 +356,7 @@ const AddressCard = () => {
                     const asset = item.tokenName;
                     const price = parseFloat(item.tokenPrice).toFixed(2);
                     const holdings = parseFloat(item.tokenBalance).toFixed(4);
-                    const value = (price * holdings).toFixed(2); // Calculate value as price * balance
+                    const value = (price * holdings).toFixed(2);
 
                     return (
                       <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
