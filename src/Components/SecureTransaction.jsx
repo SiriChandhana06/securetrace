@@ -115,6 +115,24 @@ const SecureTransaction = () => {
   };
 
 
+  const formatNumber = (num) => {
+    if (num === null || num === undefined) return "N/A"; // Handle null or undefined
+    if (isNaN(num)) return num; // Return the original if not a number
+
+    const absNum = Math.abs(num);
+
+    // Format as billions or millions
+    if (absNum >= 1e9) {
+      return `${(num / 1e9).toFixed(2)}B`; // Billions
+    } else if (absNum >= 1e6) {
+      return `${(num / 1e6).toFixed(2)}M`; // Millions
+    } else {
+      return num; // Return original number if less than a million
+    }
+  };
+
+
+
 
   return (
     <div className="w-full bg-white">
@@ -160,7 +178,7 @@ const SecureTransaction = () => {
         <div className=" w-full xl:w-[48%] flex justify-center items-center">
           <div
             className=" w-full"
-            
+
           >
             <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-16 text-center xl:text-left ">
               TRENDING TOKEN PAGES
@@ -214,10 +232,10 @@ const SecureTransaction = () => {
                               </ul>
 
                               <ul className="mt-4 text-sm md:text-lg text-[#B0B0B3] text-right">
-                                <li>${total_volume}</li>
-                                <li>${market_cap}</li>
-                                <li>${ath}</li>
-                                <li>${atl}</li>
+                                <li>${formatNumber(total_volume)}</li>
+                                <li>${formatNumber(market_cap)}</li>
+                                <li>${formatNumber(ath)}</li>
+                                <li>${formatNumber(atl)}</li>
                                 <li>{circulating_supply}</li>
                                 <li>{total_supply}</li>
                               </ul>
@@ -458,7 +476,10 @@ const SecureTransaction = () => {
                   <tbody>
                     {currentRows && currentRows.length > 0 ? (
                       currentRows.map((transaction, index) => {
-                        const { from, to, asset, tokenPrice } = transaction;
+
+                        const { from, to, asset, value } = transaction;
+                        const tokenPrice = transaction.tokenPrice * value;
+
                         return (
                           <tr key={index} className='h-12 text-center'>
                             <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={arbi} alt='img' /></td>
