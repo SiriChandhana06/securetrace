@@ -144,9 +144,9 @@ const AddressCard = () => {
           },
         }
       );
-
-      setTransfers(response1.data.from[0]);
-      console.log("Transfres from:", response1.data.from[0]);
+      const combinedTransfers = response1.data.from.concat(response1.data.to);
+      setTransfers(combinedTransfers);
+      // console.log("Transfres Data:", combinedTransfers);
 
       setLoading(false);
     } catch (error) {
@@ -367,6 +367,7 @@ const AddressCard = () => {
                     <tbody>
                       {currentRows && currentRows.length > 0 ? (
                          currentRows.map((item, index) => {
+                          const logo = item.logo;
                           const asset = item.tokenName;
                           const price = parseFloat(item.tokenPrice).toFixed(2);
                           const holdings = parseFloat(item.tokenBalance).toFixed(2);
@@ -374,7 +375,10 @@ const AddressCard = () => {
 
                           return (
                             <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                              <td className='px-4'>{asset}</td>
+                              <td className='px-4 flex items-center  justify-center gap-1'>
+                                <img src={logo} alt={asset}  className='mt-2 h-7 w-7'/>
+                               <p> {asset}</p>
+                                </td>
                               <td className='px-4'>${price}</td>
                               <td className='px-4'>{holdings}</td>
                               <td className='px-4'>${value}</td>
@@ -467,10 +471,10 @@ const AddressCard = () => {
                       <tbody className=" text-center">
                         {currentRows1 && currentRows1.length > 0 ?
                           (currentRows1.map((transfer, index) => {
-                            const { icon, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
+                            const { logo, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
                             return (
                               <tr key={index} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
-                                <td className='flex justify-center items-center mt-2 px-4'><img src={icon} alt={tokenName} /></td>
+                                <td className='flex justify-center items-center mt-2 px-4'><img src={logo} alt={tokenName} /></td>
                                 {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
                                 <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
                                 {/* <td className="me-3 px-4">{from}</td>

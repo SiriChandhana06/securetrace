@@ -78,8 +78,8 @@ const SecureTransaction = () => {
         );
 
 
-        setTransactions(response.data.txs[0]);
-        console.log('response:', response.data.txs[0]);
+        setTransactions(response.data.txs);
+        console.log('response:', response.data);
 
         setLoading(false);
       } catch (error) {
@@ -121,9 +121,7 @@ const SecureTransaction = () => {
 
   useEffect(() => {
     console.log("Transactions:", transactions);
-    console.log("trendingTokens", trendingTokens);
-    console.log("Trending Tokens:", trendingTokens);
-  }, [trendingTokens]);
+  }, [transactions]);
 
 
   const totalPages = Math.ceil(transactions.length / rowsPerPage);
@@ -240,9 +238,9 @@ const SecureTransaction = () => {
                                 <h4 className="text-2xl mt-5 text-green-500 font-bold">
                                   ${current_price}
                                 </h4>
-                                <p className="text-lg text-[#3C704F] font-semibold">
-                                  {price_change_24h.toFixed(2)}
-                                </p>
+                                <p className={`text-lg font-semibold ${price_change_24h < 0 ? 'text-red-500' : 'text-[#3C704F]'}`}>
+  {price_change_24h.toFixed(2)}
+</p>
                               </div>
                             </div>
 
@@ -502,15 +500,15 @@ const SecureTransaction = () => {
                     {currentRows && currentRows.length > 0 ? (
                       currentRows.map((transaction, index) => {
 
-                        const { from, to, asset, value } = transaction;
+                        const { from, to, asset, value, logo } = transaction;
                         const tokenPrice = transaction.tokenPrice * value;
 
                         return (
                           <tr key={index} className='h-12 text-center'>
-                            <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={arbi} alt='img' /></td>
+                            <td className='flex justify-center items-center mt-2 '><img className='h-6 w-6' src={logo} alt='asset' /></td>
                             <td className=' text-center'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
                             <td className=' text-center'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
-                            <td className=' flex gap-2 justify-center items-center'><img className='h-5 w-5' src={usdt} alt='usdt' /> {asset}</td>
+                            <td className=' flex gap-2 justify-center items-center'><img className='h-5 w-5' src={logo} alt='asset' /> {asset}</td>
                             <td className='text-[#808183] font-semibold text-lg  text-Center'>${parseFloat(tokenPrice).toFixed(2)}</td>
                           </tr>
                         );
