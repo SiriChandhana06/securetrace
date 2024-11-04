@@ -373,10 +373,14 @@ const AddressCard = () => {
                           const holdings = parseFloat(item.tokenBalance).toFixed(2);
                           const value = (price * holdings).toFixed(2);
 
+                          if (parseFloat(value) < 0.01) {
+                            return null;
+                          }
+
                           return (
                             <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
                               <td className=' flex items-center justify-center'>
-                                <div className='flex items-center gap-1  w-48'>
+                                <div className='flex items-center gap-5  w-48'>
                                 <img src={logo} alt={asset}  className='mt-2 h-7 w-7 '/>
                                 <p className='text-nowrap'> {asset}</p>
                                 </div>
