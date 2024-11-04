@@ -509,7 +509,7 @@ const SecureTransaction = () => {
                             <td className=' text-center'>{from.slice(0, 5) + "..." + from.slice(-4)}</td>
                             <td className=' text-center'>{to.slice(0, 5) + "..." + to.slice(-4)}</td>
                             <td className=' flex gap-2 justify-center items-center'><img className='h-5 w-5' src={logo} alt='asset' /> {asset}</td>
-                            <td className='text-[#808183] font-semibold text-lg  text-Center'>${parseFloat(tokenPrice).toFixed(2)}</td>
+                            <td className='text-[#808183] font-semibold text-lg text-center'>${parseFloat(tokenPrice).toFixed(2)}</td>
                           </tr>
                         );
                       })
