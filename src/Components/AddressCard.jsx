@@ -375,9 +375,12 @@ const AddressCard = () => {
 
                           return (
                             <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
-                              <td className='px-4 flex items-center  justify-center gap-1'>
-                                <img src={logo} alt={asset}  className='mt-2 h-7 w-7'/>
-                               <p> {asset}</p>
+                              <td className=' flex items-center justify-center'>
+                                <div className='flex items-center gap-1  w-48'>
+                                <img src={logo} alt={asset}  className='mt-2 h-7 w-7 '/>
+                                <p className='text-nowrap'> {asset}</p>
+                                </div>
+                                
                                 </td>
                               <td className='px-4'>${price}</td>
                               <td className='px-4'>{holdings}</td>
