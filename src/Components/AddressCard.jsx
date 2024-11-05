@@ -96,14 +96,14 @@ const AddressCard = () => {
     }
 
     try {
-      const response = await axios.get(
-        `https://caiman-wanted-fox.ngrok-free.app/fetch-address-details/${inputValue}`,
+      const response = await axios.post(
+        `https://caiman-wanted-fox.ngrok-free.app/fetch-address-details/`,
+        { address: inputValue }, // This is the request body
         {
           headers: {
             "ngrok-skip-browser-warning": "true",
-
             "Content-Type": "application/json",
-          },
+          }
         }
       );
 
@@ -134,8 +134,9 @@ const AddressCard = () => {
     }
 
     try {
-      const response1 = await axios.get(
-        `https://caiman-wanted-fox.ngrok-free.app/token-transfers/${inputValue}`,
+      const response1 = await axios.post(
+        `https://caiman-wanted-fox.ngrok-free.app/token-transfers/`,
+        { address: inputValue }, // This is the request body
         {
           headers: {
             "ngrok-skip-browser-warning": "true",

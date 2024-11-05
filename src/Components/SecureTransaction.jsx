@@ -66,7 +66,7 @@ const SecureTransaction = () => {
       setLoading(true);
 
       try {
-        const response = await axios.get(
+        const response = await axios.post(
           "https://caiman-wanted-fox.ngrok-free.app/recent-txs",
           {
             headers: {
@@ -97,7 +97,7 @@ const SecureTransaction = () => {
       setLoading(true);
 
       try {
-        const response = await axios.get(
+        const response = await axios.post(
           "https://caiman-wanted-fox.ngrok-free.app/top-tokens",
           {
             headers: {
