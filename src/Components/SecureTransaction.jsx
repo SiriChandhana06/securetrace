@@ -20,6 +20,7 @@ import { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { DevUrl } from "../Constants";
 
 const SecureTransaction = () => {
   const [inputValue, setInputValue] = useState("");
@@ -47,7 +48,7 @@ const SecureTransaction = () => {
       setLoading(false);
       return;
     }
-    
+
 
     if (!isValidEthereumAddressOrTxHash(inputValue)) {
       toast.error('Invalid Ethereum address. Please enter a valid input.');
@@ -67,7 +68,8 @@ const SecureTransaction = () => {
 
       try {
         const response = await axios.post(
-          "https://caiman-wanted-fox.ngrok-free.app/recent-txs",
+          // "https://caiman-wanted-fox.ngrok-free.app/recent-txs",
+          `${DevUrl}/recent-txs`,
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -98,7 +100,8 @@ const SecureTransaction = () => {
 
       try {
         const response = await axios.post(
-          "https://caiman-wanted-fox.ngrok-free.app/top-tokens",
+          // "https://caiman-wanted-fox.ngrok-free.app/top-tokens",
+          `${DevUrl}/top-tokens`,
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
@@ -154,7 +157,7 @@ const SecureTransaction = () => {
 
 
 
-  
+
 
 
   return (
@@ -239,8 +242,8 @@ const SecureTransaction = () => {
                                   ${current_price}
                                 </h4>
                                 <p className={`text-lg font-semibold ${price_change_24h < 0 ? 'text-red-500' : 'text-[#3C704F]'}`}>
-  {price_change_24h.toFixed(2)}
-</p>
+                                  {price_change_24h.toFixed(2)}
+                                </p>
                               </div>
                             </div>
 
