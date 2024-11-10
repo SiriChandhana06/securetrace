@@ -14,7 +14,8 @@ import { DevUrl } from '../Constants';
 const AddressCard = () => {
 
   // const defaultCardData = {
-  //   address: "0x04b21735E93Fa3f8df70e2Da89e6922616891a88",
+  //   address: "0x04b21735E93Fa3f8df70e2Da89e6922616891a88
+  // 0xa2311e75bebdCa24A3dFAb4c50aAe4988De1aCE8",
   //   amount: "$10,491.48",
   //   greenAmount: "$10,491.48",
   // };
