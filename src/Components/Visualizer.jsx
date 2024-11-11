@@ -50,6 +50,36 @@ const Visualizer = () => {
     }
   };
 
+  const handleLinkClick = async (address, blockNum) => {
+    if (validateWalletAddress(address)) {
+      setLoading(true);
+  
+      try {
+        const response = await axios.post(
+          `${DevUrl}/token-transfers/`,
+          { address: address, blockNum: blockNum },
+          {
+            headers: {
+              'ngrok-skip-browser-warning': 'true',
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log(response.data);
+  
+        const combinedTransfers = response.data.from.concat(response.data.to);
+        renderGraph(address, combinedTransfers);
+        setValidationMessage('Valid wallet address found!');
+      } catch (error) {
+        console.log('Error:', error);
+        setValidationMessage('Error retrieving data.');
+      }
+      setLoading(false);
+    } else {
+      setValidationMessage('Invalid input. Please enter a valid wallet address.');
+    }
+  };
+
 
   const renderGraph = (centerAddress, transactions) => {
     const nodes = [{ id: centerAddress, center: true }];
@@ -67,7 +97,8 @@ const Visualizer = () => {
       links.push({
         source: centerAddress,
         target,
-        hash: tx.hash,
+        hash: tx.txHash,
+        blockNum: tx.blockNum,
         type: isIncoming ? 'incoming' : 'outgoing',  // Mark transaction type
       });
     });
@@ -90,16 +121,30 @@ const Visualizer = () => {
       .attr('width', width)
       .attr('height', height);
   
+    const linkGroups = d3.group(links, d => `${d.source}-${d.target}`);
+
+    const generatePathData = (d, i, total) => {
+      const dx = d.target.x - d.source.x;
+      const dy = d.target.y - d.source.y;
+      const dr = Math.sqrt(dx * dx + dy * dy);
+      const curveOffset = (i - (total - 1) / 2) * 20; // Adjust the curve offset
+      return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,${i % 2 === 0 ? 1 : 0} ${d.target.x},${d.target.y}`;
+    };
     // Links
     const link = svg
       .append('g')
       .attr('class', 'links')
-      .selectAll('line')
+      .selectAll('path')
       .data(links)
       .enter()
-      .append('line')
+      .append('path')
       .attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'))
       .attr('stroke-width', 2)
+      .attr('fill', 'none')
+      .attr('d', (d, i) => {
+        const group = linkGroups.get(`${d.source}-${d.target}`);
+        return group.length > 1 ? generatePathData(d, i, group.length) : `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+      })
       .on('mouseover', function (event, d) {
         d3.select(this).attr('stroke', '#555');
         tooltip
@@ -111,6 +156,10 @@ const Visualizer = () => {
       .on('mouseout', function () {
         d3.select(this).attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'));
         tooltip.style('opacity', 0);
+      })
+      .on('click', function (event, d) {
+        console.log(d);
+        handleLinkClick(d.target.id, d.blockNum);
       });
   
     // Nodes
@@ -132,7 +181,7 @@ const Visualizer = () => {
           .style('left', `${event.pageX + 10}px`)
           .style('top', `${event.pageY + 10}px`);
       })
-      .on('mouseout', function (d) {
+      .on('mouseout', function () {
         d3.select(this).attr('fill', '#40a9f3');
         tooltip.style('opacity', 0);
       });
@@ -163,21 +212,14 @@ const Visualizer = () => {
       .style('pointer-events', 'none')
       .style('opacity', 0);
   
-    simulation.on('tick', () => {
-      link
-        .attr('x1', (d) => d.source.x)
-        .attr('y1', (d) => d.source.y)
-        .attr('x2', (d) => d.target.x)
-        .attr('y2', (d) => d.target.y);
-  
-      node
-        .attr('cx', (d) => d.x)
-        .attr('cy', (d) => d.y);
-  
-      text
-        .attr('x', (d) => d.x)
-        .attr('y', (d) => d.y);
-    });
+      simulation.on('tick', () => {
+        link.attr('d', (d, i) => {
+          const group = linkGroups.get(`${d.source}-${d.target}`);
+          return group.length > 1 ? generatePathData(d, i, group.length) : `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+        });
+        node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
+        text.attr('x', (d) => d.x).attr('y', (d) => d.y);
+      });
   
     function drag(simulation) {
       function dragstarted(event, d) {
