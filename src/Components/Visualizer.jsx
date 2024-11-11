@@ -50,6 +50,36 @@ const Visualizer = () => {
     }
   };
 
+  const handleLinkClick = async (address, blockNum) => {
+    if (validateWalletAddress(address)) {
+      setLoading(true);
+  
+      try {
+        const response = await axios.post(
+          `${DevUrl}/token-transfers/`,
+          { address: address, blockNum: blockNum },
+          {
+            headers: {
+              'ngrok-skip-browser-warning': 'true',
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        console.log(response.data);
+  
+        const combinedTransfers = response.data.from.concat(response.data.to);
+        renderGraph(address, combinedTransfers);
+        setValidationMessage('Valid wallet address found!');
+      } catch (error) {
+        console.log('Error:', error);
+        setValidationMessage('Error retrieving data.');
+      }
+      setLoading(false);
+    } else {
+      setValidationMessage('Invalid input. Please enter a valid wallet address.');
+    }
+  };
+
 
   const renderGraph = (centerAddress, transactions) => {
     const nodes = [{ id: centerAddress, center: true }];
@@ -67,7 +97,8 @@ const Visualizer = () => {
       links.push({
         source: centerAddress,
         target,
-        hash: tx.hash,
+        hash: tx.txHash,
+        blockNum: tx.blockNum,
         type: isIncoming ? 'incoming' : 'outgoing',  // Mark transaction type
       });
     });
@@ -111,6 +142,10 @@ const Visualizer = () => {
       .on('mouseout', function () {
         d3.select(this).attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'));
         tooltip.style('opacity', 0);
+      })
+      .on('click', function (event, d) {
+        console.log(d);
+        handleLinkClick(d.target.id, d.blockNum);
       });
   
     // Nodes
