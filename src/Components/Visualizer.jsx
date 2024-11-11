@@ -203,7 +203,7 @@ const Visualizer = () => {
       .attr('class', 'tooltip')
       .style('position', 'absolute')
       .style('text-align', 'left')
-      .style('width', '200px')
+      .style('width', '500px')
       .style('padding', '8px')
       .style('font', '12px sans-serif')
       .style('background', 'lightsteelblue')
@@ -211,6 +211,29 @@ const Visualizer = () => {
       .style('border-radius', '8px')
       .style('pointer-events', 'none')
       .style('opacity', 0);
+
+      const showTooltip = (content, x, y) => {
+        tooltip
+          .html(content)
+          .style('left', `${x}px`)
+          .style('top', `${y}px`)
+          .style('opacity', 1);
+      };
+
+      const hideTooltip = () => {
+        tooltip.style('opacity', 0);
+      };
+
+      
+      node.on('mouseover', function (event, d) {
+        showTooltip(`Address: ${d.id}`, event.pageX + 10, event.pageY + 10);
+      });
+      
+      // Hide the tooltip when clicking anywhere on the document
+      document.addEventListener('click', (event) => {
+        const isTooltipClick = tooltip.node().contains(event.target);
+        if (!isTooltipClick) hideTooltip();
+      });
   
       simulation.on('tick', () => {
         link.attr('d', (d, i) => {
