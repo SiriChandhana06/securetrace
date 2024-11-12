@@ -9,6 +9,7 @@ const Visualizer = () => {
   const [validationMessage, setValidationMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const svgRef = useRef(null);
+  const [isInputEntered, setIsInputEntered] = useState(false);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value.trim());
@@ -40,6 +41,11 @@ const Visualizer = () => {
         const combinedTransfers = response.data.from.concat(response.data.to);
         renderGraph(value, combinedTransfers);
         setValidationMessage('Valid wallet address found!');
+        if (inputValue.length > 0) {
+          setIsInputEntered(true);
+        } else {
+          setIsInputEntered(false);
+        }
       } catch (error) {
         console.log('Error:', error);
         setValidationMessage('Error retrieving data.');
@@ -105,13 +111,13 @@ const Visualizer = () => {
   
     d3.select(svgRef.current).selectAll('*').remove();
   
-    const width = 1400;
-    const height = 600;
+    const width = 2000;
+    const height = 1000;
   
     const simulation = d3
       .forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id((d) => d.id).distance(150))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('link', d3.forceLink(links).id((d) => d.id).distance(300))
+      .force('charge', d3.forceManyBody().strength(-600))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('x', d3.forceX((d) => d.center ? width / 2 : d.type === 'incoming' ? width / 3 : 2 * width / 3))
       .force('y', d3.forceY(height / 2).strength(0.05));
@@ -139,7 +145,7 @@ const Visualizer = () => {
       .enter()
       .append('path')
       .attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'))
-      .attr('stroke-width', 2)
+      .attr('stroke-width', 1)
       .attr('fill', 'none')
       .attr('d', (d, i) => {
         const group = linkGroups.get(`${d.source}-${d.target}`);
@@ -170,11 +176,11 @@ const Visualizer = () => {
       .data(nodes)
       .enter()
       .append('circle')
-      .attr('r', (d) => (d.center ? 15 : 10))
-      .attr('fill', '#40a9f3')  // Blue nodes for all transactions
+      .attr('r', (d) => (d.center ? 35 : 30))
+      .attr('fill',(d) => (d.center ? '#d6b4fc' : '#40a9f3'))  // Blue nodes for all transactions
       .call(drag(simulation))
       .on('mouseover', function (event, d) {
-        d3.select(this).attr('fill', '#40a9f3');
+        d3.select(this).attr('fill', (d) => (d.center ? '#d6b4fc' : '#40a9f3'));
         tooltip
           .style('opacity', 1)
           .html(`Address: ${d.id}`)
@@ -182,7 +188,7 @@ const Visualizer = () => {
           .style('top', `${event.pageY + 10}px`);
       })
       .on('mouseout', function () {
-        d3.select(this).attr('fill', '#40a9f3');
+        d3.select(this).attr('fill', (d) => (d.center ? '#d6b4fc' : '#40a9f3'));
         tooltip.style('opacity', 0);
       });
   
@@ -193,8 +199,9 @@ const Visualizer = () => {
       .data(nodes)
       .enter()
       .append('text')
-      .attr('dy', -15)
-      .attr('dx', 10)
+      .attr('dy', 5)
+      .attr('dx', -25)
+      .style('font-size', '12px')
       .text((d) => d.id.substring(0, 6) + '...');
   
     const tooltip = d3
@@ -272,10 +279,14 @@ const Visualizer = () => {
   return (
     <div>
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
-        <h1 className="text-3xl font-bold text-center mb-4">SecureTrace</h1>
-        <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
-          SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
-        </p>
+      {!isInputEntered && (
+          <>
+            <h1 className="text-3xl font-bold text-center mb-4">SecureTrace</h1>
+            <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+              SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
+            </p>
+          </>
+        )}
         <div className="flex flex-col sm:flex-row items-center w-full md:max-w-3xl ">
           <input
             type="text"
