@@ -50,14 +50,14 @@ const Visualizer = () => {
     }
   };
 
-  const handleLinkClick = async (address, blockNum) => {
+  const handleLinkClick = async (address, blockNum, isOutgoing) => {
     if (validateWalletAddress(address)) {
       setLoading(true);
   
       try {
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: address, blockNum: blockNum },
+          { address: address, blockNum: blockNum, bool:isOutgoing },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -159,7 +159,7 @@ const Visualizer = () => {
       })
       .on('click', function (event, d) {
         console.log(d);
-        handleLinkClick(d.target.id, d.blockNum);
+        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true);
       });
   
     // Nodes
