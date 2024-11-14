@@ -32,6 +32,7 @@ const AddressCard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalValue, setTotalValue] = useState(0);
   const [selectedChain, setSelectedChain] = useState(null);
+  const [isInputEntered, setIsInputEntered] = useState(false);
 
 
   const transferData = [
@@ -130,6 +131,7 @@ const AddressCard = () => {
       setLoading(false);
 
       localStorage.setItem('inputValue', inputValue);
+      setIsInputEntered(true);
 
     } catch (error) {
       console.log("error", error);
@@ -241,15 +243,18 @@ const AddressCard = () => {
     <div>
       <div className='flex items-center justify-center'>
         <div className=' mt-10 md:mt-20'>
-          <h1 className="text-3xl font-bold text-center mb-4">
-            SecureTrace PortfolioTracker
-          </h1>
-
-          <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
-            SecureTrace analyzes transaction data using specialized blockchain
-            forensic techniques, enhancing the detection of intricate patterns
-            and potential vulnerabilities.
-          </p>
+        {!isInputEntered && (
+          <>
+            <h1 className="text-3xl font-bold text-center mb-4">
+              SecureTrace PortfolioTracker
+            </h1>
+            <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+              SecureTrace analyzes transaction data using specialized blockchain
+              forensic techniques, enhancing the detection of intricate patterns
+              and potential vulnerabilities.
+            </p>
+          </>
+        )}
         </div>
       </div>
       <div className='flex items-center justify-center mt-6 mb-6'>
@@ -294,7 +299,7 @@ const AddressCard = () => {
               Ethereum First Funder: <span className='text-black font-semibold text-sm md:text-xl'>{localStorage.getItem('inputValue')}</span>
             </p>
           </div>
-          <img src={img} alt='img' />
+          {/* <img src={img} alt='img' /> */}
         </div>
       )
       }
