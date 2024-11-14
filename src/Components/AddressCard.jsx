@@ -10,7 +10,6 @@ import btc from '../Assests/Bitcoin.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DevUrl } from '../Constants';
-import { useNavigate } from 'react-router-dom';
 
 const AddressCard = () => {
 
@@ -29,11 +28,9 @@ const AddressCard = () => {
   // const chains = ['Ethereum', 'Binance Smart Chain', 'Polygon', 'Avalanche'];
   const [loading, setLoading] = useState(false);
   const [portfolioData, SetPortfolioData] = useState([]);
-  const rowsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalValue, setTotalValue] = useState(0);
   const [selectedChain, setSelectedChain] = useState(null);
-  const [isInputEntered, setIsInputEntered] = useState(false);
 
 
   const transferData = [
@@ -132,7 +129,6 @@ const AddressCard = () => {
       setLoading(false);
 
       localStorage.setItem('inputValue', inputValue);
-      setIsInputEntered(true);
 
     } catch (error) {
       console.log("error", error);
@@ -192,7 +188,7 @@ const AddressCard = () => {
     { asset: 'Btc', price: '$00.00K', change: '+0.00', holdings: '00.000 Btc', value: '$00.00K' },
   ];
 
-
+  const rowsPerPage = 10;
 
   const filteredData = selectedChain
     ? portfolioData.filter(item => item.chain === selectedChain)
@@ -202,6 +198,9 @@ const AddressCard = () => {
 
 
   const currentRows = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+  console.log("Filtered Data:", filteredData);
+  console.log("Current Rows:", currentRows);
+
 
   // const handleChainSelect = (chain) => {
   //   setSelectedChain(chain);
@@ -240,28 +239,19 @@ const AddressCard = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
-  
-  const handleRowClick = (txHash) => {
-    navigate(`/visualizer/${txHash}`);
-  };
-
   return (
     <div>
       <div className='flex items-center justify-center'>
         <div className=' mt-10 md:mt-20'>
-        {!isInputEntered && (
-          <>
-            <h1 className="text-3xl font-bold text-center mb-4">
-              SecureTrace PortfolioTracker
-            </h1>
-            <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
-              SecureTrace analyzes transaction data using specialized blockchain
-              forensic techniques, enhancing the detection of intricate patterns
-              and potential vulnerabilities.
-            </p>
-          </>
-        )}
+          <h1 className="text-3xl font-bold text-center mb-4">
+            SecureTrace PortfolioTracker
+          </h1>
+
+          <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+            SecureTrace analyzes transaction data using specialized blockchain
+            forensic techniques, enhancing the detection of intricate patterns
+            and potential vulnerabilities.
+          </p>
         </div>
       </div>
       <div className='flex items-center justify-center mt-6 mb-6'>
@@ -306,7 +296,7 @@ const AddressCard = () => {
               Ethereum First Funder: <span className='text-black font-semibold text-sm md:text-xl'>{localStorage.getItem('inputValue')}</span>
             </p>
           </div>
-          {/* <img src={img} alt='img' /> */}
+          <img src={img} alt='img' />
         </div>
       )
       }
@@ -524,9 +514,9 @@ const AddressCard = () => {
                       <tbody className=" text-center">
                         {currentRows1 && currentRows1.length > 0 ?
                           (currentRows1.map((transfer, index) => {
-                            const { logo, timestamp, from, to, value, tokenName, tokenPrice, txHash } = transfer;
+                            const { logo, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
                             return (
-                              <tr key={index} onClick={() => handleRowClick(txHash)} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
+                              <tr key={index} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                                 <td className='flex justify-center items-center mt-2 px-4'><img src={logo} alt={tokenName} /></td>
                                 {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
                                 <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
