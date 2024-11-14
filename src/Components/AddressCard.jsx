@@ -10,6 +10,7 @@ import btc from '../Assests/Bitcoin.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DevUrl } from '../Constants';
+import { useNavigate } from 'react-router-dom';
 
 const AddressCard = () => {
 
@@ -238,6 +239,12 @@ const AddressCard = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const navigate = useNavigate();
+  
+  const handleRowClick = (txHash) => {
+    navigate(`/visualizer/${txHash}`);
+  };
 
   return (
     <div>
@@ -517,9 +524,9 @@ const AddressCard = () => {
                       <tbody className=" text-center">
                         {currentRows1 && currentRows1.length > 0 ?
                           (currentRows1.map((transfer, index) => {
-                            const { logo, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
+                            const { logo, timestamp, from, to, value, tokenName, tokenPrice, txHash } = transfer;
                             return (
-                              <tr key={index} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
+                              <tr key={index} onClick={() => handleRowClick(txHash)} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                                 <td className='flex justify-center items-center mt-2 px-4'><img src={logo} alt={tokenName} /></td>
                                 {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
                                 <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
