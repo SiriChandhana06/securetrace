@@ -191,13 +191,23 @@ const AddressCard = () => {
   const rowsPerPage = 10;
 
   const filteredData = selectedChain
-    ? portfolioData.filter(item => item.chain === selectedChain)
-    : portfolioData;
+  ? portfolioData.filter(item => item.chain === selectedChain)
+  : portfolioData;
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const validData = filteredData.filter(item => {
+    const price = parseFloat(item.tokenPrice);
+    const holdings = parseFloat(item.tokenBalance);
+    const value = price * holdings;
+    return value >= 0.01;
+  });
+  const totalPages = Math.ceil(validData.length / rowsPerPage);
 
+// Slice data for the current page
+const currentRows = validData.slice(
+  (currentPage - 1) * rowsPerPage,
+  currentPage * rowsPerPage
+);
 
-  const currentRows = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
   console.log("Filtered Data:", filteredData);
   console.log("Current Rows:", currentRows);
 
