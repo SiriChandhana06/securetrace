@@ -519,7 +519,7 @@ const Visualizer = () => {
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
         {!isInputEntered && (
           <>
-            <h1 className="text-3xl font-bold text-center mb-4">SecureTrace</h1>
+            <h1 className="text-3xl font-bold text-center mb-4">SecureTrace Visualizer</h1>
             <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
               SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
             </p>
