@@ -210,6 +210,7 @@ const currentRows = validData.slice(
 
   console.log("Filtered Data:", filteredData);
   console.log("Current Rows:", currentRows);
+  console.log("validdata", validData);
 
 
   // const handleChainSelect = (chain) => {
@@ -419,9 +420,6 @@ const currentRows = validData.slice(
                           const holdings = parseFloat(item.tokenBalance).toFixed(2);
                           const value = (price * holdings).toFixed(2);
 
-                          if (parseFloat(value) < 0.01) {
-                            return null;
-                          }
 
                           return (
                             <tr key={index} className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white">
