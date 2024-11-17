@@ -252,7 +252,7 @@ const currentRows = validData.slice(
 
   return (
     <div>
-      <div className='flex items-center justify-center'>
+      <div className='flex items-center justify-center overflow-x-hidden'>
         <div className=' mt-10 md:mt-20'>
           <h1 className="text-3xl font-bold text-center mb-4">
             SecureTrace PortfolioTracker
