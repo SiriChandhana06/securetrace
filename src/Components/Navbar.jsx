@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { IoSunnyOutline } from "react-icons/io5";
+import { IoMoonOutline } from "react-icons/io5";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +58,10 @@ const Navbar = () => {
                 <Link to="/visualizer" className="hover:text-gray-400">Visualizer</Link>
                 <Link to="/portfoliotracker" className="hover:text-gray-400">Portfolio Tracker</Link>
             </div>
+            {/* <div className='text-white flex justify-end'>
+            <IoSunnyOutline />
+            <IoMoonOutline />
+            </div> */}
             {userEmail ? (
                 <div className="relative hidden md:flex" ref={dropdownRef}>
                     <button onClick={toggleLogout} className="hidden md:flex bg-white text-black rounded-full px-4 py-2">{userEmail}</button>
@@ -71,15 +77,25 @@ const Navbar = () => {
                     )}
                 </div>
             ) : (
-                <Link to='/loginpage'>
-                    <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
-                        Login
-                    </button>
-                </Link>
+                <div className='hidden md:flex justify-center gap-4'>
+                    <div className='text-white text-2xl mt-2'>
+                        <IoSunnyOutline />
+                    </div>
+                    <Link to='/loginpage'>
+                        <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
+                            Login
+                        </button>
+                    </Link>
+                </div>
             )}
 
-            <div className="md:hidden text-white" onClick={toggleMenu}>
+            <div className="md:hidden flex justify-center gap-2 text-white">
+                <div className='text-white text-2xl'>
+                    <IoSunnyOutline />
+                </div>
+                <div  onClick={toggleMenu}>
                 {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                </div>
             </div>
 
             {isOpen && (

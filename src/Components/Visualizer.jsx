@@ -672,7 +672,7 @@ const Visualizer = () => {
           </div>
         )}
       </div>
-      <div className=''>
+      <div className='mt-10'>
         <Footer/>
       </div>
     </div>
