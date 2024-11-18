@@ -112,14 +112,14 @@ const Visualizer = () => {
   };
 
 
-  const handleLinkClick = async (address, blockNum, isOutgoing) => {
+  const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
     if (validateWalletAddress(address)) {
       setLoading(true);
 
       try {
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: address, blockNum: blockNum, bool: isOutgoing },
+          { address: address, blockNum: blockNum, isOutgoing: isOutgoing, chain: chain },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -162,6 +162,7 @@ const Visualizer = () => {
         source: centerAddress,
         target,
         hash: tx.txHash,
+        chain: tx.chain,
         blockNum: tx.blockNum,
         type: isIncoming ? 'incoming' : 'outgoing',
       });
@@ -222,8 +223,11 @@ const Visualizer = () => {
         tooltip.style('opacity', 0);
       })
       .on('click', function (event, d) {
+        const chain = d.chain === "ethereum" ? "eth" :
+          d.chain === "polygon" ? "pol" :
+            d.chain === "arbitrum" ? "arb" : "opt";
         console.log(d);
-        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true);
+        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true, chain);
       });
 
     // Nodes
@@ -519,19 +523,12 @@ const Visualizer = () => {
     <div>
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
         {!isInputEntered && (
-            <div className='flex items-center justify-center'>
-              <div className=' mt-10 md:mt-20'>
-                <h1 className="text-3xl font-bold text-center mb-4">
-                  SecureTrace Visualizer
-                </h1>
-
-                <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
-                  SecureTrace analyzes transaction data using specialized blockchain
-                  forensic techniques, enhancing the detection of intricate patterns
-                  and potential vulnerabilities.
-                </p>
-              </div>
-            </div>
+          <>
+            <h1 className="text-3xl font-bold text-center mb-4">SecureTrace Visualizer</h1>
+            <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+              SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
+            </p>
+          </>
         )}
         <div className="flex flex-col sm:flex-row items-center w-full md:max-w-3xl ">
           <input
