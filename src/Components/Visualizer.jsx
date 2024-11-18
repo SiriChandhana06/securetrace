@@ -112,14 +112,14 @@ const Visualizer = () => {
   };
 
 
-  const handleLinkClick = async (address, blockNum, isOutgoing) => {
+  const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
     if (validateWalletAddress(address)) {
       setLoading(true);
 
       try {
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: address, blockNum: blockNum, bool: isOutgoing },
+          { address: address, blockNum: blockNum, isOutgoing: isOutgoing, chain: chain },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -162,6 +162,7 @@ const Visualizer = () => {
         source: centerAddress,
         target,
         hash: tx.txHash,
+        chain: tx.chain,
         blockNum: tx.blockNum,
         type: isIncoming ? 'incoming' : 'outgoing',
       });
@@ -222,8 +223,11 @@ const Visualizer = () => {
         tooltip.style('opacity', 0);
       })
       .on('click', function (event, d) {
+        const chain = d.chain === "ethereum" ? "eth" :
+          d.chain === "polygon" ? "pol" :
+            d.chain === "arbitrum" ? "arb" : "opt";
         console.log(d);
-        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true);
+        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true, chain);
       });
 
     // Nodes
