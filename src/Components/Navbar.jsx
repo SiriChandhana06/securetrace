@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { IoSunnyOutline } from "react-icons/io5";
+// import { IoSunnyOutline } from "react-icons/io5";
 import { IoMoonOutline } from "react-icons/io5";
+import { TbBrightnessUp  } from "react-icons/tb";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [userEmail, setUserEmail] = useState('');
     const [showLogout, setShowLogout] = useState(false);
     const dropdownRef = useRef(null);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -17,6 +19,19 @@ const Navbar = () => {
     const toggleLogout = () => {
         setShowLogout(!showLogout);
     };
+    // const toggleTheme = () => {
+    //     setIsDarkMode(!isDarkMode); 
+    //   };
+
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+        if (isDarkMode) {
+          document.documentElement.classList.add("dark"); 
+        } else {
+          document.documentElement.classList.remove("dark"); 
+        }
+      };
+      
 
     const handleLogout = () => {
         localStorage.removeItem('userEmail');
@@ -44,6 +59,13 @@ const Navbar = () => {
             setUserEmail(storedEmail);
         }
     }, []);
+
+    useEffect(() => {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.classList.remove("dark");
+          setIsDarkMode(true);
+        }
+      }, []);
 
 
     return (
@@ -78,8 +100,10 @@ const Navbar = () => {
                 </div>
             ) : (
                 <div className='hidden md:flex justify-center gap-4'>
-                    <div className='text-white text-2xl mt-2'>
-                        <IoSunnyOutline />
+                    <div className='text-white text-2xl mt-2 cursor-pointer' onClick={toggleTheme}>
+                        {/* <IoSunnyOutline /> */}
+                        {/* <IoMoonOutline /> */}
+                        {isDarkMode ? <IoMoonOutline /> : <TbBrightnessUp />}
                     </div>
                     <Link to='/loginpage'>
                         <button className="hidden md:flex bg-white text-black rounded-full px-4 py-2">
@@ -90,11 +114,14 @@ const Navbar = () => {
             )}
 
             <div className="md:hidden flex justify-center gap-2 text-white">
-                <div className='text-white text-2xl'>
-                    <IoSunnyOutline />
+                <div className='text-white text-2xl cursor-pointer' onClick={toggleTheme}>
+                    {/* <IoSunnyOutline /> */}
+                    {/* <IoMoonOutline /> */}
+                    {isDarkMode ? <IoMoonOutline /> : <TbBrightnessUp />}
+
                 </div>
-                <div  onClick={toggleMenu}>
-                {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                <div onClick={toggleMenu}>
+                    {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                 </div>
             </div>
 
@@ -126,6 +153,7 @@ const Navbar = () => {
                     )}
                 </div>
             )}
+
         </nav>
     );
 };

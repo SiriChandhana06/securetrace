@@ -161,11 +161,11 @@ const SecureTransaction = () => {
 
 
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-white dark:bg-[#001938]">
 
 
       <div className="">
-        <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
+        <div className="flex flex-col items-center justify-center py-10 px-4">
           <h1 className="text-3xl font-bold text-center mb-4">
             SecureTrace Transactions
           </h1>

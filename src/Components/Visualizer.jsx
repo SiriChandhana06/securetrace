@@ -6,6 +6,7 @@ import { DevUrl } from '../Constants';
 import btc from '../Assests/Bitcoin.png';
 import { useParams } from 'react-router-dom';
 import Footer from './Footer';
+import Navbar from './Navbar';
 
 const Visualizer = () => {
   const [inputValue, setInputValue] = useState('');
@@ -521,6 +522,9 @@ const Visualizer = () => {
 
   return (
     <div>
+      <div>
+        <Navbar/>
+        </div>
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
         {!isInputEntered && (
           <>
