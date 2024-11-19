@@ -104,7 +104,8 @@ const Visualizer = () => {
 
 
   const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
-  const currentRows1 = transfers.slice((currentPage1 - 1) * rowsPerPage1, currentPage1 * rowsPerPage1);
+  const sortedTransfers = transfers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const currentRows1 = sortedTransfers.slice((currentPage1 - 1) * rowsPerPage1, currentPage1 * rowsPerPage1);
   const handlePageChange1 = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages1) {
       setCurrentPage1(pageNumber);
@@ -130,6 +131,7 @@ const Visualizer = () => {
         console.log(response.data);
 
         const combinedTransfers = response.data.from.concat(response.data.to);
+        setTransfers(combinedTransfers);
         renderGraph(address, combinedTransfers);
         setValidationMessage('Valid wallet address found!');
       } catch (error) {
@@ -623,18 +625,28 @@ const Visualizer = () => {
                     </thead>
                     <tbody className=" text-center">
                       {currentRows1 && currentRows1.length > 0 ?
-                        (currentRows1.map((transfer, index) => {
-                          const { logo, timestamp, from, to, value, tokenName, tokenPrice } = transfer;
+                        currentRows1.map((transfer, index) => {
+                          const { logo, timestamp, from, to, value, tokenName, tokenPrice, blockNum, chain } = transfer;
                           return (
-                            <tr key={index} className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
+                            <tr key={index} className="border-t h-12 text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
                               <td className='flex justify-center items-center mt-2 px-4'><img src={logo} alt={tokenName} /></td>
-                              {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
                               <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
-                              {/* <td className="me-3 px-4">{from}</td>
-                                            <td className="me-3 px-4">{to}</td> */}
-                              <td className="me-3 px-4">{from.slice(0, 5) + "..." + from.slice(-4)}</td>
-                              <td className="me-3 px-4">{to.slice(0, 5) + "..." + to.slice(-4)}</td>
-                              {/* <td className='text-green-500'>{transfer.value}</td> */}
+                              <td className="me-3 px-4">
+                                <button
+                                  className="text-center"
+                                  onClick={() => handleLinkClick(from, blockNum, false, chain)}
+                                >
+                                  {from.slice(0, 5) + "..." + from.slice(-4)}
+                                </button>
+                              </td>
+                              <td className="me-3 px-4">
+                                <button
+                                  className="text-center"
+                                  onClick={() => handleLinkClick(to, blockNum, true, chain)}
+                                >
+                                  {to.slice(0, 5) + "..." + to.slice(-4)}
+                                </button>
+                              </td>
                               <td className="text-green-500 px-4">
                                 {parseFloat(tokenPrice).toFixed(2)}
                               </td>
@@ -642,7 +654,7 @@ const Visualizer = () => {
                               <td className="px-4">{parseFloat(value).toFixed(2)}</td>
                             </tr>
                           );
-                        }))
+                        })
                         :
                         (
                           <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
