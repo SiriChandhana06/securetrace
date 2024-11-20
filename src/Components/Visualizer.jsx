@@ -7,6 +7,7 @@ import btc from '../Assests/Bitcoin.png';
 import { useParams } from 'react-router-dom';
 import Footer from './Footer';
 import Navbar from './Navbar';
+import cytoscape from 'cytoscape';
 
 const Visualizer = () => {
   const [inputValue, setInputValue] = useState('');
@@ -149,192 +150,183 @@ const Visualizer = () => {
 
 
   const renderGraph = (centerAddress, transactions) => {
-    const nodes = [{ id: centerAddress, center: true }];
-    const links = [];
+    const elements = [];
+    
+    const shortenAddress = (address) => `${address.slice(0, 6)}...`;
+    const shortenTxHash = (address) => `${address.slice(0, 6)}...${address.slice(-4)}`;
 
+    // Add the center node
+    elements.push({
+      data: { id: centerAddress, label: shortenAddress(centerAddress) },
+      classes: 'center-node',
+    });
+
+    // Add edges and other nodes
     transactions.forEach((tx) => {
       const isIncoming = tx.to.toLowerCase() === centerAddress.toLowerCase();
       const target = isIncoming ? tx.from : tx.to;
 
-      // Ensure the node for each transaction party exists
-      if (!nodes.some(node => node.id === target)) {
-        nodes.push({ id: target, type: isIncoming ? 'incoming' : 'outgoing' });
+      // Add the target node if not already added
+      if (!elements.some((el) => el.data.id === target)) {
+        elements.push({
+          data: { 
+            id: target,
+            label: shortenAddress(target),
+            txHash: tx.txHash,
+            type: isIncoming ? 'incoming' : 'outgoing',
+            chain: tx.chain,
+            blockNum: tx.blockNum,
+            value: tx.value * tx.tokenPrice,
+          },
+          classes: isIncoming ? 'incoming-node' : 'outgoing-node',
+        });
       }
-
-      links.push({
-        source: centerAddress,
-        target,
-        hash: tx.txHash,
-        chain: tx.chain,
-        blockNum: tx.blockNum,
-        type: isIncoming ? 'incoming' : 'outgoing',
+      // Add the edge
+      elements.push({
+        data: {
+          source: centerAddress,
+          target: target,
+          label: shortenTxHash(tx.txHash),
+          hoverLabel: tx.txHash,
+          type: isIncoming ? 'incoming' : 'outgoing',
+          chain: tx.chain,
+          blockNum: tx.blockNum,
+          value: tx.value*tx.tokenPrice,
+        },
+        classes: isIncoming ? 'incoming-edge' : 'outgoing-edge',
       });
     });
 
-    d3.select(svgRef.current).selectAll('*').remove();
+    const cy = cytoscape({
+      container: document.getElementById('cy'), // HTML element to attach the graph
 
-    const width = 2000;
-    const height = 1000;
+      elements: elements,
 
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id((d) => d.id).distance(300))
-      .force('charge', d3.forceManyBody().strength(-600))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('x', d3.forceX((d) => d.center ? width / 2 : d.type === 'incoming' ? width / 3 : 2 * width / 3))
-      .force('y', d3.forceY(height / 2).strength(0.05));
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': '#40a9f3',
+            'label': 'data(label)',
+            'width': 50,
+            'height': 50,
+            'text-valign': 'center',
+            'color': '#fff',
+            'font-size': '10px',
+          },
+        },
+        {
+          selector: '.center-node',
+          style: {
+            'background-color': '#d6b4fc',
+            'width': 70,
+            'height': 70,
+          },
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 1,
+            'line-color': '#ddd',
+            'curve-style': 'bezier',
+            'label': 'data(label)',
+            'font-size': '8px',
+            'text-outline-width': 1,
+            'text-outline-color': '#fff',
+          },
+        },
+        {
+          selector: '.incoming-edge',
+          style: {
+            'line-color': 'green',
+            'source-arrow-color': 'green',
+            'source-arrow-shape': 'triangle',
+          },
+        },
+        {
+          selector: '.outgoing-edge',
+          style: {
+            'line-color': 'red',
+            'target-arrow-color': 'red',
+            'target-arrow-shape': 'triangle',
+          },
+        },
+      ],
 
-    const svg = d3
-      .select(svgRef.current)
-      .attr('width', width)
-      .attr('height', height);
+      layout: {
+        name: 'cose',
+        padding: 10,
+        nodeRepulsion: 5000,
+        idealEdgeLength: 50,
+        edgeElasticity: 100,
 
-    const linkGroups = d3.group(links, d => `${d.source}-${d.target}`);
+      },
+      wheelSensitivity: 0.2,
+    });
 
-    const generatePathData = (d, i, total) => {
-      const dx = d.target.x - d.source.x;
-      const dy = d.target.y - d.source.y;
-      const dr = Math.sqrt(dx * dx + dy * dy);
-      const curveOffset = (i - (total - 1) / 2) * 20; // Adjust the curve offset
-      return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,${i % 2 === 0 ? 1 : 0} ${d.target.x},${d.target.y}`;
-    };
-    // Links
-    const link = svg
-      .append('g')
-      .attr('class', 'links')
-      .selectAll('path')
-      .data(links)
-      .enter()
-      .append('path')
-      .attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'))
-      .attr('stroke-width', 1)
-      .attr('fill', 'none')
-      .attr('d', (d, i) => {
-        const group = linkGroups.get(`${d.source}-${d.target}`);
-        return group.length > 1 ? generatePathData(d, i, group.length) : `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
-      })
-      .on('mouseover', function (event, d) {
-        d3.select(this).attr('stroke', '#555');
-        tooltip
-          .style('opacity', 1)
-          .html(`Hash: ${d.hash}`)
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY + 10}px`);
-      })
-      .on('mouseout', function () {
-        d3.select(this).attr('stroke', (d) => (d.type === 'incoming' ? 'green' : 'red'));
-        tooltip.style('opacity', 0);
-      })
-      .on('click', function (event, d) {
-        const chain = d.chain === "ethereum" ? "eth" :
-          d.chain === "polygon" ? "pol" :
-            d.chain === "arbitrum" ? "arb" : "opt";
-        console.log(d);
-        handleLinkClick(d.target.id, d.blockNum, d.type === 'incoming' ? false : true, chain);
-      });
+    const tooltip = document.createElement('div');
+    tooltip.style.position = 'absolute';
+    tooltip.style.padding = '8px';
+    tooltip.style.background = 'lightsteelblue';
+    tooltip.style.border = '1px solid #fff';
+    tooltip.style.borderRadius = '8px';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.opacity = 0;
+    document.body.appendChild(tooltip);
 
-    // Nodes
-    const node = svg
-      .append('g')
-      .attr('class', 'nodes')
-      .selectAll('circle')
-      .data(nodes)
-      .enter()
-      .append('circle')
-      .attr('r', (d) => (d.center ? 35 : 30))
-      .attr('fill', (d) => (d.center ? '#d6b4fc' : '#40a9f3'))  // Blue nodes for all transactions
-      .call(drag(simulation))
-      .on('mouseover', function (event, d) {
-        d3.select(this).attr('fill', (d) => (d.center ? '#d6b4fc' : '#40a9f3'));
-        tooltip
-          .style('opacity', 1)
-          .html(`Address: ${d.id}`)
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY + 10}px`);
-      })
-      .on('mouseout', function () {
-        d3.select(this).attr('fill', (d) => (d.center ? '#d6b4fc' : '#40a9f3'));
-        tooltip.style('opacity', 0);
-      });
-
-    const text = svg
-      .append('g')
-      .attr('class', 'labels')
-      .selectAll('text')
-      .data(nodes)
-      .enter()
-      .append('text')
-      .attr('dy', 5)
-      .attr('dx', -25)
-      .style('font-size', '12px')
-      .text((d) => d.id.substring(0, 6) + '...');
-
-    const tooltip = d3
-      .select('body')
-      .append('div')
-      .attr('class', 'tooltip')
-      .style('position', 'absolute')
-      .style('text-align', 'left')
-      .style('width', '500px')
-      .style('padding', '8px')
-      .style('font', '12px sans-serif')
-      .style('background', 'lightsteelblue')
-      .style('border', '1px solid #fff')
-      .style('border-radius', '8px')
-      .style('pointer-events', 'none')
-      .style('opacity', 0);
-
+    // Function to show the tooltip
     const showTooltip = (content, x, y) => {
-      tooltip
-        .html(content)
-        .style('left', `${x}px`)
-        .style('top', `${y}px`)
-        .style('opacity', 1);
+      tooltip.innerHTML = content;
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+      tooltip.style.opacity = 0.7;
     };
 
+    // Function to hide the tooltip
     const hideTooltip = () => {
-      tooltip.style('opacity', 0);
+      tooltip.style.opacity = 0;
     };
 
-    node.on('mouseover', function (event, d) {
-      showTooltip(`Address: ${d.id}`, event.pageX + 10, event.pageY + 10);
+    // Attach event listeners for tooltip-like behavior
+    cy.on('mouseover', 'node', (event) => {
+      const nodeData = event.target.data();
+      const { x, y } = event.renderedPosition;
+      showTooltip(`Address: ${nodeData.id}`, x + 1, y + 1);
     });
 
-    document.addEventListener('click', (event) => {
-      const isTooltipClick = tooltip.node().contains(event.target);
-      if (!isTooltipClick) hideTooltip();
+    cy.on('mouseout', 'node', () => {
+      hideTooltip();
     });
 
-    simulation.on('tick', () => {
-      link.attr('d', (d, i) => {
-        const group = linkGroups.get(`${d.source}-${d.target}`);
-        return group.length > 1 ? generatePathData(d, i, group.length) : `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
-      });
-      node.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-      text.attr('x', (d) => d.x).attr('y', (d) => d.y);
+    cy.on('mouseover', 'edge', (event) => {
+      const edgeData = event.target.data();
+      const { x, y } = event.renderedPosition;
+      showTooltip(`Transaction Hash: ${edgeData.hoverLabel}<br>Value: $${parseFloat(edgeData.value).toFixed(2)}`, x + 10, y + 10);
     });
 
-    function drag(simulation) {
-      function dragstarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-      }
+    cy.on('mouseout', 'edge', () => {
+      hideTooltip();
+    });
+
+    cy.on('click', 'edge', (event) => {
+      const edgeData = event.target.data();
+      handleLinkClick(edgeData.target, edgeData.blockNum, edgeData.type === 'outgoing', edgeData.chain);
+    });
+  };
+
+
 
       function dragged(event, d) {
         d.fx = event.x;
         d.fy = event.y;
       }
-
-      function dragended(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+  
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
       }
 
-      return d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended);
-    }
-  };
+
 
   // const renderGraphTxHash = () => {
   //   const nodes = [{ id: centerAddress, center: true }];
@@ -548,9 +540,7 @@ const Visualizer = () => {
             {validationMessage}
           </p>
         )}
-        <div>
-          <svg ref={svgRef}></svg>
-        </div>
+        <div id="cy" className="w-full h-[800px]"></div>
       </div>
       <div className='bg-white dark:bg-[#001938]'>
         {isInputEntered && (
