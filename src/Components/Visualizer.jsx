@@ -512,18 +512,13 @@ const Visualizer = () => {
   // }
 
 
-
-
   return (
-    <div>
-      <div>
-        <Navbar/>
-        </div>
-      <div className="flex flex-col items-center justify-center py-10 px-4 bg-white">
+    <div className='overflow-hidden'>
+      <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
         {!isInputEntered && (
           <>
-            <h1 className="text-3xl font-bold text-center mb-4">SecureTrace Visualizer</h1>
-            <p className="text-center text-gray-600 mb-6 max-w-2xl font-semibold">
+            <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-4">SecureTrace Visualizer</h1>
+            <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-2xl font-semibold">
               SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
             </p>
           </>
@@ -547,10 +542,10 @@ const Visualizer = () => {
         )}
         <div id="cy" className="w-full h-[800px]"></div>
       </div>
-      <div>
+      <div className='bg-white dark:bg-[#001938]'>
         {isInputEntered && (
           // <div className="mt-10 mx-20">
-          <div className='mx-4 md:mx-32 my-10'>
+          <div className='mx-4 md:mx-32 py-10'>
             <div className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500" id="hide-scrollbar">
               <div className="">
                 <div className='flex'>
@@ -675,7 +670,7 @@ const Visualizer = () => {
           </div>
         )}
       </div>
-      <div className='mt-10'>
+      <div className=''>
         <Footer/>
       </div>
     </div>

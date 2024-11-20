@@ -9,16 +9,13 @@ const Home = () => {
     return (
         <div className='bg-white dark:bg-[#001938]'>
             <div>
-                <Navbar/>
-            </div>
-            <div>
                 <SecureTransaction/>
             </div>
             {/* <div className='text-black mt-10 mb-4'>
                 <h1 className='text-center'>support@securetrace.io - securedapp.io - 2024 </h1>
                 <h1 className='text-center'>Terms od service and privacy</h1>
             </div> */}
-            <div className='mt-10'>
+            <div className='pt-10'>
                 {/* <Footer/> */}
                 <Footer/>
             </div>
