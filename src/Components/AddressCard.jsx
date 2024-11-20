@@ -582,7 +582,7 @@ const currentRows = validData.slice(
         pauseOnFocusLoss
         theme="colored"
       />
-      <div className='pt-10'>
+      <div className='pt-20'>
                 <Footer/>
             </div>
     </div >

@@ -19,6 +19,18 @@ const Visualizer = () => {
   const rowsPerPage1 = 10;
   const [transfers, setTransfers] = useState([]);
   const { txHash } = useParams();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [option, setOption] = useState(""); // Track selected option
+  const [formData, setFormData] = useState({
+      txshash: "",
+      address: "",
+      fromDate: "",
+      toDate: "",
+      tokens: "",
+  });
+  const [error, setError] = useState("");
+
+
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value.trim());
@@ -145,6 +157,88 @@ const Visualizer = () => {
       setValidationMessage('Invalid input. Please enter a valid wallet address.');
     }
   };
+
+
+  const togglePopup = () => {
+    setIsPopupOpen(!isPopupOpen);
+};
+
+const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
+
+const handleOptionChange = (e) => {
+    setOption(e.target.value);
+    setFormData({
+        txshash: "",
+        address: "",
+        fromDate: "",
+        toDate: "",
+        tokens: "",
+    }); // Reset form fields when changing options
+    setError("");
+};
+
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+  }));
+};
+
+const validateTxHash = (txshash) => {
+  // Example validation: Tx Hash should be 64 characters long and hexadecimal
+  const hexRegex = /^[0-9a-fA-F]{64}$/;
+  if (!hexRegex.test(txshash)) {
+    alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
+      return "Invalid Tx Hash. Ensure it is a 64-character hexadecimal string.";
+  }
+  return "";
+};
+
+const validateAddress = (address) => {
+  // Example validation: Ethereum addresses start with '0x' and are 42 characters long
+  const addressRegex = /^0x[a-fA-F0-9]{40}$/;
+  if (!addressRegex.test(address)) {
+      return "Invalid Address. Ensure it starts with '0x' and is a valid Ethereum address.";
+  }
+  return "";
+};
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  // Validation for Tx Hash
+  if (option === "txshash") {
+      const txshashError = validateTxHash(formData.txshash);
+      if (txshashError) {
+          setError(txshashError);
+          return; // Stop submission if invalid
+      }
+  }
+
+  if (option === "address") {
+    const addressError = validateAddress(formData.address);
+    if (addressError) {
+        setError(addressError);
+        return; // Stop submission if invalid
+    }
+
+    if (!formData.fromDate || !formData.toDate) {
+        setError("Both 'From Date' and 'To Date' are required.");
+        return;
+    }
+
+    if (!formData.tokens) {
+        setError("Please select a token from the dropdown.");
+        return;
+    }
+}
+
+  console.log("Form Submitted:", formData);
+  setError(""); // Clear errors on successful submission
+  setIsPopupOpen(false); // Close popup
+};
 
 
 
@@ -513,7 +607,7 @@ const Visualizer = () => {
 
 
   return (
-    <div className='overflow-hidden'>
+    <div className=''>
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
         {!isInputEntered && (
           <>
@@ -531,9 +625,150 @@ const Visualizer = () => {
             placeholder="Enter transaction hash or address value"
             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
           />
+          <div className='flex gap-4'>
           <button onClick={handleScanClick} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
             {loading ? 'Loading...' : 'Scan Now'}
           </button>
+          <button  onClick={togglePopup} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+            Filter
+          </button>
+
+
+          {isPopupOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative">
+                        <button
+                            className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                            onClick={togglePopup}
+                        >
+                            ✖
+                        </button>
+                        <h2 className="text-xl font-semibold mb-4">Filter Options</h2>
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="font-medium text-gray-700">
+                                    Choose Option:
+                                </label>
+                                <div className="flex gap-4 mt-2">
+                                    <label className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="filterOption"
+                                            value="txshash"
+                                            checked={option === "txshash"}
+                                            onChange={handleOptionChange}
+                                            className="mr-2"
+                                        />
+                                        Tx Hash
+                                    </label>
+                                    <label className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="filterOption"
+                                            value="address"
+                                            checked={option === "address"}
+                                            onChange={handleOptionChange}
+                                            className="mr-2"
+                                        />
+                                        Address
+                                    </label>
+                                </div>
+                            </div>
+
+                            {option === "txshash" && (
+                                <div className="mb-4">
+                                    <label className="font-medium text-gray-700">
+                                        Tx Hash:
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="txshash"
+                                        value={formData.txshash}
+                                        onChange={handleChange}
+                                        placeholder="Enter Tx Hash"
+                                        className="w-full p-3 border rounded-lg mt-2"
+                                    />
+                                </div>
+                            )}
+
+                            {option === "address" && (
+                                <>
+                                    <div className="mb-4">
+                                        <label className="font-medium text-gray-700">
+                                            Address:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            placeholder="Enter Address"
+                                            className="w-full p-3 border rounded-lg mt-2"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="font-medium text-gray-700">
+                                            From Date:
+                                        </label>
+                                        <input
+                                            type="date"
+                                            name="fromDate"
+                                            value={formData.fromDate}
+                                            onChange={handleChange}
+                                            className="w-full p-3 border rounded-lg mt-2"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="font-medium text-gray-700">
+                                            To Date:
+                                        </label>
+                                        <input
+                                            type="date"
+                                            name="toDate"
+                                            value={formData.toDate}
+                                            onChange={handleChange}
+                                            className="w-full p-3 border rounded-lg mt-2"
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="font-medium text-gray-700">
+                                            Tokens:
+                                        </label>
+                                        <select
+                                            name="tokens"
+                                            value={formData.tokens}
+                                            onChange={handleChange}
+                                            className="w-full p-3 border rounded-lg mt-2 bg-white"
+                                        >
+                                            <option value="" disabled>
+                                                Select Token
+                                            </option>
+                                            {tokensList.map((token, index) => (
+                                                <option key={index} value={token}>
+                                                    {token}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="flex justify-end">
+                                <button
+                                    type="submit"
+                                    className="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-600 transition-all duration-300"
+                                >
+                                    {option === "txHash" ? "Scan Now" : "Submit"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+
+          </div>
         </div>
         {validationMessage && (
           <p className={`ml-10 mt-2 ${validationMessage.includes('Invalid') ? 'text-red-500' : 'text-green-500'}`}>
@@ -545,7 +780,7 @@ const Visualizer = () => {
       <div className='bg-white dark:bg-[#001938]'>
         {isInputEntered && (
           // <div className="mt-10 mx-20">
-          <div className='mx-4 md:mx-32 py-10'>
+          <div className='mx-4 md:mx-32 pt-10 pb-20'>
             <div className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500" id="hide-scrollbar">
               <div className="">
                 <div className='flex'>
