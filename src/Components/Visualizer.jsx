@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import * as d3 from 'd3';
+// import * as d3 from 'd3';
 import { isAddress } from 'ethers';
 import axios from 'axios';
 import { DevUrl } from '../Constants';
@@ -22,7 +22,7 @@ const Visualizer = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [option, setOption] = useState(""); // Track selected option
   const [formData, setFormData] = useState({
-      txshash: "",
+      txhash: "",
       address: "",
       fromDate: "",
       toDate: "",
@@ -49,15 +49,16 @@ const Visualizer = () => {
   }, [txHash]);
 
   const handleScanClick = async () => {
-    const value = inputValue;
+    const value = !formData ? inputValue : formData.txhash ? formData.txhash : formData.address;
 
     if (validateWalletAddress(value)) {
       setLoading(true);
 
       try {
+        console.log('address:', value, "fromDate:", formData.fromDate, "toDate:", formData.toDate, "tokens:", formData.tokens);
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: value },
+          { address: value, startDate: formData.fromDate ? formData.fromDate : null, endDate: formData.toDate ? formData.toDate : null, tokenList: formData.tokens ? formData.tokens : null },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -134,7 +135,7 @@ const Visualizer = () => {
       try {
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: address, blockNum: blockNum, isOutgoing: isOutgoing, chain: chain },
+          { address: address, blockNum: blockNum, isOutgoing: isOutgoing, chain: chain, tokenList: formData.tokens ? formData.tokens : null },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -168,7 +169,7 @@ const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
 const handleOptionChange = (e) => {
     setOption(e.target.value);
     setFormData({
-        txshash: "",
+        txhash: "",
         address: "",
         fromDate: "",
         toDate: "",
@@ -186,10 +187,10 @@ const handleChange = (e) => {
   }));
 };
 
-const validateTxHash = (txshash) => {
+const validateTxHash = (txhash) => {
   // Example validation: Tx Hash should be 64 characters long and hexadecimal
   const hexRegex = /^[0-9a-fA-F]{64}$/;
-  if (!hexRegex.test(txshash)) {
+  if (!hexRegex.test(txhash)) {
     alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
       return "Invalid Tx Hash. Ensure it is a 64-character hexadecimal string.";
   }
@@ -209,11 +210,13 @@ const handleSubmit = (e) => {
   e.preventDefault();
 
   // Validation for Tx Hash
-  if (option === "txshash") {
-      const txshashError = validateTxHash(formData.txshash);
-      if (txshashError) {
-          setError(txshashError);
+  if (option === "txhash") {
+      const txhashError = validateTxHash(formData.txhash);
+      if (txhashError) {
+          setError(txhashError);
           return; // Stop submission if invalid
+      } else {
+        handleScanClick();
       }
   }
 
@@ -224,18 +227,16 @@ const handleSubmit = (e) => {
         return; // Stop submission if invalid
     }
 
-    if (!formData.fromDate || !formData.toDate) {
-        setError("Both 'From Date' and 'To Date' are required.");
-        return;
-    }
-
-    if (!formData.tokens) {
-        setError("Please select a token from the dropdown.");
-        return;
-    }
-}
-
+    setFormData((prevState) => ({
+      ...prevState,
+      fromDate: formData.fromDate ? null : formData.fromDate,
+      toDate: formData.toDate === "" ? null : formData.toDate,
+      tokens: formData.tokens === "" ? null : formData.tokens,
+    }));
+  }
+  
   console.log("Form Submitted:", formData);
+  handleScanClick();
   setError(""); // Clear errors on successful submission
   setIsPopupOpen(false); // Close popup
 };
@@ -655,8 +656,8 @@ const handleSubmit = (e) => {
                                         <input
                                             type="radio"
                                             name="filterOption"
-                                            value="txshash"
-                                            checked={option === "txshash"}
+                                            value="txhash"
+                                            checked={option === "txhash"}
                                             onChange={handleOptionChange}
                                             className="mr-2"
                                         />
@@ -676,15 +677,15 @@ const handleSubmit = (e) => {
                                 </div>
                             </div>
 
-                            {option === "txshash" && (
+                            {option === "txhash" && (
                                 <div className="mb-4">
                                     <label className="font-medium text-gray-700">
                                         Tx Hash:
                                     </label>
                                     <input
                                         type="text"
-                                        name="txshash"
-                                        value={formData.txshash}
+                                        name="txhash"
+                                        value={formData.txhash}
                                         onChange={handleChange}
                                         placeholder="Enter Tx Hash"
                                         className="w-full p-3 border rounded-lg mt-2"
