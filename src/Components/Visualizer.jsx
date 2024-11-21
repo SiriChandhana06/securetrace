@@ -49,16 +49,17 @@ const Visualizer = () => {
   }, [txHash]);
 
   const handleScanClick = async () => {
+
     const value = !formData ? inputValue : formData.txhash ? formData.txhash : formData.address;
 
-    if (validateWalletAddress(value)) {
+    if (validateWalletAddress(value || inputValue)) {
       setLoading(true);
 
       try {
         console.log('address:', value, "fromDate:", formData.fromDate, "toDate:", formData.toDate, "tokens:", formData.tokens);
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: value, startDate: formData.fromDate ? formData.fromDate : null, endDate: formData.toDate ? formData.toDate : null, tokenList: formData.tokens ? formData.tokens : null },
+          { address: value || inputValue, startDate: formData.fromDate ? formData.fromDate : null, endDate: formData.toDate ? formData.toDate : null, tokenList: formData.tokens ? formData.tokens : null },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -70,7 +71,7 @@ const Visualizer = () => {
 
         const combinedTransfers = response.data.from.concat(response.data.to);
         setTransfers(combinedTransfers);
-        renderGraph(value, combinedTransfers);
+        renderGraph(value || inputValue , combinedTransfers);
         setValidationMessage('Valid wallet address found!');
         if (inputValue.length > 0) {
           setIsInputEntered(true);
@@ -82,13 +83,13 @@ const Visualizer = () => {
         setValidationMessage('Error retrieving data.');
       }
       setLoading(false);
-    } else if (validateTransactionHash(value)) {
+    } else if (validateTransactionHash(value || inputValue)) {
       setLoading(true);
 
       try {
         const response = await axios.post(
           `${DevUrl}/fetch-transaction-details/`,
-          { txhash: value },
+          { txhash: inputValue || value },
           {
             headers: {
               'ngrok-skip-browser-warning': 'true',
@@ -174,7 +175,7 @@ const handleOptionChange = (e) => {
         fromDate: "",
         toDate: "",
         tokens: "",
-    }); // Reset form fields when changing options
+    }); 
     setError("");
 };
 
@@ -618,7 +619,7 @@ const handleSubmit = (e) => {
             </p>
           </>
         )}
-        <div className="flex flex-col sm:flex-row items-center w-full md:max-w-3xl ">
+        <div className="flex flex-col sm:flex-row items-center w-full md:max-w-4xl ">
           <input
             type="text"
             value={inputValue}
@@ -630,8 +631,8 @@ const handleSubmit = (e) => {
           <button onClick={handleScanClick} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
             {loading ? 'Loading...' : 'Scan Now'}
           </button>
-          <button  onClick={togglePopup} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
-            Filter
+          <button  onClick={togglePopup} className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+          Advanced Scan
           </button>
 
 
@@ -644,7 +645,7 @@ const handleSubmit = (e) => {
                         >
                             ✖
                         </button>
-                        <h2 className="text-xl font-semibold mb-4">Filter Options</h2>
+                        <h2 className="text-xl font-semibold mb-4">Advanced Scan Option</h2>
 
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
