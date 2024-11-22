@@ -6,7 +6,7 @@ import { DevUrl } from '../Constants';
 import btc from '../Assests/Bitcoin.png';
 import { useParams } from 'react-router-dom';
 import Footer from './Footer';
-import Navbar from './Navbar';
+// import Navbar from './Navbar';
 import cytoscape from 'cytoscape';
 
 const Visualizer = () => {
@@ -29,6 +29,8 @@ const Visualizer = () => {
       tokens: "",
   });
   const [error, setError] = useState("");
+  const [tokensList, setTokensList] = useState([]);
+
 
 
 
@@ -165,7 +167,7 @@ const Visualizer = () => {
     setIsPopupOpen(!isPopupOpen);
 };
 
-const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
+// const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
 
 const handleOptionChange = (e) => {
     setOption(e.target.value);
@@ -241,6 +243,40 @@ const handleSubmit = (e) => {
   setError(""); // Clear errors on successful submission
   setIsPopupOpen(false); // Close popup
 };
+
+
+useEffect(() => {
+  const fetchTokens = async () => {
+    setLoading(true);
+    try {
+      const response5 = await axios.post(
+        `${DevUrl}/fetch-tokens`,
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(response5)
+
+      // Assuming the API returns a list of tokens in the format:
+      // [{ tokenName: "ETH", chainName: "Ethereum" }, ...]
+      const fetchedTokens = response5.data.tokens.map(
+        (token) => `${token.name}-${token.chain}`
+      );
+
+      setTokensList(fetchedTokens);
+    } catch (error) {
+      console.error("Error fetching tokens:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTokens();
+}, []);
 
 
 
