@@ -22,14 +22,15 @@ const Visualizer = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [option, setOption] = useState(""); // Track selected option
   const [formData, setFormData] = useState({
-      txhash: "",
-      address: "",
-      fromDate: "",
-      toDate: "",
-      tokens: "",
+    txhash: "",
+    address: "",
+    fromDate: "",
+    toDate: "",
+    tokens: "",
   });
   const [error, setError] = useState("");
   const [tokensList, setTokensList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
 
 
@@ -73,7 +74,7 @@ const Visualizer = () => {
 
         const combinedTransfers = response.data.from.concat(response.data.to);
         setTransfers(combinedTransfers);
-        renderGraph(value || inputValue , combinedTransfers);
+        renderGraph(value || inputValue, combinedTransfers);
         setValidationMessage('Valid wallet address found!');
         if (inputValue.length > 0 || value.length > 0) {
           setIsInputEntered(true);
@@ -165,125 +166,128 @@ const Visualizer = () => {
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
-};
+  };
 
-// const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
+  // const tokensList = ["ETH", "BTC", "USDT", "DAI", "MATIC"];
 
-const handleOptionChange = (e) => {
+  const handleOptionChange = (e) => {
     setOption(e.target.value);
     setFormData({
-        txhash: "",
-        address: "",
-        fromDate: "",
-        toDate: "",
-        tokens: "",
-    }); 
+      txhash: "",
+      address: "",
+      fromDate: "",
+      toDate: "",
+      tokens: "",
+    });
     setError("");
-};
+  };
 
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prevState) => ({
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
-  }));
-};
+    }));
+  };
 
-const validateTxHash = (txhash) => {
-  // Example validation: Tx Hash should be 64 characters long and hexadecimal
-  const hexRegex = /^[0-9a-fA-F]{64}$/;
-  if (!hexRegex.test(txhash)) {
-    alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
+  const validateTxHash = (txhash) => {
+    // Example validation: Tx Hash should be 64 characters long and hexadecimal
+    const hexRegex = /^[0-9a-fA-F]{64}$/;
+    if (!hexRegex.test(txhash)) {
+      alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
       return "Invalid Tx Hash. Ensure it is a 64-character hexadecimal string.";
-  }
-  return "";
-};
+    }
+    return "";
+  };
 
-const validateAddress = (address) => {
-  // Example validation: Ethereum addresses start with '0x' and are 42 characters long
-  const addressRegex = /^0x[a-fA-F0-9]{40}$/;
-  if (!addressRegex.test(address)) {
+  const validateAddress = (address) => {
+    // Example validation: Ethereum addresses start with '0x' and are 42 characters long
+    const addressRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!addressRegex.test(address)) {
       return "Invalid Address. Ensure it starts with '0x' and is a valid Ethereum address.";
-  }
-  return "";
-};
+    }
+    return "";
+  };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  // Validation for Tx Hash
-  if (option === "txhash") {
+    // Validation for Tx Hash
+    if (option === "txhash") {
       const txhashError = validateTxHash(formData.txhash);
       if (txhashError) {
-          setError(txhashError);
-          return; // Stop submission if invalid
+        setError(txhashError);
+        return; // Stop submission if invalid
       } else {
         handleScanClick();
       }
-  }
+    }
 
-  if (option === "address") {
-    const addressError = validateAddress(formData.address);
-    if (addressError) {
+    if (option === "address") {
+      const addressError = validateAddress(formData.address);
+      if (addressError) {
         setError(addressError);
         return; // Stop submission if invalid
+      }
+
+      setFormData((prevState) => ({
+        ...prevState,
+        fromDate: formData.fromDate ? null : formData.fromDate,
+        toDate: formData.toDate === "" ? null : formData.toDate,
+        tokens: formData.tokens === "" ? null : formData.tokens,
+      }));
     }
 
-    setFormData((prevState) => ({
-      ...prevState,
-      fromDate: formData.fromDate ? null : formData.fromDate,
-      toDate: formData.toDate === "" ? null : formData.toDate,
-      tokens: formData.tokens === "" ? null : formData.tokens,
-    }));
-  }
-  
-  console.log("Form Submitted:", formData);
-  handleScanClick();
-  setError(""); // Clear errors on successful submission
-  setIsPopupOpen(false); // Close popup
-};
-
-
-useEffect(() => {
-  const fetchTokens = async () => {
-    setLoading(true);
-    try {
-      const response5 = await axios.post(
-        `${DevUrl}/fetch-tokens`,
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log(response5)
-
-      // Assuming the API returns a list of tokens in the format:
-      // [{ tokenName: "ETH", chainName: "Ethereum" }, ...]
-      const fetchedTokens = response5.data.tokens.map(
-        (token) => `${token.name}-${token.chain}`
-      );
-
-      setTokensList(fetchedTokens);
-    } catch (error) {
-      console.error("Error fetching tokens:", error);
-    } finally {
-      setLoading(false);
-    }
+    console.log("Form Submitted:", formData);
+    handleScanClick();
+    setError(""); // Clear errors on successful submission
+    setIsPopupOpen(false); // Close popup
   };
 
-  fetchTokens();
-}, []);
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      // setLoading(true);
+      try {
+        const response5 = await axios.post(
+          `${DevUrl}/fetch-tokens`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log(response5)
+
+        const fetchedTokens = response5.data.tokens.map(
+          (token) => `${token.name}-${token.chain}`
+        );
+
+        setTokensList(fetchedTokens);
+      } catch (error) {
+        console.error("Error fetching tokens:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTokens();
+  }, []);
+
+
+  const filteredTokens = tokensList.filter((token) =>
+    token.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
 
 
 
   const renderGraph = (centerAddress, transactions) => {
     const elements = [];
-    
+
     const shortenAddress = (address) => `${address.slice(0, 6)}...`;
     const shortenTxHash = (address) => `${address.slice(0, 6)}...${address.slice(-4)}`;
 
@@ -301,7 +305,7 @@ useEffect(() => {
       // Add the target node if not already added
       if (!elements.some((el) => el.data.id === target)) {
         elements.push({
-          data: { 
+          data: {
             id: target,
             label: shortenAddress(target),
             txHash: tx.txHash,
@@ -323,7 +327,7 @@ useEffect(() => {
           type: isIncoming ? 'incoming' : 'outgoing',
           chain: tx.chain,
           blockNum: tx.blockNum,
-          value: tx.value*tx.tokenPrice,
+          value: tx.value * tx.tokenPrice,
         },
         classes: isIncoming ? 'incoming-edge' : 'outgoing-edge',
       });
@@ -654,145 +658,164 @@ useEffect(() => {
             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
           />
           <div className='flex gap-4'>
-          <button onClick={handleScanClick} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
-            {loading ? 'Loading...' : 'Scan Now'}
-          </button>
-          <button  onClick={togglePopup} className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
-          Advanced Scan
-          </button>
+            <button onClick={handleScanClick} disabled={loading} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+              {/* {loading ? 'Scanning...' : 'Scan Now'} */}
+              Scan Now
+            </button>
+            {loading && (
+              <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-green-700"></div>
+              </div>
+            )}
+            <button onClick={togglePopup} className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+              Advanced Scan
+            </button>
 
 
-          {isPopupOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative">
-                        <button
-                            className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-                            onClick={togglePopup}
-                        >
-                            ✖
-                        </button>
-                        <h2 className="text-xl font-semibold mb-4">Advanced Scan Option</h2>
+            {isPopupOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative overflow-y-scroll" style={{maxHeight: "90vh",}} id='hide-scrollbar'>
+                  <button
+                    className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                    onClick={togglePopup}
+                  >
+                    ✖
+                  </button>
+                  <h2 className="text-xl font-semibold mb-4">Advanced Scan Option</h2>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="font-medium text-gray-700">
-                                    Choose Option:
-                                </label>
-                                <div className="flex gap-4 mt-2">
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            name="filterOption"
-                                            value="txhash"
-                                            checked={option === "txhash"}
-                                            onChange={handleOptionChange}
-                                            className="mr-2"
-                                        />
-                                        Tx Hash
-                                    </label>
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            name="filterOption"
-                                            value="address"
-                                            checked={option === "address"}
-                                            onChange={handleOptionChange}
-                                            className="mr-2"
-                                        />
-                                        Address
-                                    </label>
-                                </div>
-                            </div>
-
-                            {option === "txhash" && (
-                                <div className="mb-4">
-                                    <label className="font-medium text-gray-700">
-                                        Tx Hash:
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="txhash"
-                                        value={formData.txhash}
-                                        onChange={handleChange}
-                                        placeholder="Enter Tx Hash"
-                                        className="w-full p-3 border rounded-lg mt-2"
-                                    />
-                                </div>
-                            )}
-
-                            {option === "address" && (
-                                <>
-                                    <div className="mb-4">
-                                        <label className="font-medium text-gray-700">
-                                            Address:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="address"
-                                            value={formData.address}
-                                            onChange={handleChange}
-                                            placeholder="Enter Address"
-                                            className="w-full p-3 border rounded-lg mt-2"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="font-medium text-gray-700">
-                                            From Date:
-                                        </label>
-                                        <input
-                                            type="date"
-                                            name="fromDate"
-                                            value={formData.fromDate}
-                                            onChange={handleChange}
-                                            className="w-full p-3 border rounded-lg mt-2"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="font-medium text-gray-700">
-                                            To Date:
-                                        </label>
-                                        <input
-                                            type="date"
-                                            name="toDate"
-                                            value={formData.toDate}
-                                            onChange={handleChange}
-                                            className="w-full p-3 border rounded-lg mt-2"
-                                        />
-                                    </div>
-                                    <div className="mb-4">
-                                        <label className="font-medium text-gray-700">
-                                            Tokens:
-                                        </label>
-                                        <select
-                                            name="tokens"
-                                            value={formData.tokens}
-                                            onChange={handleChange}
-                                            className="w-full p-3 border rounded-lg mt-2 bg-white"
-                                        >
-                                            <option value="" disabled>
-                                                Select Token
-                                            </option>
-                                            {tokensList.map((token, index) => (
-                                                <option key={index} value={token}>
-                                                    {token}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </>
-                            )}
-
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    className="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-600 transition-all duration-300"
-                                >
-                                    {option === "txHash" ? "Scan Now" : "Submit"}
-                                </button>
-                            </div>
-                        </form>
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                      <label className="font-medium text-gray-700">
+                        Choose Option:
+                      </label>
+                      <div className="flex gap-4 mt-2">
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="filterOption"
+                            value="txhash"
+                            checked={option === "txhash"}
+                            onChange={handleOptionChange}
+                            className="mr-2"
+                          />
+                          Tx Hash
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="filterOption"
+                            value="address"
+                            checked={option === "address"}
+                            onChange={handleOptionChange}
+                            className="mr-2"
+                          />
+                          Address
+                        </label>
+                      </div>
                     </div>
+
+                    {option === "txhash" && (
+                      <div className="mb-4">
+                        <label className="font-medium text-gray-700">
+                          Tx Hash:
+                        </label>
+                        <input
+                          type="text"
+                          name="txhash"
+                          value={formData.txhash}
+                          onChange={handleChange}
+                          placeholder="Enter Tx Hash"
+                          className="w-full p-3 border rounded-lg mt-2"
+                        />
+                      </div>
+                    )}
+
+                    {option === "address" && (
+                      <>
+                        <div className="mb-4">
+                          <label className="font-medium text-gray-700">
+                            Address:
+                          </label>
+                          <input
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            placeholder="Enter Address"
+                            className="w-full p-3 border rounded-lg mt-2"
+                          />
+                        </div>
+                        <div className="mb-4">
+                          <label className="font-medium text-gray-700">
+                            From Date:
+                          </label>
+                          <input
+                            type="date"
+                            name="fromDate"
+                            value={formData.fromDate}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg mt-2"
+                          />
+                        </div>
+                        <div className="mb-4">
+                          <label className="font-medium text-gray-700">
+                            To Date:
+                          </label>
+                          <input
+                            type="date"
+                            name="toDate"
+                            value={formData.toDate}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg mt-2"
+                          />
+                        </div>
+                        <div className="mb-4 relative">
+                          <label className="font-medium text-gray-700">Tokens:</label>
+                          <div className="mt-2">
+                            {/* Search Bar */}
+                            <input
+                              type="text"
+                              placeholder="Search tokens..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              className="w-full p-3 border rounded-lg mb-2 bg-white"
+                            />
+
+                            {/* Dropdown */}
+                            <div className="border rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto">
+                              {filteredTokens.length > 0 ? (
+                                filteredTokens.map((token, index) => (
+                                  <div
+                                    key={index}
+                                    onClick={() =>
+                                      handleChange({ target: { name: "tokens", value: token } })
+                                    }
+                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${formData.tokens === token ? "bg-gray-200 font-bold" : ""
+                                      }`}
+                                  >
+                                    {token}
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="p-3 text-gray-500">No tokens found</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        className="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-600 transition-all duration-300"
+                      >
+                        {option === "txHash" ? "Scan Now" : "Submit"}
+                      </button>
+                    </div>
+                  </form>
                 </div>
+              </div>
             )}
 
 
@@ -934,7 +957,7 @@ useEffect(() => {
         )}
       </div>
       <div className=''>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
