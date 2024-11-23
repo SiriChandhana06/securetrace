@@ -58,6 +58,8 @@ const Visualizer = () => {
     if (validateWalletAddress(value || inputValue)) {
       setLoading(true);
 
+      setCurrentPage1(1);
+
       try {
         console.log('address:', value, "fromDate:", formData.fromDate, "toDate:", formData.toDate, "tokens:", formData.tokens);
         const response = await axios.post(
@@ -262,9 +264,15 @@ const Visualizer = () => {
 
         console.log(response5)
 
-        const fetchedTokens = response5.data.tokens.map(
-          (token) => `${token.name}-${token.chain}`
-        );
+        // const fetchedTokens = response5.data.tokens.map(
+        //   (token) => `${token.name}-${token.chain}`
+        // );
+
+        const fetchedTokens = response5.data.tokens.map((token) => ({
+          name: token.name,
+          address: token.address,
+          chain: token.chain,
+        }));
 
         setTokensList(fetchedTokens);
       } catch (error) {
@@ -279,18 +287,36 @@ const Visualizer = () => {
 
 
   const filteredTokens = tokensList.filter((token) =>
-    token.toLowerCase().includes(searchTerm.toLowerCase())
+    token.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 
+
+  // const handleTokenSelection = (token) => {
+  //   setFormData((prevFormData) => {
+  //     const isSelected = prevFormData.tokens.includes(token);
+  //     return {
+  //       ...prevFormData,
+  //       tokens: isSelected
+  //         ? prevFormData.tokens.filter((t) => t !== token) // Remove if already selected
+  //         : [...prevFormData.tokens, token], // Add if not selected
+  //     };
+  //   });
+  // };
+
   const handleTokenSelection = (token) => {
     setFormData((prevFormData) => {
-      const isSelected = prevFormData.tokens.includes(token);
+      const isSelected = prevFormData.tokens.includes(token.address);
+      if (isSelected) {
+        console.log(`Deselected token address: ${token.address}`);
+      } else {
+        console.log(`Selected token address: ${token.address}`);
+      }
       return {
         ...prevFormData,
         tokens: isSelected
-          ? prevFormData.tokens.filter((t) => t !== token) // Remove if already selected
-          : [...prevFormData.tokens, token], // Add if not selected
+          ? prevFormData.tokens.filter((t) => t !== token.address) // Remove if already selected
+          : [...prevFormData.tokens, token.address], // Add if not selected
       };
     });
   };
@@ -788,22 +814,28 @@ const Visualizer = () => {
                             {/* Display Selected Tokens */}
                             {formData.tokens.length > 0 && (
                               <div className="mb-2 flex flex-wrap gap-2">
-                                {formData.tokens.map((token, index) => (
-                                  <span
-                                    key={index}
-                                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg flex items-center gap-2"
-                                  >
-                                    {token}
-                                    <button
-                                      onClick={() => handleTokenSelection(token)}
-                                      className="text-red-500 hover:text-red-700"
+                                {formData.tokens.map((tokenAddress, index) => {
+                                  // Find the corresponding token object using the address
+                                  const token = tokensList.find((t) => t.address === tokenAddress);
+                                  
+                                  return token ? (
+                                    <span
+                                      key={index}
+                                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg flex items-center gap-2"
                                     >
-                                      ✖
-                                    </button>
-                                  </span>
-                                ))}
+                                      {token.name} - {token.chain}
+                                      <button
+                                        onClick={() => handleTokenSelection(token)}
+                                        className="text-red-500 hover:text-red-700"
+                                      >
+                                        ✖
+                                      </button>
+                                    </span>
+                                  ) : null; // Skip if the token is not found
+                                })}
                               </div>
                             )}
+
 
                             {/* Search Bar */}
                             <input
@@ -821,16 +853,17 @@ const Visualizer = () => {
                                   <div
                                     key={index}
                                     onClick={() => handleTokenSelection(token)}
-                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${formData.tokens.includes(token) ? "bg-gray-200 font-bold" : ""
+                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${formData.tokens.includes(token.address) ? "bg-gray-200 font-bold" : ""
                                       }`}
                                   >
-                                    {token}
+                                    {token.name} - {token.chain} {/* Display token name and chain */}
                                   </div>
                                 ))
                               ) : (
                                 <div className="p-3 text-gray-500">No tokens found</div>
                               )}
                             </div>
+
                           </div>
                         </div>
 
