@@ -109,10 +109,19 @@ const AddressCard = () => {
       return;
     }
 
+
+
+    const isAlgorandAddress = /^[A-Z2-7]{58}$/.test(inputValue);
+    const apiEndpoint = isAlgorandAddress
+      ? `${DevUrl}/fetch-algorand-details/`
+      : `${DevUrl}/fetch-address-details/`;
+
+
     try {
       const response = await axios.post(
         // `https://caiman-wanted-fox.ngrok-free.app/fetch-address-details/`,
-        `${DevUrl}/fetch-address-details/`,
+        // `${DevUrl}/fetch-address-details/`,
+        apiEndpoint,
         { address: inputValue }, // This is the request body
         {
           headers: {
