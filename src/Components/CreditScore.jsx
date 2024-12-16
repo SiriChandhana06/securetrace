@@ -31,8 +31,9 @@ const CreditScore = () => {
       });
       console.log("score:", data);
       
-      // Handle different response structures based on active tab
-      const score = activeTab === "wallet" ? data : data.creditScore;
+      // Handle different response structures and round the score for smart contracts
+      const rawScore = activeTab === "wallet" ? data : data.creditScore;
+      const score = activeTab === "smartContract" ? Math.round(rawScore) : rawScore;
       setCreditScore(score);
       return true;
     } catch (error) {
