@@ -134,9 +134,15 @@ const CreditScore = () => {
         {validatedData ? (
           <div className="my-20">
             <p className="text-lg text-start ml-10 font-semibold text-gray-700 dark:text-gray-200">
-              {validatedData.type === "wallet" ? "Wallet Address" : "Smart Contract Address"}
-              : <span className="text-green-500">
-                {`${validatedData.value.slice(0, 5)}...${validatedData.value.slice(-4)}`}
+              {validatedData.type === "wallet"
+                ? "Wallet Address"
+                : "Smart Contract Address"}
+              :{" "}
+              <span className="text-green-500">
+                {`${validatedData.value.slice(
+                  0,
+                  5
+                )}...${validatedData.value.slice(-4)}`}
               </span>
             </p>
             <div className="text-center">
@@ -146,8 +152,12 @@ const CreditScore = () => {
                 </div>
               ) : activeTab === "wallet" ? (
                 <div>
-                <h1 className="text-black dark:text-white text-2xl">Credit Score</h1>
-                <h1 className="text-green-500 text-3xl font-bold">{creditScore}</h1>
+                  <h1 className="text-black dark:text-white text-2xl">
+                    Credit Score
+                  </h1>
+                  <h1 className="text-green-500 text-3xl font-bold">
+                    {creditScore}
+                  </h1>
                 </div>
               ) : (
                 creditScore && (
@@ -155,18 +165,40 @@ const CreditScore = () => {
                     <h1 className="text-lg font-bold text-gray-700 dark:text-white">
                       Smart Contract Analysis
                     </h1>
-                    <p className="text-green-500 text-3xl font-bold mt-4">
-                      Credit Score: {creditScore.creditScore}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2">
-                      Transaction Success Percentage: {creditScore.successPc} %
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2">
-                      Verification Status: {creditScore.verificationStatus}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300 mt-2">
-                      Diversity Score: {creditScore.diversityScore}
-                    </p>
+                    <div className="flex flex-wrap justify-center gap-4 mt-4">
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-md shadow-md p-4 w-full sm:w-48">
+                        <p className="text-green-500 text-xl font-bold">
+                          Credit Score
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                          {creditScore.creditScore}
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-md shadow-md p-4 w-full sm:w-48">
+                        <p className="text-green-500 text-xl font-bold">
+                          Transaction Success Percentage
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                          {creditScore.successPc} %
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-md shadow-md p-4 w-full sm:w-48">
+                        <p className="text-green-500 text-xl font-bold">
+                          Verification Status
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                          {creditScore.verificationStatus}
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-md shadow-md p-4 w-full sm:w-48">
+                        <p className="text-green-500 text-xl font-bold">
+                          Diversity Score
+                        </p>
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                          {creditScore.diversityScore}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )
               )}
@@ -181,7 +213,9 @@ const CreditScore = () => {
               <input
                 type="text"
                 placeholder={`Enter ${
-                  activeTab === "wallet" ? "Wallet Address" : "Smart Contract Address"
+                  activeTab === "wallet"
+                    ? "Wallet Address"
+                    : "Smart Contract Address"
                 }`}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -193,7 +227,9 @@ const CreditScore = () => {
                   onClick={validateInput}
                   disabled={isLoading}
                   className={`bg-green-500 w-56 lg:w-40 text-center text-black font-semibold py-3 px-8 rounded-xl shadow-md transition-all duration-300 ${
-                    isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"
+                    isLoading
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-green-600"
                   }`}
                 >
                   {isLoading ? "Loading..." : "Scan Now"}
