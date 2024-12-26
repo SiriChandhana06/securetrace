@@ -83,17 +83,19 @@ const Visualizer = () => {
 
     if (!value) {
       setValidationMessage(
-        "Invalid input. Please enter a valid wallet address or tx hash."
+        "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
       );
       return;
     }
 
+    const algoAddressRegex = /^[A-Z2-7]{58}$/;
     const isAddress = validateWalletAddress(value);
     const isTxHash = validateTransactionHash(value);
+    const isAlgoAddress = algoAddressRegex.test(value);
 
-    if (!isAddress && !isTxHash) {
+    if (!isAddress && !isTxHash && !isAlgoAddress) {
       setValidationMessage(
-        "Invalid input. Please enter a valid wallet address or tx hash."
+        "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
       );
       return;
     }
@@ -148,6 +150,25 @@ const Visualizer = () => {
         setTransfers(response.data.transfers);
         renderGraphTxHash(value, response.data.transfers);
         setValidationMessage("Valid transaction hash found!");
+      } else if (isAlgoAddress) {
+        console.log("Scanning Algorand Address:", value);
+
+        response = await axios.post(
+          `${DevUrl}/algorand-address/`,
+          {
+            algoAddress: value,
+          },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setTransfers(response.data.transfers);
+        renderGraph(value, response.data.transfers);
+        setValidationMessage("Valid Algorand address found!");
       }
 
       setIsInputEntered(!!value);
@@ -158,6 +179,7 @@ const Visualizer = () => {
       setLoading(false);
     }
   };
+
 
   // New function: Directly binds and triggers `handleScanClick`
   useEffect(() => {

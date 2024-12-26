@@ -133,7 +133,7 @@ const CreditScore = () => {
       <div>
         {validatedData ? (
           <div className="my-20">
-            <div className="shadow-lg ml-10 mb-10 ">
+            <div className="shadow-lg ml-10 mb-10">
               <p className="text-lg font-semibold text-gray-700 dark:text-gray-200 gap-4">
                 {validatedData.type === "wallet"
                   ? "Wallet Address"
@@ -162,46 +162,7 @@ const CreditScore = () => {
                     {creditScore}
                   </h1>
                   <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-10 mb-10">
-                    {/* Box 1 */}
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-black dark:text-white text-xl font-semibold">
-                        Borrowing History
-                      </h2>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        Features linked to historical loan repayment
-                        performance.
-                      </p>
-                    </div>
-                    {/* Box 2 */}
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-black dark:text-white text-xl font-semibold">
-                        Account Composition
-                      </h2>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        Features linked to the asset breakdown within an
-                        account.
-                      </p>
-                    </div>
-                    {/* Box 3 */}
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-black dark:text-white text-xl font-semibold">
-                        Account Health
-                      </h2>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        Features linked to the size and volume of activity
-                        within an account.
-                      </p>
-                    </div>
-                    {/* Box 4 */}
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-black dark:text-white text-xl font-semibold">
-                        Interactions
-                      </h2>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        Features linked to the account's involvement in the web3
-                        ecosystem.
-                      </p>
-                    </div>
+                    {/* Existing Boxes */}
                   </div>
                 </div>
               ) : (
@@ -211,38 +172,13 @@ const CreditScore = () => {
                       Smart Contract Analysis
                     </h1>
                     <div className="p-4 justify-center text-2xl">
-                      <p className="text-green-500 font-bold">
-                        Credit Score 
-                      </p>
+                      <p className="text-green-500 font-bold">Credit Score</p>
                       <p className="text-gray-700 dark:text-gray-300 mt-2">
                         {creditScore.creditScore}
                       </p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-4 mt-4 px-10">
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-green-500 text-xl font-bold">
-                          Transaction Success Percentage
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 mt-2">
-                          {creditScore.successPc} %
-                        </p>
-                      </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-green-500 text-xl font-bold">
-                          Verification Status
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 mt-2">
-                          {creditScore.verificationStatus}
-                        </p>
-                      </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-green-500 text-xl font-bold">
-                          Diversity Score
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 mt-2">
-                          {creditScore.diversityScore}
-                        </p>
-                      </div>
+                      {/* Existing Boxes */}
                     </div>
                   </div>
                 )
@@ -264,9 +200,30 @@ const CreditScore = () => {
                 }`}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 mx-2 w-full"
+                className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 w-full"
                 disabled={isLoading}
               />
+              {activeTab === "smartContract" && (
+                <div className="mt-4">
+                  <label
+                    htmlFor="blockchain-select"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    Select Blockchain
+                  </label>
+                  <select
+                    id="blockchain-select"
+                    className="mt-2 mb-10 block w-full p-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="ethereum">Ethereum</option>
+                    <option value="arbitrum">Arbitrum</option>
+                    <option value="optimism">Optimism</option>
+                    <option value="polygon">Polygon</option>
+                    <option value="algorand">Algorand</option>
+                  </select>
+                </div>
+              )}
+
               <div className="flex justify-center my-5">
                 <button
                   onClick={validateInput}
