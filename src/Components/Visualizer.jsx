@@ -36,7 +36,19 @@ const Visualizer = () => {
   const [tokensList, setTokensList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-
+  const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
+  const sortedTransfers = transfers.sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
+  const currentRows1 = sortedTransfers.slice(
+    (currentPage1 - 1) * rowsPerPage1,
+    currentPage1 * rowsPerPage1
+  );
+  const handlePageChange1 = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages1) {
+      setCurrentPage1(pageNumber);
+    }
+  };
 
 
   const handleInputChange = (e) => {
