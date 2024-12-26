@@ -133,8 +133,8 @@ const CreditScore = () => {
       <div>
         {validatedData ? (
           <div className="my-20">
-            <div className="border border-gray-300 dark:border-gray-100 rounded-md shadow-lg p-4 bg-gray-100 dark:bg-[#001938] w-96 mx-auto">
-              <p className="text-lg flex justify-center font-semibold text-gray-700 dark:text-gray-200 gap-4">
+            <div className="shadow-lg ml-10 mb-10 ">
+              <p className="text-lg font-semibold text-gray-700 dark:text-gray-200 gap-4">
                 {validatedData.type === "wallet"
                   ? "Wallet Address"
                   : "Smart Contract Address"}
@@ -161,22 +161,64 @@ const CreditScore = () => {
                   <h1 className="text-green-500 text-3xl font-bold">
                     {creditScore}
                   </h1>
+                  <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-10 mb-10">
+                    {/* Box 1 */}
+                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                      <h2 className="text-black dark:text-white text-xl font-semibold">
+                        Borrowing History
+                      </h2>
+                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                        Features linked to historical loan repayment
+                        performance.
+                      </p>
+                    </div>
+                    {/* Box 2 */}
+                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                      <h2 className="text-black dark:text-white text-xl font-semibold">
+                        Account Composition
+                      </h2>
+                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                        Features linked to the asset breakdown within an
+                        account.
+                      </p>
+                    </div>
+                    {/* Box 3 */}
+                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                      <h2 className="text-black dark:text-white text-xl font-semibold">
+                        Account Health
+                      </h2>
+                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                        Features linked to the size and volume of activity
+                        within an account.
+                      </p>
+                    </div>
+                    {/* Box 4 */}
+                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                      <h2 className="text-black dark:text-white text-xl font-semibold">
+                        Interactions
+                      </h2>
+                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                        Features linked to the account's involvement in the web3
+                        ecosystem.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 creditScore && (
                   <div className="mt-10 text-center">
-                    <h1 className="text-lg font-bold text-gray-700 dark:text-white">
+                    <h1 className="text-2xl font-bold text-gray-700 dark:text-white mb-10">
                       Smart Contract Analysis
                     </h1>
+                    <div className="p-4 justify-center text-2xl">
+                      <p className="text-green-500 font-bold">
+                        Credit Score 
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                        {creditScore.creditScore}
+                      </p>
+                    </div>
                     <div className="flex flex-wrap justify-center gap-4 mt-4">
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-green-500 text-xl font-bold">
-                          Credit Score
-                        </p>
-                        <p className="text-gray-700 dark:text-gray-300 mt-2">
-                          {creditScore.creditScore}
-                        </p>
-                      </div>
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
                         <p className="text-green-500 text-xl font-bold">
                           Transaction Success Percentage
@@ -238,50 +280,6 @@ const CreditScore = () => {
                   {isLoading ? "Loading..." : "Scan Now"}
                 </button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Static Boxes for Wallet Tab */}
-        {activeTab === "wallet" && (
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-10 mb-10">
-            {/* Box 1 */}
-            <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-              <h2 className="text-black dark:text-white text-xl font-semibold">
-                Borrowing History
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 mt-2">
-                Features linked to historical loan repayment performance.
-              </p>
-            </div>
-            {/* Box 2 */}
-            <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-              <h2 className="text-black dark:text-white text-xl font-semibold">
-                Account Composition
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 mt-2">
-                Features linked to the asset breakdown within an account.
-              </p>
-            </div>
-            {/* Box 3 */}
-            <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-              <h2 className="text-black dark:text-white text-xl font-semibold">
-                Account Health
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 mt-2">
-                Features linked to the size and volume of activity within an
-                account.
-              </p>
-            </div>
-            {/* Box 4 */}
-            <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-              <h2 className="text-black dark:text-white text-xl font-semibold">
-                Interactions
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 mt-2">
-                Features linked to the account's involvement in the web3
-                ecosystem.
-              </p>
             </div>
           </div>
         )}
