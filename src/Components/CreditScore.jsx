@@ -218,7 +218,7 @@ const CreditScore = () => {
                         {creditScore.creditScore}
                       </p>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-4 mt-4">
+                    <div className="flex flex-wrap justify-center gap-4 mt-4 px-10">
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
                         <p className="text-green-500 text-xl font-bold">
                           Transaction Success Percentage
