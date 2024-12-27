@@ -17,28 +17,66 @@ const apiClient = axios.create({
 const CreditScore = () => {
   const [activeTab, setActiveTab] = useState("wallet");
   const [inputValue, setInputValue] = useState("");
+  const [inputChain, setInputChain] = useState("");
   const [validatedData, setValidatedData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [creditScore, setCreditScore] = useState(null);
 
-  const fetchCreditScore = async (address) => {
+  const fetchWalletCreditScore = async (address) => {
     setIsLoading(true);
     try {
-      const endpoint = activeTab === "wallet" ? '/wallet-credit-score' : '/sc-credit-score';
+      const endpoint = '/wallet-credit-score';
       const { data } = await apiClient.post(endpoint, { address });
 
       console.log("score:", data);
 
-      if (activeTab === "wallet") {
-        setCreditScore(data);
-      } else {
-        setCreditScore({
-          creditScore: Math.round(data.creditScore),
-          successPc: Math.round(data.successPc),
-          verificationStatus: data.verificationStatus,
-          diversityScore: parseFloat(data.diversityScore.toFixed(2)), // Keeps diversity score to 2 decimal places
-        });
+      setCreditScore(data);
+
+      return true;
+    } catch (error) {
+      console.error('Error fetching credit score:', error);
+
+      let errorMessage = "Failed to fetch credit score. Please try again.";
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            errorMessage = "Credit score endpoint not found.";
+            break;
+          case 400:
+            errorMessage = error.response.data.message || "Invalid request. Please check your input.";
+            break;
+          case 500:
+            errorMessage = "Server error. Please try again later.";
+            break;
+          default:
+            errorMessage = error.response.data.message || "An unexpected error occurred.";
+        }
+      } else if (error.request) {
+        errorMessage = "Could not connect to the server. Please check your connection.";
       }
+
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSCCreditScore = async (address, chain) => {
+    setIsLoading(true);
+    try {
+      const endpoint = chain === 'algorand' ? '/algo-sc-credit-score' : '/sc-credit-score';
+      const { data } = await apiClient.post(endpoint, { address: address, chain: chain });
+
+      console.log("score:", data);
+
+      setCreditScore({
+        creditScore: Math.round(data.creditScore),
+        successPc: Math.round(data.successPc),
+        verificationStatus: data.verificationStatus,
+        diversityScore: parseFloat(data.diversityScore.toFixed(2)), // Keeps diversity score to 2 decimal places
+      });
 
       return true;
     } catch (error) {
@@ -73,15 +111,26 @@ const CreditScore = () => {
 
   const validateInput = async () => {
     const walletRegex = /^0x[a-fA-F0-9]{40}$/;
-    const isValid = walletRegex.test(inputValue);
-
-    if (!isValid) {
-      toast.error("Invalid address. Please enter a valid value.");
-      setInputValue("");
-      return;
+    const appIdRegex = /^[1-9][0-9]*$/;
+    let isValid;
+    if(inputChain === 'algorand') {
+      isValid = appIdRegex.test(inputValue);
+      if(!isValid) {
+        toast.error("Invalid app ID. Please enter a valid value.");
+        setInputValue("");
+        return;
+      }
+    } else {
+      const isValid = walletRegex.test(inputValue);
+      if (!isValid) {
+        toast.error("Invalid address. Please enter a valid value.");
+        setInputValue("");
+        return;
+      }
     }
 
-    const scoresFetched = await fetchCreditScore(inputValue);
+    const scoresFetched = activeTab === "wallet" ?
+      await fetchWalletCreditScore(inputValue) : await fetchSCCreditScore(inputValue, inputChain);
 
     if (scoresFetched) {
       toast.success(
@@ -214,6 +263,7 @@ const CreditScore = () => {
                   <select
                     id="blockchain-select"
                     className="mt-2 mb-10 block w-full p-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    onChange={(e) => setInputChain(e.target.value)}
                   >
                     <option value="ethereum">Ethereum</option>
                     <option value="arbitrum">Arbitrum</option>
