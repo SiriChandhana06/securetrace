@@ -110,46 +110,42 @@ const CreditScore = () => {
   };
 
   const validateInput = async () => {
-  const walletRegex = /^0x[a-fA-F0-9]{40}$/;
-  const appIdRegex = /^[1-9][0-9]*$/;
-  let isValid;
+    const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+    const appIdRegex = /^[1-9][0-9]*$/;
+    let isValid;
 
-  if (activeTab === "wallet" && !inputChain) {
-    setInputChain("ethereum");
-  }
-
-  if (inputChain === "algorand") {
-    isValid = appIdRegex.test(inputValue);
-    if (!isValid) {
-      toast.error("Invalid app ID. Please enter a valid value.");
-      setInputValue("");
-      return;
+    if (inputChain === "algorand") {
+      isValid = appIdRegex.test(inputValue);
+      if (!isValid) {
+        toast.error("Invalid app ID. Please enter a valid value.");
+        setInputValue("");
+        return;
+      }
+    } else {
+      isValid = walletRegex.test(inputValue);
+      if (!isValid) {
+        toast.error("Invalid address. Please enter a valid value.");
+        setInputValue("");
+        return;
+      }
     }
-  } else {
-    isValid = walletRegex.test(inputValue);
-    if (!isValid) {
-      toast.error("Invalid address. Please enter a valid value.");
+
+    const scoresFetched =
+      activeTab === "wallet"
+        ? await fetchWalletCreditScore(inputValue)
+        : await fetchSCCreditScore(inputValue, inputChain);
+
+    if (scoresFetched) {
+      toast.success(
+        `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
+      );
+      setValidatedData({
+        type: activeTab,
+        value: inputValue,
+      });
       setInputValue("");
-      return;
     }
-  }
-
-  const scoresFetched =
-    activeTab === "wallet"
-      ? await fetchWalletCreditScore(inputValue)
-      : await fetchSCCreditScore(inputValue, inputChain);
-
-  if (scoresFetched) {
-    toast.success(
-      `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
-    );
-    setValidatedData({
-      type: activeTab,
-      value: inputValue,
-    });
-    setInputValue("");
-  }
-};
+  };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -167,7 +163,10 @@ const CreditScore = () => {
                 ? "bg-green-500 text-black"
                 : "hover:text-gray-500 dark:text-white"
             } hover:scale-90 hover:rounded-xl`}
-            onClick={() => handleTabChange("wallet")}
+            onClick={() => {
+              handleTabChange("wallet");
+              setInputChain("ethereum");
+            }}
           >
             Wallet
           </button>
@@ -275,9 +274,9 @@ const CreditScore = () => {
                     <div className="flex flex-wrap justify-center gap-4 px-10 mt-4">
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
                         <p className="text-xl font-bold text-green-500">
-                          Transaction Success Percentage
+                          Tx Success %
                         </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
                           {creditScore.successPc} %
                         </p>
                       </div>
@@ -293,7 +292,7 @@ const CreditScore = () => {
                         <p className="text-xl font-bold text-green-500">
                           Diversity Score
                         </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
                           {creditScore.diversityScore}
                         </p>
                       </div>
