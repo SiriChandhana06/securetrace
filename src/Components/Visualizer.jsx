@@ -154,9 +154,9 @@ const Visualizer = () => {
         console.log("Scanning Algorand Address:", value);
 
         response = await axios.post(
-          `${DevUrl}/algorand-address/`,
+          `${DevUrl}/algo-transfers/`,
           {
-            algoAddress: value,
+            address: value,
           },
           {
             headers: {
@@ -166,8 +166,10 @@ const Visualizer = () => {
           }
         );
 
-        setTransfers(response.data.transfers);
-        renderGraph(value, response.data.transfers);
+        console.log(response.data);
+
+        setTransfers(response.data.fromTransfers);
+        renderGraph(value, response.data.fromTransfers);
         setValidationMessage("Valid Algorand address found!");
       }
 
@@ -756,7 +758,7 @@ const Visualizer = () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value.trim())}
-            placeholder="Enter transaction hash value"
+            placeholder="Enter tx hash or address value"
             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
           />
           <div className="flex gap-4">
