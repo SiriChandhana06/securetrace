@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 // import * as d3 from 'd3';
 import { isAddress } from 'ethers';
 import axios from 'axios';
@@ -10,7 +11,10 @@ import Footer from './Footer';
 import cytoscape from 'cytoscape';
 
 const Visualizer = () => {
-  const [inputValue, setInputValue] = useState('');
+  const location = useLocation();
+  const [inputValue, setInputValue] = useState(
+    location.state?.inputValue || ""
+  );
   const [validationMessage, setValidationMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const svgRef = useRef(null);
@@ -32,7 +36,19 @@ const Visualizer = () => {
   const [tokensList, setTokensList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-
+  const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
+  const sortedTransfers = transfers.sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
+  const currentRows1 = sortedTransfers.slice(
+    (currentPage1 - 1) * rowsPerPage1,
+    currentPage1 * rowsPerPage1
+  );
+  const handlePageChange1 = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages1) {
+      setCurrentPage1(pageNumber);
+    }
+  };
 
 
   const handleInputChange = (e) => {
@@ -63,86 +79,116 @@ const Visualizer = () => {
   }, [inputValue]);
 
   const handleScanClick = async () => {
+    const value = formData?.txhash || formData?.address || inputValue;
 
-    const value = !formData ? inputValue : formData.txhash ? formData.txhash : formData.address;
+    if (!value) {
+      setValidationMessage(
+        "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
+      );
+      return;
+    }
 
-    if (validateWalletAddress(value || inputValue)) {
-      setLoading(true);
+    const algoAddressRegex = /^[A-Z2-7]{58}$/;
+    const isAddress = validateWalletAddress(value);
+    const isTxHash = validateTransactionHash(value);
+    const isAlgoAddress = algoAddressRegex.test(value);
 
-      setCurrentPage1(1);
+    if (!isAddress && !isTxHash && !isAlgoAddress) {
+      setValidationMessage(
+        "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
+      );
+      return;
+    }
 
-      try {
-        console.log('address:', value, "fromDate:", formData.fromDate, "toDate:", formData.toDate, "tokens:", formData.tokens);
-        const response = await axios.post(
+    setLoading(true);
+
+    try {
+      let response, combinedTransfers;
+
+      if (isAddress) {
+        console.log("Scanning Address:", value);
+        console.log("Filters:", {
+          fromDate: formData?.fromDate,
+          toDate: formData?.toDate,
+          tokens: formData?.tokens,
+        });
+
+        response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: value || inputValue, startDate: formData.fromDate ? formData.fromDate : null, endDate: formData.toDate ? formData.toDate : null, tokenList: formData.tokens ? formData.tokens : null },
+          {
+            address: value,
+            startDate: formData?.fromDate || null,
+            endDate: formData?.toDate || null,
+            tokenList: formData?.tokens || null,
+          },
           {
             headers: {
-              'ngrok-skip-browser-warning': 'true',
-              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
             },
           }
         );
-        console.log(response.data);
 
-        const combinedTransfers = response.data.from.concat(response.data.to);
+        combinedTransfers = response.data.from.concat(response.data.to);
         setTransfers(combinedTransfers);
-        renderGraph(value || inputValue, combinedTransfers);
-        setValidationMessage('Valid wallet address found!');
-        if (inputValue.length > 0 || value.length > 0) {
-          setIsInputEntered(true);
-        } else {
-          setIsInputEntered(false);
-        }
-      } catch (error) {
-        console.log('Error:', error);
-        setValidationMessage('Error retrieving data.');
-      }
-      setLoading(false);
-    } else if (validateTransactionHash(value || inputValue)) {
-      setLoading(true);
+        renderGraph(value, combinedTransfers);
+        setValidationMessage("Valid wallet address found!");
+      } else if (isTxHash) {
+        console.log("Scanning Transaction Hash:", value);
 
-      try {
-        const response = await axios.post(
+        response = await axios.post(
           `${DevUrl}/fetch-transaction-details/`,
-          { txhash: inputValue || value },
+          { txhash: value },
           {
             headers: {
-              'ngrok-skip-browser-warning': 'true',
-              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
             },
           }
         );
-        console.log(response.data);
 
         setTransfers(response.data.transfers);
-        renderGraphTxHash(inputValue || value, response.data.transfers);
-        setValidationMessage('Valid tx found!');
-        if (inputValue.length > 0) {
-          setIsInputEntered(true);
-        } else {
-          setIsInputEntered(false);
-        }
-      } catch (error) {
-        console.log('Error:', error);
-        setValidationMessage('Error retrieving data.');
+        renderGraphTxHash(value, response.data.transfers);
+        setValidationMessage("Valid transaction hash found!");
+      } else if (isAlgoAddress) {
+        console.log("Scanning Algorand Address:", value);
+
+        response = await axios.post(
+          `${DevUrl}/algo-transfers/`,
+          {
+            address: value,
+          },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log(response.data);
+
+        setTransfers(response.data.fromTransfers);
+        renderGraph(value, response.data.fromTransfers);
+        setValidationMessage("Valid Algorand address found!");
       }
+
+      setIsInputEntered(!!value);
+    } catch (error) {
+      console.error("Error during scan:", error);
+      setValidationMessage("Error retrieving data. Please try again.");
+    } finally {
       setLoading(false);
-
-    } else {
-      setValidationMessage('Invalid input. Please enter a valid wallet address or tx hash.');
     }
   };
 
 
-  const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
-  const sortedTransfers = transfers.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  const currentRows1 = sortedTransfers.slice((currentPage1 - 1) * rowsPerPage1, currentPage1 * rowsPerPage1);
-  const handlePageChange1 = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages1) {
-      setCurrentPage1(pageNumber);
+  // New function: Directly binds and triggers `handleScanClick`
+  useEffect(() => {
+    if (inputValue) {
+      handleScanClick(); // Automatically trigger the scan when inputValue is set
     }
-  };
+  }, [inputValue]);
 
 
   const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
@@ -266,8 +312,6 @@ const Visualizer = () => {
     setError("");
     setIsPopupOpen(false);
   };
-  
-
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -311,8 +355,6 @@ const Visualizer = () => {
     token.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-
-
   // const handleTokenSelection = (token) => {
   //   setFormData((prevFormData) => {
   //     const isSelected = prevFormData.tokens.includes(token);
@@ -341,9 +383,6 @@ const Visualizer = () => {
       };
     });
   };
-
-
-
 
   const renderGraph = (centerAddress, transactions) => {
     const elements = [];
@@ -700,13 +739,17 @@ const Visualizer = () => {
 
 
   return (
-    <div className=''>
+    <div className="">
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
         {!isInputEntered && (
           <>
-            <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-4">SecureTrace Visualizer</h1>
+            <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-4">
+              SecureTrace Visualizer
+            </h1>
             <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-2xl font-semibold">
-              SecureTrace analyzes transaction data using blockchain forensic techniques, enhancing the detection of intricate patterns and potential vulnerabilities.
+              SecureTrace analyzes transaction data using blockchain forensic
+              techniques, enhancing the detection of intricate patterns and
+              potential vulnerabilities.
             </p>
           </>
         )}
@@ -714,35 +757,46 @@ const Visualizer = () => {
           <input
             type="text"
             value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Enter transaction hash or address value"
+            onChange={(e) => setInputValue(e.target.value.trim())}
+            placeholder="Enter tx hash or address value"
             className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
           />
-          <div className='flex gap-4'>
-            <button onClick={handleScanClick} disabled={loading} className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
-              {/* {loading ? 'Scanning...' : 'Scan Now'} */}
-              Scan Now
+          <div className="flex gap-4">
+            <button
+              onClick={handleScanClick}
+              disabled={loading}
+              className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300"
+            >
+              {loading ? "Scanning..." : "Scan Now"}
             </button>
             {loading && (
               <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                 <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-green-700"></div>
               </div>
             )}
-            <button onClick={togglePopup} className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300">
+            <button
+              onClick={togglePopup}
+              className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300"
+            >
               Advanced Scan
             </button>
 
-
             {isPopupOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <div className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative overflow-y-scroll" style={{ maxHeight: "90vh", }} id='hide-scrollbar'>
+                <div
+                  className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative overflow-y-scroll"
+                  style={{ maxHeight: "90vh" }}
+                  id="hide-scrollbar"
+                >
                   <button
                     className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
                     onClick={togglePopup}
                   >
                     ✖
                   </button>
-                  <h2 className="text-xl font-semibold mb-4">Advanced Scan Option</h2>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Advanced Scan Option
+                  </h2>
 
                   <form onSubmit={handleSubmit}>
                     <div className="mb-4">
@@ -831,15 +885,19 @@ const Visualizer = () => {
                           />
                         </div>
                         <div className="mb-4 relative">
-                          <label className="font-medium text-gray-700">Tokens:</label>
+                          <label className="font-medium text-gray-700">
+                            Tokens:
+                          </label>
                           <div className="mt-2">
                             {/* Display Selected Tokens */}
                             {formData.tokens.length > 0 && (
                               <div className="mb-2 flex flex-wrap gap-2">
                                 {formData.tokens.map((tokenAddress, index) => {
                                   // Find the corresponding token object using the address
-                                  const token = tokensList.find((t) => t.address === tokenAddress);
-                                  
+                                  const token = tokensList.find(
+                                    (t) => t.address === tokenAddress
+                                  );
+
                                   return token ? (
                                     <span
                                       key={index}
@@ -847,7 +905,9 @@ const Visualizer = () => {
                                     >
                                       {token.name} - {token.chain}
                                       <button
-                                        onClick={() => handleTokenSelection(token)}
+                                        onClick={() =>
+                                          handleTokenSelection(token)
+                                        }
                                         className="text-red-500 hover:text-red-700"
                                       >
                                         ✖
@@ -857,7 +917,6 @@ const Visualizer = () => {
                                 })}
                               </div>
                             )}
-
 
                             {/* Search Bar */}
                             <input
@@ -875,20 +934,24 @@ const Visualizer = () => {
                                   <div
                                     key={index}
                                     onClick={() => handleTokenSelection(token)}
-                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${formData.tokens.includes(token.address) ? "bg-gray-200 font-bold" : ""
-                                      }`}
+                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${
+                                      formData.tokens.includes(token.address)
+                                        ? "bg-gray-200 font-bold"
+                                        : ""
+                                    }`}
                                   >
-                                    {token.name} - {token.chain} {/* Display token name and chain */}
+                                    {token.name} - {token.chain}{" "}
+                                    {/* Display token name and chain */}
                                   </div>
                                 ))
                               ) : (
-                                <div className="p-3 text-gray-500">No tokens found</div>
+                                <div className="p-3 text-gray-500">
+                                  No tokens found
+                                </div>
                               )}
                             </div>
-
                           </div>
                         </div>
-
                       </>
                     )}
 
@@ -904,99 +967,276 @@ const Visualizer = () => {
                 </div>
               </div>
             )}
-
-
           </div>
         </div>
         {validationMessage && (
-          <p className={`ml-10 mt-2 ${validationMessage.includes('Invalid') ? 'text-red-500' : 'text-green-500'}`}>
+          <p
+            className={`ml-10 mt-2 ${
+              validationMessage.includes("Invalid")
+                ? "text-red-500"
+                : "text-green-500"
+            }`}
+          >
             {validationMessage}
           </p>
         )}
         <div id="cy" className="w-full h-[800px]"></div>
       </div>
-      <div className='bg-white dark:bg-[#001938]'>
+      <div className="bg-white dark:bg-[#001938]">
         {isInputEntered && (
           // <div className="mt-10 mx-20">
-          <div className='mx-4 md:mx-32 pt-10 pb-20'>
-            <div className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500" id="hide-scrollbar">
+          <div className="mx-4 md:mx-32 pt-10 pb-20">
+            <div
+              className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500"
+              id="hide-scrollbar"
+            >
               <div className="">
-                <div className='flex'>
-                  <h3 className="text-2xl font-semibold mt-1 mb-4">Transfers</h3>
+                <div className="flex">
+                  <h3 className="text-2xl font-semibold mt-1 mb-4">
+                    Transfers
+                  </h3>
                   <div className="flex items-center mb-4">
                     <button
-                      className={`px-4 py-2 font-bold ${currentPage1 === 1 ? 'cursor-not-allowed opacity-50 ' : 'cursor-pointer'}`}
+                      className={`px-4 py-2 font-bold ${
+                        currentPage1 === 1
+                          ? "cursor-not-allowed opacity-50 "
+                          : "cursor-pointer"
+                      }`}
                       onClick={() => handlePageChange1(currentPage1 - 1)}
                       disabled={currentPage1 === 1}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024"><path fill="black" d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0" /></svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 1024 1024"
+                      >
+                        <path
+                          fill="black"
+                          d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0"
+                        />
+                      </svg>
                     </button>
-                    <span className='font-bold text-xl'>
+                    <span className="font-bold text-xl">
                       {currentPage1} / {totalPages1}
                     </span>
                     <button
-                      className={`px-4 py-2 font-bold ${currentPage1 === totalPages1 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                      className={`px-4 py-2 font-bold ${
+                        currentPage1 === totalPages1
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-pointer"
+                      }`}
                       onClick={() => handlePageChange1(currentPage1 + 1)}
                       disabled={currentPage1 === totalPages1}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 12 24"><path fill="black" fill-rule="evenodd" d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414" /></svg>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="30"
+                        height="30"
+                        viewBox="0 0 12 24"
+                      >
+                        <path
+                          fill="black"
+                          fill-rule="evenodd"
+                          d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414"
+                        />
+                      </svg>
                     </button>
                   </div>
                 </div>
                 <div className="overflow-x-scroll" id="hide-scrollbar">
                   <table className="w-full text-center">
-                    <thead className=''>
+                    <thead className="">
                       <tr className="text-gray-500 h-10">
-                        <th className='flex justify-center items-center space-x-2 px-4'><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="black" d="M14.78 3.653a3.936 3.936 0 1 1 5.567 5.567l-3.627 3.627a3.936 3.936 0 0 1-5.88-.353a.75.75 0 0 0-1.18.928a5.436 5.436 0 0 0 8.12.486l3.628-3.628a5.436 5.436 0 1 0-7.688-7.688l-3 3a.75.75 0 0 0 1.06 1.061z" /><path fill="black" d="M7.28 11.153a3.936 3.936 0 0 1 5.88.353a.75.75 0 0 0 1.18-.928a5.436 5.436 0 0 0-8.12-.486L2.592 13.72a5.436 5.436 0 1 0 7.688 7.688l3-3a.75.75 0 1 0-1.06-1.06l-3 3a3.936 3.936 0 0 1-5.567-5.568z" /></svg></th>
-                        <th className=' px-4'>
-                          <div className="flex justify-center items-center space-x-2"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="black" fill-rule="evenodd" d="m12.6 11.503l3.891 3.891l-.848.849L11.4 12V6h1.2zM12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-1.2a8.8 8.8 0 1 0 0-17.6a8.8 8.8 0 0 0 0 17.6" /></svg>
+                        <th className="flex justify-center items-center space-x-2 px-4">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="1em"
+                            height="1em"
+                            viewBox="0 0 512 512"
+                          >
+                            <path
+                              fill="none"
+                              stroke="black"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="32"
+                              d="M32 144h448M112 256h288M208 368h96"
+                            />
+                          </svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="1em"
+                            height="1em"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              fill="black"
+                              d="M14.78 3.653a3.936 3.936 0 1 1 5.567 5.567l-3.627 3.627a3.936 3.936 0 0 1-5.88-.353a.75.75 0 0 0-1.18.928a5.436 5.436 0 0 0 8.12.486l3.628-3.628a5.436 5.436 0 1 0-7.688-7.688l-3 3a.75.75 0 0 0 1.06 1.061z"
+                            />
+                            <path
+                              fill="black"
+                              d="M7.28 11.153a3.936 3.936 0 0 1 5.88.353a.75.75 0 0 0 1.18-.928a5.436 5.436 0 0 0-8.12-.486L2.592 13.72a5.436 5.436 0 1 0 7.688 7.688l3-3a.75.75 0 1 0-1.06-1.06l-3 3a3.936 3.936 0 0 1-5.567-5.568z"
+                            />
+                          </svg>
+                        </th>
+                        <th className=" px-4">
+                          <div className="flex justify-center items-center space-x-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fill="black"
+                                fill-rule="evenodd"
+                                d="m12.6 11.503l3.891 3.891l-.848.849L11.4 12V6h1.2zM12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-1.2a8.8 8.8 0 1 0 0-17.6a8.8 8.8 0 0 0 0 17.6"
+                              />
+                            </svg>
                             <h1>Time</h1>
                           </div>
                         </th>
-                        <th className=' px-6'>
+                        <th className=" px-6">
                           <div className="flex justify-center items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 512 512"
+                            >
+                              <path
+                                fill="none"
+                                stroke="black"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="32"
+                                d="M32 144h448M112 256h288M208 368h96"
+                              />
+                            </svg>
                             <h1>From</h1>
                           </div>
                         </th>
-                        <th className='px-6'>
+                        <th className="px-6">
                           <div className="flex justify-center items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 512 512"
+                            >
+                              <path
+                                fill="none"
+                                stroke="black"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="32"
+                                d="M32 144h448M112 256h288M208 368h96"
+                              />
+                            </svg>
                             <h1>To</h1>
                           </div>
                         </th>
-                        <th className=' px-4'>
+                        <th className=" px-4">
                           <div className="flex justify-center items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 512 512"
+                            >
+                              <path
+                                fill="none"
+                                stroke="black"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="32"
+                                d="M32 144h448M112 256h288M208 368h96"
+                              />
+                            </svg>
                             <h1>Value</h1>
                           </div>
                         </th>
-                        <th className=' px-4'>
+                        <th className=" px-4">
                           <div className="flex justify-center items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 512 512"
+                            >
+                              <path
+                                fill="none"
+                                stroke="black"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="32"
+                                d="M32 144h448M112 256h288M208 368h96"
+                              />
+                            </svg>
                             <h1>Token</h1>
                           </div>
                         </th>
-                        <th className=' px-4'>
+                        <th className=" px-4">
                           <div className="flex justify-center items-center space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M32 144h448M112 256h288M208 368h96" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="1em"
+                              height="1em"
+                              viewBox="0 0 512 512"
+                            >
+                              <path
+                                fill="none"
+                                stroke="black"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="32"
+                                d="M32 144h448M112 256h288M208 368h96"
+                              />
+                            </svg>
                             <h1>Amount</h1>
                           </div>
                         </th>
                       </tr>
                     </thead>
                     <tbody className=" text-center">
-                      {currentRows1 && currentRows1.length > 0 ?
+                      {currentRows1 && currentRows1.length > 0 ? (
                         currentRows1.map((transfer, index) => {
-                          const { logo, timestamp, from, to, value, tokenName, tokenPrice, blockNum, chain } = transfer;
+                          const {
+                            logo,
+                            timestamp,
+                            from,
+                            to,
+                            value,
+                            tokenName,
+                            tokenPrice,
+                            blockNum,
+                            chain,
+                          } = transfer;
                           return (
-                            <tr key={index} className="border-t h-12 text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2">
-                              <td className='flex justify-center items-center mt-2 px-4'><img src={logo} alt={tokenName} /></td>
-                              <td className="text-green-500 me-3 px-4">{new Date(timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
+                            <tr
+                              key={index}
+                              className="border-t h-12 text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
+                            >
+                              <td className="flex justify-center items-center mt-2 px-4">
+                                <img src={logo} alt={tokenName} />
+                              </td>
+                              <td className="text-green-500 me-3 px-4">
+                                {new Date(timestamp).toLocaleString("en-IN", {
+                                  timeZone: "Asia/Kolkata",
+                                })}
+                              </td>
                               <td className="me-3 px-4">
                                 <button
                                   className="text-center"
-                                  onClick={() => handleLinkClick(from, blockNum, false, chain)}
+                                  onClick={() =>
+                                    handleLinkClick(
+                                      from,
+                                      blockNum,
+                                      false,
+                                      chain
+                                    )
+                                  }
                                 >
                                   {from.slice(0, 5) + "..." + from.slice(-4)}
                                 </button>
@@ -1004,7 +1244,9 @@ const Visualizer = () => {
                               <td className="me-3 px-4">
                                 <button
                                   className="text-center"
-                                  onClick={() => handleLinkClick(to, blockNum, true, chain)}
+                                  onClick={() =>
+                                    handleLinkClick(to, blockNum, true, chain)
+                                  }
                                 >
                                   {to.slice(0, 5) + "..." + to.slice(-4)}
                                 </button>
@@ -1013,28 +1255,30 @@ const Visualizer = () => {
                                 {parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
-                              <td className="px-4">{parseFloat(value).toFixed(2)}</td>
+                              <td className="px-4">
+                                {parseFloat(value).toFixed(2)}
+                              </td>
                             </tr>
                           );
                         })
-                        :
-                        (
-                          <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
-                            <td className='flex justify-center items-center mt-2'><img src={btc} alt="Token Name" /></td>
-                            <td className="text-green-500 text-center">0 days ago</td>
-                            <td className="text-center">0000....000</td>
-                            <td className="text-center">0000....000</td>
-                            <td className='text-green-500'>0.00</td>
-                            {/* <td className="text-green-500">
+                      ) : (
+                        <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
+                          <td className="flex justify-center items-center mt-2">
+                            <img src={btc} alt="Token Name" />
+                          </td>
+                          <td className="text-green-500 text-center">
+                            0 days ago
+                          </td>
+                          <td className="text-center">0000....000</td>
+                          <td className="text-center">0000....000</td>
+                          <td className="text-green-500">0.00</td>
+                          {/* <td className="text-green-500">
                                             0.00
                                         </td> */}
-                            <td>BTC</td>
-                            <td>$0.00</td>
-                          </tr>
-                        )
-                      }
-
-
+                          <td>BTC</td>
+                          <td>$0.00</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1043,7 +1287,7 @@ const Visualizer = () => {
           </div>
         )}
       </div>
-      <div className=''>
+      <div className="">
         <Footer />
       </div>
     </div>
