@@ -17,7 +17,7 @@ const apiClient = axios.create({
 const CreditScore = () => {
   const [activeTab, setActiveTab] = useState("wallet");
   const [inputValue, setInputValue] = useState("");
-  const [inputChain, setInputChain] = useState("");
+  const [inputChain, setInputChain] = useState("ethereum");
   const [validatedData, setValidatedData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [creditScore, setCreditScore] = useState(null);
@@ -110,39 +110,46 @@ const CreditScore = () => {
   };
 
   const validateInput = async () => {
-    const walletRegex = /^0x[a-fA-F0-9]{40}$/;
-    const appIdRegex = /^[1-9][0-9]*$/;
-    let isValid;
-    if(inputChain === 'algorand') {
-      isValid = appIdRegex.test(inputValue);
-      if(!isValid) {
-        toast.error("Invalid app ID. Please enter a valid value.");
-        setInputValue("");
-        return;
-      }
-    } else {
-      const isValid = walletRegex.test(inputValue);
-      if (!isValid) {
-        toast.error("Invalid address. Please enter a valid value.");
-        setInputValue("");
-        return;
-      }
-    }
+  const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+  const appIdRegex = /^[1-9][0-9]*$/;
+  let isValid;
 
-    const scoresFetched = activeTab === "wallet" ?
-      await fetchWalletCreditScore(inputValue) : await fetchSCCreditScore(inputValue, inputChain);
+  if (activeTab === "wallet" && !inputChain) {
+    setInputChain("ethereum");
+  }
 
-    if (scoresFetched) {
-      toast.success(
-        `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
-      );
-      setValidatedData({
-        type: activeTab,
-        value: inputValue,
-      });
+  if (inputChain === "algorand") {
+    isValid = appIdRegex.test(inputValue);
+    if (!isValid) {
+      toast.error("Invalid app ID. Please enter a valid value.");
       setInputValue("");
+      return;
     }
-  };
+  } else {
+    isValid = walletRegex.test(inputValue);
+    if (!isValid) {
+      toast.error("Invalid address. Please enter a valid value.");
+      setInputValue("");
+      return;
+    }
+  }
+
+  const scoresFetched =
+    activeTab === "wallet"
+      ? await fetchWalletCreditScore(inputValue)
+      : await fetchSCCreditScore(inputValue, inputChain);
+
+  if (scoresFetched) {
+    toast.success(
+      `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
+    );
+    setValidatedData({
+      type: activeTab,
+      value: inputValue,
+    });
+    setInputValue("");
+  }
+};
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -182,8 +189,8 @@ const CreditScore = () => {
       <div>
         {validatedData ? (
           <div className="my-20">
-            <div className="shadow-lg ml-10 mb-10">
-              <p className="text-lg font-semibold text-gray-700 dark:text-gray-200 gap-4">
+            <div className="mb-10 ml-10 shadow-lg">
+              <p className="gap-4 text-lg font-semibold text-gray-700 dark:text-gray-200">
                 {validatedData.type === "wallet"
                   ? "Wallet Address"
                   : "Smart Contract Address"}
@@ -199,41 +206,103 @@ const CreditScore = () => {
 
             <div className="text-center">
               {isLoading ? (
-                <div className="animate-pulse text-green-500 text-3xl font-bold">
+                <div className="text-3xl font-bold text-green-500 animate-pulse">
                   Loading...
                 </div>
               ) : activeTab === "wallet" ? (
                 <div>
-                  <h1 className="text-black dark:text-white text-2xl">
+                  <h1 className="text-2xl text-black dark:text-white">
                     Credit Score
                   </h1>
-                  <h1 className="text-green-500 text-3xl font-bold">
+                  <h1 className="text-3xl font-bold text-green-500">
                     {creditScore}
                   </h1>
-                  <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-10 mb-10">
-                    {/* Existing Boxes */}
+                  <div className="grid grid-cols-1 gap-4 px-10 mt-10 mb-10 md:grid-cols-2 lg:grid-cols-4">
+                      {/* Box 1 */}
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Borrowing History
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to historical loan repayment
+                          performance.
+                        </p>
+                      </div>
+                      {/* Box 2 */}
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Account Composition
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the asset breakdown within an
+                          account.
+                        </p>
+                      </div>
+                      {/* Box 3 */}
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Account Health
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the size and volume of activity
+                          within an account.
+                        </p>
+                      </div>
+                      {/* Box 4 */}
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Interactions
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the account's involvement in the
+                          web3 ecosystem.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
               ) : (
                 creditScore && (
                   <div className="mt-10 text-center">
-                    <h1 className="text-2xl font-bold text-gray-700 dark:text-white mb-10">
+                    <h1 className="mb-10 text-2xl font-bold text-gray-700 dark:text-white">
                       Smart Contract Analysis
                     </h1>
-                    <div className="p-4 justify-center text-2xl">
-                      <p className="text-green-500 font-bold">Credit Score</p>
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
+                    <div className="justify-center p-4 text-2xl">
+                      <p className="font-bold text-green-500">Credit Score</p>
+                      <p className="mt-2 text-gray-700 dark:text-gray-300">
                         {creditScore.creditScore}
                       </p>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-4 mt-4 px-10">
-                      {/* Existing Boxes */}
+                    <div className="flex flex-wrap justify-center gap-4 px-10 mt-4">
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
+                        <p className="text-xl font-bold text-green-500">
+                          Transaction Success Percentage
+                        </p>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          {creditScore.successPc} %
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
+                        <p className="text-xl font-bold text-green-500">
+                          Verification Status
+                        </p>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          {creditScore.verificationStatus}
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
+                        <p className="text-xl font-bold text-green-500">
+                          Diversity Score
+                        </p>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          {creditScore.diversityScore}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )
               )}
             </div>
-            <p className="text-gray-500 mt-4 text-center">
+            <p className="mt-4 text-center text-gray-500">
               Your {validatedData.type} is valid. Analysis is available.
             </p>
           </div>
@@ -249,7 +318,7 @@ const CreditScore = () => {
                 }`}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 w-full"
+                className="w-full px-4 py-3 mb-4 border border-gray-300 shadow-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:mb-0"
                 disabled={isLoading}
               />
               {activeTab === "smartContract" && (
@@ -262,7 +331,7 @@ const CreditScore = () => {
                   </label>
                   <select
                     id="blockchain-select"
-                    className="mt-2 mb-10 block w-full p-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="block w-full p-3 mt-2 mb-10 text-gray-700 bg-gray-100 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     onChange={(e) => setInputChain(e.target.value)}
                   >
                     <option value="ethereum">Ethereum</option>
