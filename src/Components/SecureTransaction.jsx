@@ -33,12 +33,6 @@ const SecureTransaction = () => {
   const rowsPerPage = 10;
   const { darkMode } = useTheme();
 
-  const isValidEthereumAddressOrTxHash = (value) => {
-    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
-    const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
-    return ethAddressRegex.test(value) || txHashRegex.test(value);
-  };
-
   const handleInputChange = (e) => {
     setInputValue(e.target.value.trim());
   };
@@ -150,12 +144,12 @@ const SecureTransaction = () => {
   return (
     <div className="w-full bg-white dark:bg-[#001938]">
       <div className="">
-        <div className="flex flex-col items-center justify-center py-10 px-4">
-          <h1 className="text-3xl font-bold text-center mb-4 text-black dark:text-white">
+        <div className="flex flex-col items-center justify-center px-4 py-10">
+          <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
             SecureTrace Transactions
           </h1>
 
-          <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-2xl font-semibold">
+          <p className="max-w-2xl mb-6 font-semibold text-center text-gray-600 dark:text-gray-300">
             SecureTrace analyzes transaction data using specialized blockchain
             forensic techniques, enhancing the detection of intricate patterns
             and potential vulnerabilities.
@@ -167,14 +161,14 @@ const SecureTransaction = () => {
               value={inputValue}
               onChange={handleInputChange}
               placeholder="Search for funds, exchange, transactions..."
-              className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full placeholder:text-center"
+              className="w-full px-4 py-3 mb-4 border border-gray-300 shadow-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:mb-0 sm:mr-4 placeholder:text-center"
             />
 
             <div className="flex justify-center">
               <button
                 type="submit"
                 disabled={!inputValue}
-                className="bg-green-500 w-60 mt-6 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300"
+                className="px-8 py-3 mt-6 font-semibold text-black transition-all duration-300 bg-green-500 shadow-md w-60 rounded-xl hover:bg-green-600"
               >
                 Scan Now
               </button>
@@ -183,16 +177,16 @@ const SecureTransaction = () => {
         </div>
       </div>
 
-      <div className="flex justify-center items-center xl:items-start flex-wrap">
+      <div className="flex flex-wrap items-center justify-center xl:items-start">
         {loading && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-green-700"></div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div className="border-t-2 border-b-2 border-green-700 rounded-full animate-spin h-14 w-14"></div>
           </div>
         )}
 
         <div className=" w-full xl:w-[48%] flex justify-center items-center">
-          <div className=" w-full">
-            <h3 className="text-xl font-semibold text-green-500 mb-4 ml-0 lg:ml-16 text-center xl:text-left ">
+          <div className="w-full ">
+            <h3 className="mb-4 ml-0 text-xl font-semibold text-center text-green-500 lg:ml-16 xl:text-left ">
               TRENDING TOKEN PAGES
             </h3>
             <div
@@ -216,15 +210,15 @@ const SecureTransaction = () => {
                   return (
                     <div>
                       <div className="border border-green-500 rounded-xl p-4 sm:p-6 shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
-                        {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
+                        {/* <h3 className="mb-4 text-xl font-semibold text-green-500">
                           TRENDING TOKEN PAGES
                         </h3> */}
 
-                        <div className="md:flex gap-2 ">
+                        <div className="gap-2 md:flex ">
                           <div className=" md:mt-6 md:w-[30%] ">
                             <div className="flex items-center gap-2">
                               <img
-                                className="h-12 w-12"
+                                className="w-12 h-12"
                                 src={image}
                                 alt="Token"
                               />
@@ -237,7 +231,7 @@ const SecureTransaction = () => {
                             </div>
 
                             <div>
-                              <h4 className="text-2xl mt-5 text-green-500 font-bold">
+                              <h4 className="mt-5 text-2xl font-bold text-green-500">
                                 ${current_price}
                               </h4>
                               <p
@@ -281,15 +275,15 @@ const SecureTransaction = () => {
               ) : (
                 <div className="flex justify-center">
                   <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
-                    {/* <h3 className="text-xl font-semibold text-green-500 mb-4">
+                    {/* <h3 className="mb-4 text-xl font-semibold text-green-500">
                         TRENDING TOKEN PAGES
                       </h3> */}
 
-                    <div className="md:flex gap-10">
+                    <div className="gap-10 md:flex">
                       <div className="mt-6">
                         <div className="flex items-center gap-4">
                           <img
-                            className="h-12 w-12"
+                            className="w-12 h-12"
                             src={layerzero}
                             alt="Token"
                           />
@@ -302,7 +296,7 @@ const SecureTransaction = () => {
                         </div>
 
                         <div>
-                          <h4 className="text-2xl mt-5 text-green-500 font-bold">
+                          <h4 className="mt-5 text-2xl font-bold text-green-500">
                             $0.00
                           </h4>
                           <p className="text-lg text-[#3C704F] font-semibold">
@@ -339,8 +333,8 @@ const SecureTransaction = () => {
         </div>
 
         <div className=" w-full xl:w-[50%] ">
-          <div className=" flex sm:justify-center sm:gap-40 md:gap-72 lg:gap-96 xl:justify-between xl:gap-0 mt-10 md:mt-0 ">
-            <h3 className="text-xl font-semibold text-green-500 text-center mt-2 xl:text-left ">
+          <div className="flex mt-10 sm:justify-center sm:gap-40 md:gap-72 lg:gap-96 xl:justify-between xl:gap-0 md:mt-0">
+            <h3 className="mt-2 text-xl font-semibold text-center text-green-500 xl:text-left ">
               TRANSACTIONS
             </h3>
 
@@ -366,7 +360,7 @@ const SecureTransaction = () => {
                   />
                 </svg>
               </button>
-              <span className="font-bold text-xl text-black dark:text-white">
+              <span className="text-xl font-bold text-black dark:text-white">
                 {currentPage} / {totalPages}
               </span>
               <button
@@ -393,14 +387,14 @@ const SecureTransaction = () => {
               </button>
             </div>
           </div>
-          <div className=" w-full flex justify-center items-center pr-3 mx-auto">
+          <div className="flex items-center justify-center w-full pr-3 mx-auto ">
             <div className="  w-[98%] md:w-[750px] flex justify-center items-center mx-auto ">
-              <div className="overflow-x-auto w-full">
-                <table className="table-auto w-full  text-sm  overflow-hidden ">
+              <div className="w-full overflow-x-auto">
+                <table className="w-full overflow-hidden text-sm table-auto ">
                   <thead className="">
                     <tr className="bg-[#ADADAD] h-12 ">
-                      <th className="pr-10 pl-10">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="pl-10 pr-10">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -435,7 +429,7 @@ const SecureTransaction = () => {
                       </th>
 
                       <th className="pr-10 ">
-                        <div className="flex justify-center items-center space-x-2">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -456,8 +450,8 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="pr-10 pl-10 ">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="pl-10 pr-10 ">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -478,8 +472,8 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="pr-10 pl-10">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="pl-10 pr-10">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -500,8 +494,8 @@ const SecureTransaction = () => {
                         </div>
                       </th>
 
-                      <th className="pr-10 pl-10">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="pl-10 pr-10">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -532,17 +526,17 @@ const SecureTransaction = () => {
 
                         return (
                           <tr key={index} className="h-12 text-center">
-                            <td className="flex justify-center items-center mt-2 ">
-                              <img className="h-6 w-6" src={logo} alt="asset" />
+                            <td className="flex items-center justify-center mt-2 ">
+                              <img className="w-6 h-6" src={logo} alt="asset" />
                             </td>
-                            <td className=" text-center text-black dark:text-white">
+                            <td className="text-center text-black dark:text-white">
                               {from.slice(0, 5) + "..." + from.slice(-4)}
                             </td>
-                            <td className=" text-center text-black dark:text-white">
+                            <td className="text-center text-black dark:text-white">
                               {to.slice(0, 5) + "..." + to.slice(-4)}
                             </td>
-                            <td className=" flex gap-2 justify-center items-center text-black dark:text-white">
-                              <img className="h-5 w-5" src={logo} alt="asset" />{" "}
+                            <td className="flex items-center justify-center gap-2 text-black dark:text-white">
+                              <img className="w-5 h-5" src={logo} alt="asset" />{" "}
                               {asset}
                             </td>
                             <td className="text-[#808183] dark:text-white font-semibold text-lg text-center">
@@ -555,7 +549,7 @@ const SecureTransaction = () => {
                       <tr>
                         <td
                           colSpan="5"
-                          className="text-center text-black dark:text-white py-4"
+                          className="py-4 text-center text-black dark:text-white"
                         >
                           No transactions available
                         </td>

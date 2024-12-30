@@ -217,7 +217,6 @@ const CreditScore = () => {
                     {creditScore}
                   </h1>
                   <div className="grid grid-cols-1 gap-4 px-10 mt-10 mb-10 md:grid-cols-2 lg:grid-cols-4">
-                      {/* Box 1 */}
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
                         <h2 className="text-xl font-semibold text-black dark:text-white">
                           Borrowing History
@@ -227,7 +226,6 @@ const CreditScore = () => {
                           performance.
                         </p>
                       </div>
-                      {/* Box 2 */}
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
                         <h2 className="text-xl font-semibold text-black dark:text-white">
                           Account Composition
@@ -237,7 +235,6 @@ const CreditScore = () => {
                           account.
                         </p>
                       </div>
-                      {/* Box 3 */}
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
                         <h2 className="text-xl font-semibold text-black dark:text-white">
                           Account Health
@@ -247,7 +244,6 @@ const CreditScore = () => {
                           within an account.
                         </p>
                       </div>
-                      {/* Box 4 */}
                       <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
                         <h2 className="text-xl font-semibold text-black dark:text-white">
                           Interactions

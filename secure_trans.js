@@ -10,7 +10,6 @@ import btc from "../Assests/Bitcoin.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DevUrl } from "../Constants";
-import { useLocation } from "react-router-dom";
 import Footer from "./Footer";
 
 const AddressCard = () => {
@@ -20,7 +19,7 @@ const AddressCard = () => {
   //   amount: "$10,491.48",
   //   greenAmount: "$10,491.48",
   // };
-  const location = useLocation();
+
   const [cardData, setCardData] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [isPortfolioVisible, setIsPortfolioVisible] = useState(false);
@@ -70,16 +69,8 @@ const AddressCard = () => {
   const isValidEthereumAddressOrTxHash = (value) => {
     const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
     const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
-    const algoAddressRegex = /^[A-Z2-7]{58}$/;
-    const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
 
-    // return ethAddressRegex.test(value) || txHashRegex.test(value);
-    return (
-      ethAddressRegex.test(value) ||
-      txHashRegex.test(value) ||
-      algoAddressRegex.test(value) ||
-      algoTxHashRegex.test(value)
-    );
+    return ethAddressRegex.test(value) || txHashRegex.test(value);
   };
 
   const copyToClipboard = () => {
@@ -98,22 +89,31 @@ const AddressCard = () => {
     }
 
     if (!isValidEthereumAddressOrTxHash(inputValue)) {
-      toast.error(
-        "Invalid Ethereum address or transaction hash. Please enter a valid input."
-      );
+      toast.error("Invalid Ethereum address. Please enter a valid input.");
       setLoading(false);
       return;
     }
 
-    const apiEndpoint = /^[A-Z2-7]{58}$/.test(inputValue)
-      ? `${DevUrl}/fetch-algorand-details/`
-      : `${DevUrl}/fetch-address-details/`;
-
     try {
-      const response = await axios.post(apiEndpoint, { address: inputValue });
+      const response = await axios.post(
+        // `https://caiman-wanted-fox.ngrok-free.app/fetch-address-details/`,
+        `${DevUrl}/fetch-address-details/`,
+        { address: inputValue }, // This is the request body
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       SetPortfolioData(response.data.tokens);
+      console.log("Portfolio data:", response.data.tokens);
 
       const tokens = response.data.tokens;
+      // setPortfolioData(tokens);
+
+      // Calculate total value
       const total = tokens.reduce((sum, item) => {
         const price = parseFloat(item.tokenPrice);
         const holdings = parseFloat(item.tokenBalance);
@@ -123,11 +123,12 @@ const AddressCard = () => {
       setTotalValue(total.toFixed(2));
       setIsPortfolioVisible(true);
 
+      setLoading(false);
+
       localStorage.setItem("inputValue", inputValue);
     } catch (error) {
-      console.error("Error fetching portfolio data:", error);
-      toast.error("Failed to fetch portfolio data.");
-    } finally {
+      console.log("error", error);
+
       setLoading(false);
     }
 
@@ -135,9 +136,8 @@ const AddressCard = () => {
       const response1 = await axios.post(
         // `https://caiman-wanted-fox.ngrok-free.app/token-transfers/`,
         `${DevUrl}/token-transfers/`,
-        {
-          address: inputValue,
-        },
+
+        { address: inputValue }, // This is the request body
         {
           headers: {
             "ngrok-skip-browser-warning": "true",
@@ -148,33 +148,28 @@ const AddressCard = () => {
       );
       const combinedTransfers = response1.data.from.concat(response1.data.to);
       setTransfers(combinedTransfers);
+      // console.log("Transfres Data:", combinedTransfers);
+
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching transfers:", error);
+      console.log("error", error);
+
+      setLoading(false);
     }
+
+    // const foundData = jsonData[inputValue];
+    // if (foundData) {
+    //   setCardData({
+    //     address: inputValue,
+    //     amount: foundData.amount,
+    //     greenAmount: foundData.greenAmount,
+    //   });
+    //   setIsPortfolioVisible(true);
+    // } else {
+    //   alert('Data not found for the given address value.');
+    // }
+    setInputValue("");
   };
-
-  useEffect(() => {
-    if (location.state && location.state.inputValue) {
-      setInputValue(location.state.inputValue); // Set input value from Secure Transaction page
-    }
-  }, [location.state]);
-
-  useEffect(() => {
-    if (inputValue) {
-      handleScanNow(); // Trigger scan automatically after setting input value
-    }
-  }, [inputValue]);
-  // const foundData = jsonData[inputValue];
-  // if (foundData) {
-  //   setCardData({
-  //     address: inputValue,
-  //     amount: foundData.amount,
-  //     greenAmount: foundData.greenAmount,
-  //   });
-  //   setIsPortfolioVisible(true);
-  // } else {
-  //   alert('Data not found for the given address value.');
-  // }
 
   // useEffect(() => {
   //   const storedInputValue = localStorage.getItem('inputValue');
@@ -259,7 +254,7 @@ const AddressCard = () => {
   return (
     <div className="bg-white dark:bg-[#001938]">
       <div className="flex items-center justify-center overflow-x-hidden ">
-        <div className="mt-10 md:mt-20">
+        <div className="mt-10  md:mt-20">
           <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
             SecureTrace PortfolioTracker
           </h1>
@@ -297,6 +292,7 @@ const AddressCard = () => {
           </div>
         </div>
       )}
+
       {isPortfolioVisible && !loading && (
         <div className="flex flex-col items-center gap-4 p-4 mx-4 my-10 bg-white border border-black rounded-lg shadow-lg md:mx-32 shadow-gray-500 lg:flex-row">
           <div className="flex-1 ml-0 md:ml-4">
@@ -311,7 +307,7 @@ const AddressCard = () => {
                 <FaRegCopy />
               </button>
             </div>
-            <div className="items-center mt-2 md:flex">
+            <div className="items-center mt-2  md:flex">
               <h1 className="ml-2 text-4xl lg:ml-0">{`$${totalValue}`}</h1>
               <span className="mt-2 ml-2 text-2xl text-green-500">{`$${totalValue}`}</span>
               <button className="mt-2 ml-2 text-black text-md md:text-xl hover:text-gray-600">

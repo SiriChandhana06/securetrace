@@ -182,11 +182,9 @@ const Visualizer = () => {
     }
   };
 
-
-  // New function: Directly binds and triggers `handleScanClick`
   useEffect(() => {
     if (inputValue) {
-      handleScanClick(); // Automatically trigger the scan when inputValue is set
+      handleScanClick();
     }
   }, [inputValue]);
 
@@ -743,58 +741,58 @@ const Visualizer = () => {
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
         {!isInputEntered && (
           <>
-            <h1 className="text-3xl font-bold text-center text-black dark:text-white mb-4">
+            <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
               SecureTrace Visualizer
             </h1>
-            <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-2xl font-semibold">
+            <p className="max-w-2xl mb-6 font-semibold text-center text-gray-600 dark:text-gray-300">
               SecureTrace analyzes transaction data using blockchain forensic
               techniques, enhancing the detection of intricate patterns and
               potential vulnerabilities.
             </p>
           </>
         )}
-        <div className="flex flex-col sm:flex-row items-center w-full md:max-w-4xl ">
+        <div className="flex flex-col items-center w-full sm:flex-row md:max-w-4xl ">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value.trim())}
             placeholder="Enter tx hash or address value"
-            className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 sm:mr-4 w-full"
+            className="w-full px-4 py-3 mb-4 border border-gray-300 shadow-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:mb-0 sm:mr-4"
           />
           <div className="flex gap-4">
             <button
               onClick={handleScanClick}
               disabled={loading}
-              className="bg-green-500 w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300"
+              className="w-40 px-8 py-3 font-semibold text-black transition-all duration-300 bg-green-500 shadow-md rounded-xl hover:bg-green-600"
             >
               {loading ? "Scanning..." : "Scan Now"}
             </button>
             {loading && (
-              <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-                <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-green-700"></div>
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                <div className="border-t-2 border-b-2 border-green-700 rounded-full animate-spin h-14 w-14"></div>
               </div>
             )}
             <button
               onClick={togglePopup}
-              className="bg-green-500 w-44 text-black font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-green-600 transition-all duration-300"
+              className="px-8 py-3 font-semibold text-black transition-all duration-300 bg-green-500 shadow-md w-44 rounded-xl hover:bg-green-600"
             >
               Advanced Scan
             </button>
 
             {isPopupOpen && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                 <div
                   className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative overflow-y-scroll"
                   style={{ maxHeight: "90vh" }}
                   id="hide-scrollbar"
                 >
                   <button
-                    className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                    className="absolute text-gray-600 top-4 right-4 hover:text-gray-800"
                     onClick={togglePopup}
                   >
                     ✖
                   </button>
-                  <h2 className="text-xl font-semibold mb-4">
+                  <h2 className="mb-4 text-xl font-semibold">
                     Advanced Scan Option
                   </h2>
 
@@ -840,7 +838,7 @@ const Visualizer = () => {
                           value={formData.txhash}
                           onChange={handleChange}
                           placeholder="Enter Tx Hash"
-                          className="w-full p-3 border rounded-lg mt-2"
+                          className="w-full p-3 mt-2 border rounded-lg"
                         />
                       </div>
                     )}
@@ -857,7 +855,7 @@ const Visualizer = () => {
                             value={formData.address}
                             onChange={handleChange}
                             placeholder="Enter Address"
-                            className="w-full p-3 border rounded-lg mt-2"
+                            className="w-full p-3 mt-2 border rounded-lg"
                           />
                         </div>
                         <div className="mb-4">
@@ -869,7 +867,7 @@ const Visualizer = () => {
                             name="fromDate"
                             value={formData.fromDate}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg mt-2"
+                            className="w-full p-3 mt-2 border rounded-lg"
                           />
                         </div>
                         <div className="mb-4">
@@ -881,17 +879,17 @@ const Visualizer = () => {
                             name="toDate"
                             value={formData.toDate}
                             onChange={handleChange}
-                            className="w-full p-3 border rounded-lg mt-2"
+                            className="w-full p-3 mt-2 border rounded-lg"
                           />
                         </div>
-                        <div className="mb-4 relative">
+                        <div className="relative mb-4">
                           <label className="font-medium text-gray-700">
                             Tokens:
                           </label>
                           <div className="mt-2">
                             {/* Display Selected Tokens */}
                             {formData.tokens.length > 0 && (
-                              <div className="mb-2 flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-2 mb-2">
                                 {formData.tokens.map((tokenAddress, index) => {
                                   // Find the corresponding token object using the address
                                   const token = tokensList.find(
@@ -901,7 +899,7 @@ const Visualizer = () => {
                                   return token ? (
                                     <span
                                       key={index}
-                                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-lg flex items-center gap-2"
+                                      className="flex items-center gap-2 px-2 py-1 text-blue-800 bg-blue-100 rounded-lg"
                                     >
                                       {token.name} - {token.chain}
                                       <button
@@ -924,11 +922,11 @@ const Visualizer = () => {
                               placeholder="Search tokens..."
                               value={searchTerm}
                               onChange={(e) => setSearchTerm(e.target.value)}
-                              className="w-full p-3 border rounded-lg mb-2 bg-white"
+                              className="w-full p-3 mb-2 bg-white border rounded-lg"
                             />
 
                             {/* Dropdown */}
-                            <div className="border rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto">
+                            <div className="overflow-y-auto bg-white border rounded-lg shadow-lg max-h-48">
                               {filteredTokens.length > 0 ? (
                                 filteredTokens.map((token, index) => (
                                   <div
@@ -958,7 +956,7 @@ const Visualizer = () => {
                     <div className="flex justify-end">
                       <button
                         type="submit"
-                        className="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-600 transition-all duration-300"
+                        className="px-6 py-2 font-semibold text-white transition-all duration-300 bg-green-500 rounded-lg hover:bg-green-600"
                       >
                         {option === "txHash" ? "Scan Now" : "Submit"}
                       </button>
@@ -984,15 +982,15 @@ const Visualizer = () => {
       </div>
       <div className="bg-white dark:bg-[#001938]">
         {isInputEntered && (
-          // <div className="mt-10 mx-20">
-          <div className="mx-4 md:mx-32 pt-10 pb-20">
+          // <div className="mx-20 mt-10">
+          <div className="pt-10 pb-20 mx-4 md:mx-32">
             <div
-              className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500"
+              className="p-6 overflow-x-hidden bg-white border border-black shadow-md rounded-xl shadow-gray-500"
               id="hide-scrollbar"
             >
               <div className="">
                 <div className="flex">
-                  <h3 className="text-2xl font-semibold mt-1 mb-4">
+                  <h3 className="mt-1 mb-4 text-2xl font-semibold">
                     Transfers
                   </h3>
                   <div className="flex items-center mb-4">
@@ -1017,7 +1015,7 @@ const Visualizer = () => {
                         />
                       </svg>
                     </button>
-                    <span className="font-bold text-xl">
+                    <span className="text-xl font-bold">
                       {currentPage1} / {totalPages1}
                     </span>
                     <button
@@ -1047,8 +1045,8 @@ const Visualizer = () => {
                 <div className="overflow-x-scroll" id="hide-scrollbar">
                   <table className="w-full text-center">
                     <thead className="">
-                      <tr className="text-gray-500 h-10">
-                        <th className="flex justify-center items-center space-x-2 px-4">
+                      <tr className="h-10 text-gray-500">
+                        <th className="flex items-center justify-center px-4 space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -1080,8 +1078,8 @@ const Visualizer = () => {
                             />
                           </svg>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1097,8 +1095,8 @@ const Visualizer = () => {
                             <h1>Time</h1>
                           </div>
                         </th>
-                        <th className=" px-6">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-6 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1118,7 +1116,7 @@ const Visualizer = () => {
                           </div>
                         </th>
                         <th className="px-6">
-                          <div className="flex justify-center items-center space-x-2">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1137,8 +1135,8 @@ const Visualizer = () => {
                             <h1>To</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1157,8 +1155,8 @@ const Visualizer = () => {
                             <h1>Value</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1177,8 +1175,8 @@ const Visualizer = () => {
                             <h1>Token</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -1199,7 +1197,7 @@ const Visualizer = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className=" text-center">
+                    <tbody className="text-center ">
                       {currentRows1 && currentRows1.length > 0 ? (
                         currentRows1.map((transfer, index) => {
                           const {
@@ -1218,15 +1216,15 @@ const Visualizer = () => {
                               key={index}
                               className="border-t h-12 text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
                             >
-                              <td className="flex justify-center items-center mt-2 px-4">
+                              <td className="flex items-center justify-center px-4 mt-2">
                                 <img src={logo} alt={tokenName} />
                               </td>
-                              <td className="text-green-500 me-3 px-4">
+                              <td className="px-4 text-green-500 me-3">
                                 {new Date(timestamp).toLocaleString("en-IN", {
                                   timeZone: "Asia/Kolkata",
                                 })}
                               </td>
-                              <td className="me-3 px-4">
+                              <td className="px-4 me-3">
                                 <button
                                   className="text-center"
                                   onClick={() =>
@@ -1241,7 +1239,7 @@ const Visualizer = () => {
                                   {from.slice(0, 5) + "..." + from.slice(-4)}
                                 </button>
                               </td>
-                              <td className="me-3 px-4">
+                              <td className="px-4 me-3">
                                 <button
                                   className="text-center"
                                   onClick={() =>
@@ -1251,7 +1249,7 @@ const Visualizer = () => {
                                   {to.slice(0, 5) + "..." + to.slice(-4)}
                                 </button>
                               </td>
-                              <td className="text-green-500 px-4">
+                              <td className="px-4 text-green-500">
                                 {parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
@@ -1263,10 +1261,10 @@ const Visualizer = () => {
                         })
                       ) : (
                         <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
-                          <td className="flex justify-center items-center mt-2">
+                          <td className="flex items-center justify-center mt-2">
                             <img src={btc} alt="Token Name" />
                           </td>
-                          <td className="text-green-500 text-center">
+                          <td className="text-center text-green-500">
                             0 days ago
                           </td>
                           <td className="text-center">0000....000</td>
