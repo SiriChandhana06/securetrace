@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 // import * as d3 from 'd3';
-import { isAddress } from 'ethers';
-import axios from 'axios';
-import { DevUrl } from '../Constants';
-import btc from '../Assests/Bitcoin.png';
-import { useParams } from 'react-router-dom';
-import Footer from './Footer';
+import { isAddress } from "ethers";
+import axios from "axios";
+import { DevUrl } from "../Constants";
+import btc from "../Assests/Bitcoin.png";
+import { useParams } from "react-router-dom";
+import Footer from "./Footer";
 // import Navbar from './Navbar';
-import cytoscape from 'cytoscape';
+import cytoscape from "cytoscape";
 
 const Visualizer = () => {
   const location = useLocation();
@@ -33,6 +33,7 @@ const Visualizer = () => {
     tokens: [],
   });
   const [error, setError] = useState("");
+  const [isFromSecureTransaction, setIsFromSecureTransaction] = useState(false);
   const [tokensList, setTokensList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -50,22 +51,9 @@ const Visualizer = () => {
     }
   };
 
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value.trim());
-  };
-
   const validateWalletAddress = (address) => isAddress(address);
 
   const validateTransactionHash = (hash) => /^0x([A-Fa-f0-9]{64})$/.test(hash);
-
-
-  useEffect(() => {
-    if (txHash) {
-      setInputValue(txHash);
-      handleScanClick();
-    }
-  }, [txHash]);
 
   useEffect(() => {
     setFormData({
@@ -75,8 +63,23 @@ const Visualizer = () => {
       tokens: "",
       txhash: "",
     });
-    setSearchTerm('');
+    setSearchTerm("");
   }, [inputValue]);
+
+  useEffect(() => {
+    // Check if the input value is coming from the Secure Transaction page
+    if (location.state && location.state.inputValue) {
+      setInputValue(location.state.inputValue); // Set input value from Secure Transaction page
+      setIsFromSecureTransaction(true); // Set flag to indicate the source
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (isFromSecureTransaction && inputValue) {
+      handleScanClick();
+      setIsFromSecureTransaction(false); // Reset flag after scan
+    }
+  }, [inputValue, isFromSecureTransaction]);
 
   const handleScanClick = async () => {
     const value = formData?.txhash || formData?.address || inputValue;
@@ -146,7 +149,6 @@ const Visualizer = () => {
             },
           }
         );
-
         setTransfers(response.data.transfers);
         renderGraphTxHash(value, response.data.transfers);
         setValidationMessage("Valid transaction hash found!");
@@ -165,7 +167,6 @@ const Visualizer = () => {
             },
           }
         );
-
         console.log(response.data);
 
         setTransfers(response.data.fromTransfers);
@@ -182,13 +183,6 @@ const Visualizer = () => {
     }
   };
 
-  useEffect(() => {
-    if (inputValue) {
-      handleScanClick();
-    }
-  }, [inputValue]);
-
-
   const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
     if (validateWalletAddress(address)) {
       setLoading(true);
@@ -196,11 +190,17 @@ const Visualizer = () => {
       try {
         const response = await axios.post(
           `${DevUrl}/token-transfers/`,
-          { address: address, blockNum: blockNum, isOutgoing: isOutgoing, chain: chain, tokenList: formData.tokens ? formData.tokens : null },
+          {
+            address: address,
+            blockNum: blockNum,
+            isOutgoing: isOutgoing,
+            chain: chain,
+            tokenList: formData.tokens ? formData.tokens : null,
+          },
           {
             headers: {
-              'ngrok-skip-browser-warning': 'true',
-              'Content-Type': 'application/json',
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
             },
           }
         );
@@ -209,17 +209,18 @@ const Visualizer = () => {
         const combinedTransfers = response.data.from.concat(response.data.to);
         setTransfers(combinedTransfers);
         renderGraph(address, combinedTransfers);
-        setValidationMessage('Valid wallet address found!');
+        setValidationMessage("Valid wallet address found!");
       } catch (error) {
-        console.log('Error:', error);
-        setValidationMessage('Error retrieving data.');
+        console.log("Error:", error);
+        setValidationMessage("Error retrieving data.");
       }
       setLoading(false);
     } else {
-      setValidationMessage('Invalid input. Please enter a valid wallet address.');
+      setValidationMessage(
+        "Invalid input. Please enter a valid wallet address."
+      );
     }
   };
-
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -238,7 +239,6 @@ const Visualizer = () => {
     });
     setError("");
   };
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -269,7 +269,7 @@ const Visualizer = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     // Validation for Tx Hash
     if (option === "txhash") {
       const txhashError = validateTxHash(formData.txhash);
@@ -280,22 +280,22 @@ const Visualizer = () => {
         handleScanClick();
       }
     }
-  
+
     // Validation for Address
     if (option === "address") {
       if (!inputValue.trim() && !formData.address.trim()) {
         alert("Please enter an address.");
         return;
       }
-  
-      const addressToUse = inputValue.trim() || formData.address.trim(); 
-  
+
+      const addressToUse = inputValue.trim() || formData.address.trim();
+
       const addressError = validateAddress(addressToUse);
       if (addressError) {
         setError(addressError);
-        return; 
+        return;
       }
-  
+
       setFormData((prevState) => ({
         ...prevState,
         address: addressToUse,
@@ -304,7 +304,7 @@ const Visualizer = () => {
         tokens: formData.tokens === "" ? null : formData.tokens,
       }));
     }
-  
+
     console.log("Form Submitted:", formData);
     handleScanClick();
     setError("");
@@ -315,17 +315,14 @@ const Visualizer = () => {
     const fetchTokens = async () => {
       // setLoading(true);
       try {
-        const response5 = await axios.post(
-          `${DevUrl}/fetch-tokens`,
-          {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response5 = await axios.post(`${DevUrl}/fetch-tokens`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        });
 
-        console.log(response5)
+        console.log(response5);
 
         // const fetchedTokens = response5.data.tokens.map(
         //   (token) => `${token.name}-${token.chain}`
@@ -347,7 +344,6 @@ const Visualizer = () => {
 
     fetchTokens();
   }, []);
-
 
   const filteredTokens = tokensList.filter((token) =>
     token.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -386,12 +382,13 @@ const Visualizer = () => {
     const elements = [];
 
     const shortenAddress = (address) => `${address.slice(0, 6)}...`;
-    const shortenTxHash = (address) => `${address.slice(0, 6)}...${address.slice(-4)}`;
+    const shortenTxHash = (address) =>
+      `${address.slice(0, 6)}...${address.slice(-4)}`;
 
     // Add the center node
     elements.push({
       data: { id: centerAddress, label: shortenAddress(centerAddress) },
-      classes: 'center-node',
+      classes: "center-node",
     });
 
     // Add edges and other nodes
@@ -406,12 +403,12 @@ const Visualizer = () => {
             id: target,
             label: shortenAddress(target),
             txHash: tx.txHash,
-            type: isIncoming ? 'incoming' : 'outgoing',
+            type: isIncoming ? "incoming" : "outgoing",
             chain: tx.chain,
             blockNum: tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
-          classes: isIncoming ? 'incoming-node' : 'outgoing-node',
+          classes: isIncoming ? "incoming-node" : "outgoing-node",
         });
       }
       // Add the edge
@@ -421,89 +418,88 @@ const Visualizer = () => {
           target: target,
           label: shortenTxHash(tx.txHash),
           hoverLabel: tx.txHash,
-          type: isIncoming ? 'incoming' : 'outgoing',
+          type: isIncoming ? "incoming" : "outgoing",
           chain: tx.chain,
           blockNum: tx.blockNum,
           value: tx.value * tx.tokenPrice,
         },
-        classes: isIncoming ? 'incoming-edge' : 'outgoing-edge',
+        classes: isIncoming ? "incoming-edge" : "outgoing-edge",
       });
     });
 
     const cy = cytoscape({
-      container: document.getElementById('cy'), // HTML element to attach the graph
+      container: document.getElementById("cy"), // HTML element to attach the graph
 
       elements: elements,
 
       style: [
         {
-          selector: 'node',
+          selector: "node",
           style: {
-            'background-color': '#40a9f3',
-            'label': 'data(label)',
-            'width': 50,
-            'height': 50,
-            'text-valign': 'center',
-            'color': '#fff',
-            'font-size': '10px',
+            "background-color": "#40a9f3",
+            label: "data(label)",
+            width: 50,
+            height: 50,
+            "text-valign": "center",
+            color: "#fff",
+            "font-size": "10px",
           },
         },
         {
-          selector: '.center-node',
+          selector: ".center-node",
           style: {
-            'background-color': '#d6b4fc',
-            'width': 70,
-            'height': 70,
+            "background-color": "#d6b4fc",
+            width: 70,
+            height: 70,
           },
         },
         {
-          selector: 'edge',
+          selector: "edge",
           style: {
-            'width': 1,
-            'line-color': '#ddd',
-            'curve-style': 'bezier',
-            'label': 'data(label)',
-            'font-size': '8px',
-            'text-outline-width': 1,
-            'text-outline-color': '#fff',
+            width: 1,
+            "line-color": "#ddd",
+            "curve-style": "bezier",
+            label: "data(label)",
+            "font-size": "8px",
+            "text-outline-width": 1,
+            "text-outline-color": "#fff",
           },
         },
         {
-          selector: '.incoming-edge',
+          selector: ".incoming-edge",
           style: {
-            'line-color': 'green',
-            'source-arrow-color': 'green',
-            'source-arrow-shape': 'triangle',
+            "line-color": "green",
+            "source-arrow-color": "green",
+            "source-arrow-shape": "triangle",
           },
         },
         {
-          selector: '.outgoing-edge',
+          selector: ".outgoing-edge",
           style: {
-            'line-color': 'red',
-            'target-arrow-color': 'red',
-            'target-arrow-shape': 'triangle',
+            "line-color": "red",
+            "target-arrow-color": "red",
+            "target-arrow-shape": "triangle",
           },
         },
       ],
 
       layout: {
-        name: 'cose',
+        name: "cose",
         padding: 10,
         nodeRepulsion: 5000,
         idealEdgeLength: 50,
         edgeElasticity: 100,
-
       },
       wheelSensitivity: 0.2,
     });
 
-    const tooltip = document.createElement('div');
-    tooltip.style.position = 'absolute';
-    tooltip.style.padding = '8px';
-    tooltip.style.background = 'lightsteelblue';
-    tooltip.style.border = '1px solid #fff';
-    tooltip.style.borderRadius = '8px';
-    tooltip.style.pointerEvents = 'none';
+    const tooltip = document.createElement("div");
+    tooltip.style.position = "absolute";
+    tooltip.style.padding = "8px";
+    tooltip.style.background = "lightsteelblue";
+    tooltip.style.border = "1px solid #fff";
+    tooltip.style.borderRadius = "8px";
+    tooltip.style.pointerEvents = "none";
     tooltip.style.opacity = 0;
     document.body.appendChild(tooltip);
 
@@ -521,35 +517,44 @@ const Visualizer = () => {
     };
 
     // Attach event listeners for tooltip-like behavior
-    cy.on('mouseover', 'node', (event) => {
+    cy.on("mouseover", "node", (event) => {
       const nodeData = event.target.data();
       const { x, y } = event.renderedPosition;
       showTooltip(`Address: ${nodeData.id}`, x + 1, y + 1);
     });
 
-    cy.on('mouseout', 'node', () => {
+    cy.on("mouseout", "node", () => {
       hideTooltip();
     });
 
-    cy.on('mouseover', 'edge', (event) => {
+    cy.on("mouseover", "edge", (event) => {
       const edgeData = event.target.data();
       const { x, y } = event.renderedPosition;
-      showTooltip(`Transaction Hash: ${edgeData.hoverLabel}<br>Value: $${parseFloat(edgeData.value).toFixed(2)}`, x + 10, y + 10);
+      showTooltip(
+        `Transaction Hash: ${edgeData.hoverLabel}<br>Value: $${parseFloat(
+          edgeData.value
+        ).toFixed(2)}`,
+        x + 10,
+        y + 10
+      );
     });
 
-    cy.on('mouseout', 'edge', () => {
+    cy.on("mouseout", "edge", () => {
       hideTooltip();
     });
 
-    cy.on('click', 'edge', (event) => {
+    cy.on("click", "edge", (event) => {
       const edgeData = event.target.data();
-      handleLinkClick(edgeData.target, edgeData.blockNum, edgeData.type === 'outgoing', edgeData.chain);
+      handleLinkClick(
+        edgeData.target,
+        edgeData.blockNum,
+        edgeData.type === "outgoing",
+        edgeData.chain
+      );
       hideTooltip();
     });
   };
 
-
-
   // function dragged(event, d) {
   //   d.fx = event.x;
   //   d.fy = event.y;
@@ -559,13 +564,12 @@ const Visualizer = () => {
   //   d.fx = event.x;
   //   d.fy = event.y;
   // }
-
-
 
   const renderGraphTxHash = (inputTxHash, transactions) => {
     const elements = [];
 
-    const shortenAddress = (address) => `${address.slice(0, 5)}...${address.slice(-4)}`;
+    const shortenAddress = (address) =>
+      `${address.slice(0, 5)}...${address.slice(-4)}`;
 
     transactions.forEach((tx) => {
       const source = tx.from;
@@ -580,7 +584,7 @@ const Visualizer = () => {
             blockNum: tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
-          classes: 'node',
+          classes: "node",
         });
       }
 
@@ -593,7 +597,7 @@ const Visualizer = () => {
             blockNum: tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
-          classes: 'node',
+          classes: "node",
         });
       }
 
@@ -607,68 +611,68 @@ const Visualizer = () => {
           value: tx.value * tx.tokenPrice,
           label: tx.value * tx.tokenPrice,
         },
-        classes: tx.type === 'incoming' ? 'incoming-edge' : 'outgoing-edge',
+        classes: tx.type === "incoming" ? "incoming-edge" : "outgoing-edge",
       });
     });
 
     const cy = cytoscape({
-      container: document.getElementById('cy'), // HTML element to attach the graph
+      container: document.getElementById("cy"), // HTML element to attach the graph
 
       elements: elements,
 
       style: [
         {
-          selector: 'node',
+          selector: "node",
           style: {
-            'background-color': '#40a9f3',
-            'label': 'data(label)',
-            'width': 50,
-            'height': 50,
-            'text-valign': 'center',
-            'color': '#fff',
-            'font-size': '10px',
+            "background-color": "#40a9f3",
+            label: "data(label)",
+            width: 50,
+            height: 50,
+            "text-valign": "center",
+            color: "#fff",
+            "font-size": "10px",
           },
         },
         {
-          selector: '.center-node',
+          selector: ".center-node",
           style: {
-            'background-color': '#d6b4fc',
-            'width': 70,
-            'height': 70,
+            "background-color": "#d6b4fc",
+            width: 70,
+            height: 70,
           },
         },
         {
-          selector: 'edge',
+          selector: "edge",
           style: {
-            'width': 1,
-            'line-color': '#ddd',
-            'curve-style': 'bezier',
-            'label': 'data(label)',
-            'font-size': '8px',
-            'text-outline-width': 1,
-            'text-outline-color': '#fff',
+            width: 1,
+            "line-color": "#ddd",
+            "curve-style": "bezier",
+            label: "data(label)",
+            "font-size": "8px",
+            "text-outline-width": 1,
+            "text-outline-color": "#fff",
           },
         },
         {
-          selector: '.incoming-edge',
+          selector: ".incoming-edge",
           style: {
-            'line-color': 'green',
-            'source-arrow-color': 'green',
-            'source-arrow-shape': 'triangle',
+            "line-color": "green",
+            "source-arrow-color": "green",
+            "source-arrow-shape": "triangle",
           },
         },
         {
-          selector: '.outgoing-edge',
+          selector: ".outgoing-edge",
           style: {
-            'line-color': 'red',
-            'target-arrow-color': 'red',
-            'target-arrow-shape': 'triangle',
+            "line-color": "red",
+            "target-arrow-color": "red",
+            "target-arrow-shape": "triangle",
           },
         },
       ],
 
       layout: {
-        name: 'cose',
+        name: "cose",
         padding: 10,
         nodeRepulsion: 5000,
         idealEdgeLength: 50,
@@ -677,19 +681,19 @@ const Visualizer = () => {
       wheelSensitivity: 0.2,
     });
 
-    const tooltip = document.createElement('div');
-    tooltip.style.position = 'absolute';
-    tooltip.style.padding = '8px';
-    tooltip.style.background = 'lightsteelblue';
-    tooltip.style.border = '1px solid #fff';
-    tooltip.style.borderRadius = '8px';
-    tooltip.style.pointerEvents = 'none';
+    const tooltip = document.createElement("div");
+    tooltip.style.position = "absolute";
+    tooltip.style.padding = "8px";
+    tooltip.style.background = "lightsteelblue";
+    tooltip.style.border = "1px solid #fff";
+    tooltip.style.borderRadius = "8px";
+    tooltip.style.pointerEvents = "none";
     tooltip.style.opacity = 0;
     document.body.appendChild(tooltip);
 
     // Function to show the tooltip
     const showTooltip = (content, x, y) => {
-      tooltip.innerHTML = content.replace(/\n/g, '<br>'); // Replace \n with <br>
+      tooltip.innerHTML = content.replace(/\n/g, "<br>"); // Replace \n with <br>
       tooltip.style.left = `${x + 10}px`; // Adjust the x position
       tooltip.style.top = `${y + 10}px`; // Adjust the y position
       tooltip.style.opacity = 1;
@@ -701,40 +705,50 @@ const Visualizer = () => {
     };
 
     // Attach event listeners for tooltip-like behavior
-    cy.on('mouseover', 'node', (event) => {
+    cy.on("mouseover", "node", (event) => {
       const nodeData = event.target.data();
       const { x, y } = event.renderedPosition;
       showTooltip(`Address: ${nodeData.id}`, x, y);
     });
 
-    cy.on('mouseout', 'node', () => {
+    cy.on("mouseout", "node", () => {
       hideTooltip();
     });
 
-    cy.on('mouseover', 'edge', (event) => {
+    cy.on("mouseover", "edge", (event) => {
       const edgeData = event.target.data();
       const { x, y } = event.renderedPosition;
-      showTooltip(`Transaction Hash: ${edgeData.hoverLabel}<br>Value: $${parseFloat(edgeData.value).toFixed(2)}`, x, y);
+      showTooltip(
+        `Transaction Hash: ${edgeData.hoverLabel}<br>Value: $${parseFloat(
+          edgeData.value
+        ).toFixed(2)}`,
+        x,
+        y
+      );
     });
 
-    cy.on('mouseout', 'edge', () => {
+    cy.on("mouseout", "edge", () => {
       hideTooltip();
     });
 
-    cy.on('tap', 'node', (event) => {
+    cy.on("tap", "node", (event) => {
       const nodeData = event.target.data();
-      handleLinkClick(nodeData.id, nodeData.blockNum, nodeData.type, nodeData.chain);
+      handleLinkClick(
+        nodeData.id,
+        nodeData.blockNum,
+        nodeData.type,
+        nodeData.chain
+      );
     });
 
     cy.layout({
-      name: 'cose',
+      name: "cose",
       padding: 10,
       nodeRepulsion: 5000,
       idealEdgeLength: 50,
       edgeElasticity: 100,
     }).run();
   };
-
 
   return (
     <div className="">

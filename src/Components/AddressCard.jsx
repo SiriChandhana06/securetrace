@@ -32,6 +32,7 @@ const AddressCard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalValue, setTotalValue] = useState(0);
   const [selectedChain, setSelectedChain] = useState(null);
+  const [isFromSecureTransaction, setIsFromSecureTransaction] = useState(false);
 
   const transferData = [
     {
@@ -154,16 +155,19 @@ const AddressCard = () => {
   };
 
   useEffect(() => {
+    // Check if the input value is coming from the Secure Transaction page
     if (location.state && location.state.inputValue) {
       setInputValue(location.state.inputValue); // Set input value from Secure Transaction page
+      setIsFromSecureTransaction(true); // Set flag to indicate the source
     }
   }, [location.state]);
 
   useEffect(() => {
-    if (inputValue) {
-      handleScanNow(); // Trigger scan automatically after setting input value
+    if (isFromSecureTransaction && inputValue) {
+      handleScanNow();
+      setIsFromSecureTransaction(false);
     }
-  }, [inputValue]);
+  }, [inputValue, isFromSecureTransaction]);
   // const foundData = jsonData[inputValue];
   // if (foundData) {
   //   setCardData({
@@ -816,7 +820,7 @@ const AddressCard = () => {
                                 {to.slice(0, 5) + "..." + to.slice(-4)}
                               </td>
                               {/* <td className='text-green-500'>{transfer.value}</td> */}
-                              <td className="px-4 text-green-500">
+                              <td className="px-4 text-green-500"> $
                                 {parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
