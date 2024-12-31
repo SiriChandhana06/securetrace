@@ -168,7 +168,7 @@ const CreditScore = () => {
               setInputChain("ethereum");
             }}
           >
-            Wallet
+            Wallet 
           </button>
         </div>
         <div>
