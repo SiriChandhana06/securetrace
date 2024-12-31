@@ -186,9 +186,9 @@ const SecureTransaction = () => {
 
         <div className=" w-full xl:w-[48%] flex justify-center items-center">
           <div className="w-full ">
-            <h3 className="mb-4 ml-0 text-xl font-semibold text-center text-green-500 lg:ml-16 xl:text-left ">
+            {/*<h3 className="mb-4 ml-0 text-xl font-semibold text-center text-green-500 lg:ml-16 xl:text-left ">
               TRENDING TOKEN PAGES
-            </h3>
+            </h3>}*/}
             <div
               className=" h-[520px] w-full overflow-y-auto"
               id="hide-scrollbar"
@@ -210,9 +210,9 @@ const SecureTransaction = () => {
                   return (
                     <div>
                       <div className="border border-green-500 rounded-xl p-4 sm:p-6 shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
-                        {/* <h3 className="mb-4 text-xl font-semibold text-green-500">
+                         <h3 className="mb-4 text-xl font-semibold text-green-500">
                           TRENDING TOKEN PAGES
-                        </h3> */}
+                        </h3>
 
                         <div className="gap-2 md:flex ">
                           <div className=" md:mt-6 md:w-[30%] ">
@@ -275,9 +275,9 @@ const SecureTransaction = () => {
               ) : (
                 <div className="flex justify-center">
                   <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
-                    {/* <h3 className="mb-4 text-xl font-semibold text-green-500">
+                      <h3 className="mb-4 text-xl font-semibold text-green-500">
                         TRENDING TOKEN PAGES
-                      </h3> */}
+                      </h3> 
 
                     <div className="gap-10 md:flex">
                       <div className="mt-6">
