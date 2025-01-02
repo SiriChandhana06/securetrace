@@ -22,10 +22,10 @@ const CreditScore = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [creditScore, setCreditScore] = useState(null);
 
-  const fetchWalletCreditScore = async (address) => {
+  const fetchWalletCreditScore = async (address, chain) => {
     setIsLoading(true);
     try {
-      const endpoint = '/wallet-credit-score';
+      const endpoint = chain === "algorand" ? '/algo-wallet-credit-score' : '/wallet-credit-score';
       const { data } = await apiClient.post(endpoint, { address });
 
       console.log("score:", data);
@@ -112,9 +112,11 @@ const CreditScore = () => {
   const validateInput = async () => {
     const walletRegex = /^0x[a-fA-F0-9]{40}$/;
     const appIdRegex = /^[1-9][0-9]*$/;
+    const algoAddressRegex = /^[A-Z2-7]{58}$/;
     let isValid;
+    let isAlgorand = false;
 
-    if (inputChain === "algorand") {
+    if (inputChain === "algorand" && activeTab !== "wallet") {
       isValid = appIdRegex.test(inputValue);
       if (!isValid) {
         toast.error("Invalid app ID. Please enter a valid value.");
@@ -123,7 +125,10 @@ const CreditScore = () => {
       }
     } else {
       isValid = walletRegex.test(inputValue);
-      if (!isValid) {
+      if(!isValid && algoAddressRegex.test(inputValue)) {
+        isValid = true;
+        isAlgorand = true;
+      } else if (!isValid) {
         toast.error("Invalid address. Please enter a valid value.");
         setInputValue("");
         return;
@@ -132,7 +137,7 @@ const CreditScore = () => {
 
     const scoresFetched =
       activeTab === "wallet"
-        ? await fetchWalletCreditScore(inputValue)
+        ? await fetchWalletCreditScore(inputValue, isAlgorand ? "algorand" : "ethereum")
         : await fetchSCCreditScore(inputValue, inputChain);
 
     if (scoresFetched) {
