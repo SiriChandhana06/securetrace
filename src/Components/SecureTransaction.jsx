@@ -332,8 +332,8 @@ const SecureTransaction = () => {
           </div>
         </div>
 
-        <div className=" w-full xl:w-[50%] ">
-          <div className="flex mt-10 sm:justify-center sm:gap-40 md:gap-72 lg:gap-96 xl:justify-between xl:gap-0 md:mt-0">
+        <div className=" w-full xl:w-[50%] border border-green-400 rounded-md">
+          <div className="flex p-3 mt-10 sm:justify-center sm:gap-40 md:gap-72 lg:gap-96 xl:justify-between xl:gap-0 md:mt-0">
             <h3 className="mt-2 text-xl font-semibold text-center text-green-500 xl:text-left ">
               TRANSACTIONS
             </h3>

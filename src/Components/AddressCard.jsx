@@ -302,34 +302,27 @@ const AddressCard = () => {
         </div>
       )}
       {isPortfolioVisible && !loading && (
-        <div className="flex flex-col items-center gap-4 p-4 mx-4 my-10 bg-white border border-black rounded-lg shadow-lg md:mx-32 shadow-gray-500 lg:flex-row">
+        <div className="flex flex-col items-center p-4 my-10 bg-white border border-black rounded-lg shadow-lg 4mx-4 gap- md:mx-32 shadow-gray-500 lg:flex-row">
           <div className="flex-1 ml-0 md:ml-4">
-            <div className="flex items-center">
-              <span className="text-sm font-semibold text-black md:text-xl">
+            <div className="flex items-center justify-center">
+              <span className="text-sm text-black lg:text-2xl md:text-xl">
                 {localStorage.getItem("inputValue")}
               </span>
               <button
                 onClick={copyToClipboard}
-                className="ml-2 text-sm text-black md:text-xl hover:text-gray-600"
+                className="ml-4 text-sm text-black md:text-xl hover:text-gray-600"
               >
                 <FaRegCopy />
               </button>
             </div>
-            <div className="items-center mt-2 md:flex">
+            <div className="flex items-center justify-center p-4 mt-2 md:flex">
               <h1 className="ml-2 text-4xl lg:ml-0">{`$${totalValue}`}</h1>
               <span className="mt-2 ml-2 text-2xl text-green-500">{`$${totalValue}`}</span>
               <button className="mt-2 ml-2 text-black text-md md:text-xl hover:text-gray-600">
                 <FaShareNodes />
               </button>
             </div>
-            <p className="mt-1 ml-2 text-xl text-gray-400 lg:ml-0">
-              Ethereum First Funder:{" "}
-              <span className="text-sm font-semibold text-black md:text-xl">
-                {localStorage.getItem("inputValue")}
-              </span>
-            </p>
           </div>
-          <img src={img} alt="img" />
         </div>
       )}
 

@@ -992,7 +992,11 @@ const Visualizer = () => {
             {validationMessage}
           </p>
         )}
-        <div id="cy" className="w-full h-[800px]"></div>
+        <div
+          className="mt-10 overflow-x-hidden border border-gray-400 rounded-md shadow-md shadow-gray-500"
+        >
+          <div id="cy" className="h-[600px] w-[1200px]"></div>
+        </div>
       </div>
       <div className="bg-white dark:bg-[#001938]">
         {isInputEntered && (
