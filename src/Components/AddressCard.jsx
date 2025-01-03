@@ -32,6 +32,7 @@ const AddressCard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalValue, setTotalValue] = useState(0);
   const [selectedChain, setSelectedChain] = useState(null);
+  const [isFromSecureTransaction, setIsFromSecureTransaction] = useState(false);
 
   const transferData = [
     {
@@ -89,7 +90,7 @@ const AddressCard = () => {
 
   const handleScanNow = async () => {
     setLoading(true);
-    setIsPortfolioVisible(false);
+    setSelectedChain(null);
 
     if (!inputValue) {
       toast.error("Please enter a contract address.");
@@ -132,9 +133,20 @@ const AddressCard = () => {
     }
 
     try {
-      const response1 = await axios.post(`${DevUrl}/token-transfers/`, {
-        address: inputValue,
-      });
+      const response1 = await axios.post(
+        // `https://caiman-wanted-fox.ngrok-free.app/token-transfers/`,
+        `${DevUrl}/token-transfers/`,
+        {
+          address: inputValue,
+        },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const combinedTransfers = response1.data.from.concat(response1.data.to);
       setTransfers(combinedTransfers);
     } catch (error) {
@@ -143,16 +155,19 @@ const AddressCard = () => {
   };
 
   useEffect(() => {
+    // Check if the input value is coming from the Secure Transaction page
     if (location.state && location.state.inputValue) {
       setInputValue(location.state.inputValue); // Set input value from Secure Transaction page
+      setIsFromSecureTransaction(true); // Set flag to indicate the source
     }
   }, [location.state]);
 
   useEffect(() => {
-    if (inputValue) {
-      handleScanNow(); // Trigger scan automatically after setting input value
+    if (isFromSecureTransaction && inputValue) {
+      handleScanNow();
+      setIsFromSecureTransaction(false);
     }
-  }, [inputValue]);
+  }, [inputValue, isFromSecureTransaction]);
   // const foundData = jsonData[inputValue];
   // if (foundData) {
   //   setCardData({
@@ -248,12 +263,12 @@ const AddressCard = () => {
   return (
     <div className="bg-white dark:bg-[#001938]">
       <div className="flex items-center justify-center overflow-x-hidden ">
-        <div className=" mt-10 md:mt-20">
-          <h1 className="text-3xl font-bold text-black dark:text-white text-center mb-4">
+        <div className="mt-10 md:mt-20">
+          <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
             SecureTrace PortfolioTracker
           </h1>
 
-          <p className="text-center text-gray-600 dark:text-gray-300 mb-6 max-w-2xl font-semibold">
+          <p className="max-w-2xl mb-6 font-semibold text-center text-gray-600 dark:text-gray-300">
             SecureTrace analyzes transaction data using specialized blockchain
             forensic techniques, enhancing the detection of intricate patterns
             and potential vulnerabilities.
@@ -261,76 +276,55 @@ const AddressCard = () => {
         </div>
       </div>
       <div className="flex items-center justify-center mt-6 mb-6">
-        <div className="flex flex-col sm:flex-row items-center w-80 md:w-full md:max-w-3xl ">
+        <div className="flex flex-col items-center sm:flex-row w-80 md:w-full md:max-w-3xl ">
           <input
             type="text"
             value={inputValue}
             disabled={loading}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Enter address value"
-            className="py-3 px-4 rounded-xl border border-gray-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 sm:mb-0 mx-2 w-full"
+            className="w-full px-4 py-3 mx-2 mb-4 border border-gray-300 shadow-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:mb-0"
           />
           <button
             onClick={handleScanNow}
             disabled={loading}
-            className={`${
-              loading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-green-500 hover:bg-green-600"
-            } w-56 lg:w-40 text-black font-semibold py-3 px-8 rounded-xl shadow-md transition-all duration-300`}
+            className="w-56 px-8 py-3 font-semibold text-black transition-all duration-300 bg-green-500 shadow-md lg:w-40 rounded-xl hover:bg-green-600"
           >
-            {loading ? "Scanning..." : "Scan Now"}
+            Scan Now
           </button>
-
-          {isPortfolioVisible && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold">
-                Portfolio Value: ${totalValue}
-              </h2>
-              <ul>
-                {portfolioData.map((token, index) => (
-                  <li key={index} className="py-2">
-                    {token.tokenName}: {token.tokenBalance} @ $
-                    {token.tokenPrice} each
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
       {loading && (
         <div className="bg-white dark:bg-[#001938]">
           <div className="flex items-center justify-center mt-6 ">
-            <div className="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-green-700"></div>
+            <div className="border-t-2 border-b-2 border-green-700 rounded-full animate-spin h-14 w-14"></div>
           </div>
         </div>
       )}
-
       {isPortfolioVisible && !loading && (
-        <div className="mx-4 md:mx-32 my-10 border border-black rounded-lg shadow-lg shadow-gray-500 p-4 bg-white flex flex-col lg:flex-row items-center gap-4">
+        <div className="flex flex-col items-center gap-4 p-4 mx-4 my-10 bg-white border border-black rounded-lg shadow-lg md:mx-32 shadow-gray-500 lg:flex-row">
           <div className="flex-1 ml-0 md:ml-4">
             <div className="flex items-center">
-              <span className="text-sm md:text-xl text-black font-semibold">
+              <span className="text-sm font-semibold text-black md:text-xl">
                 {localStorage.getItem("inputValue")}
               </span>
               <button
                 onClick={copyToClipboard}
-                className="ml-2 text-sm md:text-xl text-black hover:text-gray-600"
+                className="ml-2 text-sm text-black md:text-xl hover:text-gray-600"
               >
                 <FaRegCopy />
               </button>
             </div>
-            <div className=" mt-2 md:flex items-center">
-              <h1 className="ml-2 lg:ml-0 text-4xl">{`$${totalValue}`}</h1>
-              <span className="text-green-500 text-2xl ml-2 mt-2">{`$${totalValue}`}</span>
-              <button className="ml-2 mt-2 text-md md:text-xl text-black hover:text-gray-600">
+            <div className="items-center mt-2 md:flex">
+              <h1 className="ml-2 text-4xl lg:ml-0">{`$${totalValue}`}</h1>
+              <span className="mt-2 ml-2 text-2xl text-green-500">{`$${totalValue}`}</span>
+              <button className="mt-2 ml-2 text-black text-md md:text-xl hover:text-gray-600">
                 <FaShareNodes />
               </button>
             </div>
-            <p className="text-gray-400 text-xl mt-1 ml-2 lg:ml-0">
+            <p className="mt-1 ml-2 text-xl text-gray-400 lg:ml-0">
               Ethereum First Funder:{" "}
-              <span className="text-black font-semibold text-sm md:text-xl">
+              <span className="text-sm font-semibold text-black md:text-xl">
                 {localStorage.getItem("inputValue")}
               </span>
             </p>
@@ -340,17 +334,17 @@ const AddressCard = () => {
       )}
 
       {isPortfolioVisible && !loading && (
-        <div className="mx-4 md:mx-32 mt-10">
+        <div className="mx-4 mt-10 md:mx-32">
           {/* <div className="">
             <Portfolio />
           </div> */}
           <div>
             <div className="bg-white p-6 w-full xl:w-[100%] rounded-xl border border-black shadow-md shadow-gray-500">
-              <div className="lg:flex gap-1 lg:flex-row justify-between items-start lg:items-center">
-                <div className="flex gap-2 items-center mb-4 lg:mb-0">
+              <div className="items-start justify-between gap-1 lg:flex lg:flex-row lg:items-center">
+                <div className="flex items-center gap-2 mb-4 lg:mb-0">
                   <div className="flex gap-2">
-                    <img className="h-8 w-8" src={Port} alt="portfolio" />
-                    <h3 className="text-xl lg:text-2xl font-semibold">
+                    <img className="w-8 h-8" src={Port} alt="portfolio" />
+                    <h3 className="text-xl font-semibold lg:text-2xl">
                       Portfolio
                     </h3>
                   </div>
@@ -376,7 +370,7 @@ const AddressCard = () => {
                         />
                       </svg>
                     </button>
-                    <span className="font-bold text-xl">
+                    <span className="text-xl font-bold">
                       {currentPage} / {totalPages}
                     </span>
                     <button
@@ -422,7 +416,7 @@ const AddressCard = () => {
                         {[...new Set(portfolioData.map(item => item.chain))].map((chain, index) => (
                           <div
                             key={index}
-                            className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                             onClick={() => handleChainSelect(chain)}
                           >
                             {chain.charAt(0).toUpperCase() + chain.slice(1)}
@@ -436,7 +430,7 @@ const AddressCard = () => {
                       ref={dropdownRef}
                     >
                       <div
-                        className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                         onClick={() => handleChainSelect(null)} // Null or an empty string to indicate "All"
                       >
                         All
@@ -446,7 +440,7 @@ const AddressCard = () => {
                       ].map((chain, index) => (
                         <div
                           key={index}
-                          className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                           onClick={() => handleChainSelect(chain)}
                         >
                           {chain.charAt(0).toUpperCase() + chain.slice(1)}
@@ -461,9 +455,9 @@ const AddressCard = () => {
                 <table className="w-full mt-2 text-center">
                   <thead>
                     <tr className="h-10">
-                      <th className=" px-4">Asset</th>
-                      <th className=" px-4">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="px-4 ">Asset</th>
+                      <th className="px-4 ">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -482,8 +476,8 @@ const AddressCard = () => {
                           <h1>Price</h1>
                         </div>
                       </th>
-                      <th className=" px-4">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="px-4 ">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -502,8 +496,8 @@ const AddressCard = () => {
                           <h1>Holdings</h1>
                         </div>
                       </th>
-                      <th className=" px-4">
-                        <div className="flex justify-center items-center space-x-2">
+                      <th className="px-4 ">
+                        <div className="flex items-center justify-center space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -540,8 +534,8 @@ const AddressCard = () => {
                               key={index}
                               className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white"
                             >
-                              <td className=" flex items-center justify-center">
-                                <div className="flex items-center gap-5  w-48">
+                              <td className="flex items-center justify-center ">
+                                <div className="flex items-center w-48 gap-5">
                                   <img
                                     src={logo}
                                     alt={asset}
@@ -579,12 +573,12 @@ const AddressCard = () => {
           </div>
           <div className="mt-10 ">
             <div
-              className="overflow-x-hidden bg-white p-6 rounded-xl border border-black shadow-md shadow-gray-500"
+              className="p-6 overflow-x-hidden bg-white border border-black shadow-md rounded-xl shadow-gray-500"
               id="hide-scrollbar"
             >
               <div className="">
                 <div className="flex">
-                  <h3 className="text-2xl font-semibold mt-1 mb-4">
+                  <h3 className="mt-1 mb-4 text-2xl font-semibold">
                     Transfers
                   </h3>
                   <div className="flex items-center mb-4">
@@ -609,7 +603,7 @@ const AddressCard = () => {
                         />
                       </svg>
                     </button>
-                    <span className="font-bold text-xl">
+                    <span className="text-xl font-bold">
                       {currentPage1} / {totalPages1}
                     </span>
                     <button
@@ -639,8 +633,8 @@ const AddressCard = () => {
                 <div className="overflow-x-scroll" id="hide-scrollbar">
                   <table className="w-full text-center">
                     <thead className="">
-                      <tr className="text-gray-500 h-10">
-                        <th className="flex justify-center items-center space-x-2 px-4">
+                      <tr className="h-10 text-gray-500">
+                        <th className="flex items-center justify-center px-4 space-x-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -672,8 +666,8 @@ const AddressCard = () => {
                             />
                           </svg>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -689,8 +683,8 @@ const AddressCard = () => {
                             <h1>Time</h1>
                           </div>
                         </th>
-                        <th className=" px-6">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-6 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -710,7 +704,7 @@ const AddressCard = () => {
                           </div>
                         </th>
                         <th className="px-6">
-                          <div className="flex justify-center items-center space-x-2">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -729,8 +723,8 @@ const AddressCard = () => {
                             <h1>To</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -749,8 +743,8 @@ const AddressCard = () => {
                             <h1>Value</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -769,8 +763,8 @@ const AddressCard = () => {
                             <h1>Token</h1>
                           </div>
                         </th>
-                        <th className=" px-4">
-                          <div className="flex justify-center items-center space-x-2">
+                        <th className="px-4 ">
+                          <div className="flex items-center justify-center space-x-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="1em"
@@ -791,7 +785,7 @@ const AddressCard = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className=" text-center">
+                    <tbody className="text-center ">
                       {currentRows1 && currentRows1.length > 0 ? (
                         currentRows1.map((transfer, index) => {
                           const {
@@ -808,25 +802,25 @@ const AddressCard = () => {
                               key={index}
                               className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
                             >
-                              <td className="flex justify-center items-center mt-2 px-4">
+                              <td className="flex items-center justify-center px-4 mt-2">
                                 <img src={logo} alt={tokenName} />
                               </td>
-                              {/* <td className="text-green-500 me-3 px-4">{timestamp}</td> */}
-                              <td className="text-green-500 me-3 px-4">
+                              {/* <td className="px-4 text-green-500 me-3">{timestamp}</td> */}
+                              <td className="px-4 text-green-500 me-3">
                                 {new Date(timestamp).toLocaleString("en-IN", {
                                   timeZone: "Asia/Kolkata",
                                 })}
                               </td>
-                              {/* <td className="me-3 px-4">{from}</td>
-                                            <td className="me-3 px-4">{to}</td> */}
-                              <td className="me-3 px-4">
+                              {/* <td className="px-4 me-3">{from}</td>
+                                            <td className="px-4 me-3">{to}</td> */}
+                              <td className="px-4 me-3">
                                 {from.slice(0, 5) + "..." + from.slice(-4)}
                               </td>
-                              <td className="me-3 px-4">
+                              <td className="px-4 me-3">
                                 {to.slice(0, 5) + "..." + to.slice(-4)}
                               </td>
                               {/* <td className='text-green-500'>{transfer.value}</td> */}
-                              <td className="text-green-500 px-4">
+                              <td className="px-4 text-green-500"> $
                                 {parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
@@ -838,10 +832,10 @@ const AddressCard = () => {
                         })
                       ) : (
                         <tr className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white ">
-                          <td className="flex justify-center items-center mt-2">
+                          <td className="flex items-center justify-center mt-2">
                             <img src={btc} alt="Token Name" />
                           </td>
-                          <td className="text-green-500 text-center">
+                          <td className="text-center text-green-500">
                             0 days ago
                           </td>
                           <td className="text-center">0000....000</td>
