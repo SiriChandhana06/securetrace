@@ -19,6 +19,7 @@ const Visualizer = () => {
   const [loading, setLoading] = useState(false);
   const svgRef = useRef(null);
   const [isInputEntered, setIsInputEntered] = useState(false);
+  const [isAlgorand, setIsAlgorand] = useState(false);
   const [currentPage1, setCurrentPage1] = useState(1);
   const rowsPerPage1 = 10;
   const [transfers, setTransfers] = useState([]);
@@ -50,8 +51,10 @@ const Visualizer = () => {
       setCurrentPage1(pageNumber);
     }
   };
-
+  
   const validateWalletAddress = (address) => isAddress(address);
+  const validateAlgoAddress = (address) => /^[A-Z2-7]{58}$/.test(address);
+  const validateAlgoTransactionId = (id) => /^[A-Z2-7]{52}$/.test(id);
 
   const validateTransactionHash = (hash) => /^0x([A-Fa-f0-9]{64})$/.test(hash);
 
@@ -91,12 +94,12 @@ const Visualizer = () => {
       return;
     }
 
-    const algoAddressRegex = /^[A-Z2-7]{58}$/;
     const isAddress = validateWalletAddress(value);
     const isTxHash = validateTransactionHash(value);
-    const isAlgoAddress = algoAddressRegex.test(value);
+    const isAlgoAddress = validateAlgoAddress(value);
+    const isAlgoTxId = validateAlgoTransactionId(value);
 
-    if (!isAddress && !isTxHash && !isAlgoAddress) {
+    if (!isAddress && !isTxHash && !isAlgoAddress && !isAlgoTxId) {
       setValidationMessage(
         "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
       );
@@ -169,9 +172,25 @@ const Visualizer = () => {
         );
         console.log(response.data);
 
-        setTransfers(response.data.fromTransfers);
-        renderGraph(value, response.data.fromTransfers);
+        setTransfers(response.data.transfers);
+        renderGraph(value, response.data.transfers);
         setValidationMessage("Valid Algorand address found!");
+      } else if (isAlgoTxId) {
+        console.log("Scanning Algorand Transaction ID:", value);
+
+        response = await axios.post(
+          `${DevUrl}/algo-transaction-details/`,
+          { txId: value },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setTransfers(response.data);
+        renderGraphTxHash(value, response.data);
       }
 
       setIsInputEntered(!!value);
