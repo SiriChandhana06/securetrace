@@ -68,11 +68,12 @@ const AddressCard = () => {
     },
   };
 
+  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
+  const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
+  const algoAddressRegex = /^[A-Z2-7]{58}$/;
+  const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
+
   const isValidEthereumAddressOrTxHash = (value) => {
-    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
-    const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
-    const algoAddressRegex = /^[A-Z2-7]{58}$/;
-    const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
 
     // return ethAddressRegex.test(value) || txHashRegex.test(value);
     return (
@@ -106,7 +107,7 @@ const AddressCard = () => {
       return;
     }
 
-    const apiEndpoint = /^[A-Z2-7]{58}$/.test(inputValue)
+    const apiEndpoint = algoAddressRegex.test(inputValue)
       ? `${DevUrl}/fetch-algorand-details/`
       : `${DevUrl}/fetch-address-details/`;
 
@@ -133,22 +134,38 @@ const AddressCard = () => {
     }
 
     try {
-      const response1 = await axios.post(
-        // `https://caiman-wanted-fox.ngrok-free.app/token-transfers/`,
-        `${DevUrl}/token-transfers/`,
-        {
-          address: inputValue,
-        },
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-
-            "Content-Type": "application/json",
+      if(ethAddressRegex.test(inputValue)){
+        const response1 = await axios.post(
+          `${DevUrl}/token-transfers/`,
+          {
+            address: inputValue,
           },
-        }
-      );
-      const combinedTransfers = response1.data.from.concat(response1.data.to);
-      setTransfers(combinedTransfers);
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+  
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const combinedTransfers = response1.data.from.concat(response1.data.to);
+        setTransfers(combinedTransfers);
+      } else if(algoAddressRegex.test(inputValue)){
+        const response1 = await axios.post(
+          `${DevUrl}/algo-transfers/`,
+          {
+            address: inputValue,
+          },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+  
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setTransfers(response1.data.transfers);
+      }
     } catch (error) {
       console.error("Error fetching transfers:", error);
     }
@@ -733,7 +750,7 @@ const AddressCard = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Value</h1>
+                            <h1>Price</h1>
                           </div>
                         </th>
                         <th className="px-4 ">
@@ -773,7 +790,7 @@ const AddressCard = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Amount</h1>
+                            <h1>Quantity</h1>
                           </div>
                         </th>
                       </tr>
@@ -789,6 +806,7 @@ const AddressCard = () => {
                             value,
                             tokenName,
                             tokenPrice,
+                            chain,
                           } = transfer;
                           return (
                             <tr
@@ -800,7 +818,9 @@ const AddressCard = () => {
                               </td>
                               {/* <td className="px-4 text-green-500 me-3">{timestamp}</td> */}
                               <td className="px-4 text-green-500 me-3">
-                                {new Date(timestamp).toLocaleString("en-IN", {
+                                { chain === "algorand" ? new Date(timestamp*1000).toLocaleString("en-IN", {
+                                  timeZone: "Asia/Kolkata",
+                                }): new Date(timestamp).toLocaleString("en-IN", {
                                   timeZone: "Asia/Kolkata",
                                 })}
                               </td>
