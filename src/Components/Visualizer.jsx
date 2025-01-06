@@ -112,6 +112,7 @@ const Visualizer = () => {
       let response, combinedTransfers;
 
       if (isAddress) {
+        setIsAlgorand(false);
         console.log("Scanning Address:", value);
         console.log("Filters:", {
           fromDate: formData?.fromDate,
@@ -140,6 +141,7 @@ const Visualizer = () => {
         renderGraph(value, combinedTransfers);
         setValidationMessage("Valid wallet address found!");
       } else if (isTxHash) {
+        setIsAlgorand(false);
         console.log("Scanning Transaction Hash:", value);
 
         response = await axios.post(
@@ -156,12 +158,15 @@ const Visualizer = () => {
         renderGraphTxHash(value, response.data.transfers);
         setValidationMessage("Valid transaction hash found!");
       } else if (isAlgoAddress) {
+        setIsAlgorand(true);
         console.log("Scanning Algorand Address:", value);
 
         response = await axios.post(
           `${DevUrl}/algo-transfers/`,
           {
             address: value,
+            startDate: formData?.fromDate || null,
+            endDate: formData?.toDate || null,
           },
           {
             headers: {
@@ -176,6 +181,7 @@ const Visualizer = () => {
         renderGraph(value, response.data.transfers);
         setValidationMessage("Valid Algorand address found!");
       } else if (isAlgoTxId) {
+        setIsAlgorand(true);
         console.log("Scanning Algorand Transaction ID:", value);
 
         response = await axios.post(
@@ -203,6 +209,7 @@ const Visualizer = () => {
   };
 
   const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
+    console.log("Link clicked:", address, blockNum, isOutgoing, chain);
     if (validateWalletAddress(address)) {
       setLoading(true);
 
@@ -234,6 +241,28 @@ const Visualizer = () => {
         setValidationMessage("Error retrieving data.");
       }
       setLoading(false);
+    } else if(validateAlgoAddress(address)) {
+        console.log("Scanning Algorand Address:", address);
+
+        const response = await axios.post(
+          `${DevUrl}/algo-transfers/`,
+          {
+            address: address,
+            timestamp: blockNum,
+            isOutgoing: isOutgoing,
+          },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log(response.data);
+
+        setTransfers(response.data.transfers);
+        renderGraph(address, response.data.transfers);
+        setValidationMessage("Valid Algorand address found!");
     } else {
       setValidationMessage("Invalid input. Please enter a valid wallet address.");
     }
@@ -267,8 +296,9 @@ const Visualizer = () => {
 
   const validateTxHash = (txhash) => {
     // Example validation: Tx Hash should be 64 characters long and hexadecimal
-    const hexRegex = /^[0-9a-fA-F]{64}$/;
-    if (!hexRegex.test(txhash)) {
+    const txRegex = /^[0-9a-fA-F]{64}$/;
+    const algoTxRegex = /^[A-Z2-7]{52}$/;
+    if (!txRegex.test(txhash) && !algoTxRegex.test(txhash)) {
       alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
       return "Invalid Tx Hash. Ensure it is a 64-character hexadecimal string.";
     }
@@ -278,7 +308,8 @@ const Visualizer = () => {
   const validateAddress = (address) => {
     // Example validation: Ethereum addresses start with '0x' and are 42 characters long
     const addressRegex = /^0x[a-fA-F0-9]{40}$/;
-    if (!addressRegex.test(address)) {
+    const algoAddressRegex = /^[A-Z2-7]{58}$/;
+    if (!addressRegex.test(address) && !algoAddressRegex.test(address)) {
       return "Invalid Address. Ensure it starts with '0x' and is a valid Ethereum address.";
     }
     return "";
@@ -422,7 +453,7 @@ const Visualizer = () => {
             txHash: tx.txHash,
             type: isIncoming ? "incoming" : "outgoing",
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: isIncoming ? "incoming-node" : "outgoing-node",
@@ -437,7 +468,7 @@ const Visualizer = () => {
           hoverLabel: tx.txHash,
           type: isIncoming ? "incoming" : "outgoing",
           chain: tx.chain,
-          blockNum: tx.blockNum,
+          blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
           value: tx.value * tx.tokenPrice,
         },
         classes: isIncoming ? "incoming-edge" : "outgoing-edge",
@@ -598,7 +629,7 @@ const Visualizer = () => {
             id: source,
             label: shortenAddress(source),
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: "node",
@@ -611,7 +642,7 @@ const Visualizer = () => {
             id: target,
             label: shortenAddress(target),
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: "node",
@@ -624,7 +655,7 @@ const Visualizer = () => {
           target: target,
           hoverLabel: inputTxHash,
           chain: tx.chain,
-          blockNum: tx.blockNum,
+          blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
           value: tx.value * tx.tokenPrice,
           label: tx.value * tx.tokenPrice,
         },
@@ -1187,7 +1218,7 @@ const Visualizer = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Value</h1>
+                            <h1>Price</h1>
                           </div>
                         </th>
                         <th className="px-4 ">
@@ -1227,7 +1258,7 @@ const Visualizer = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Amount</h1>
+                            <h1>Quantity</h1>
                           </div>
                         </th>
                       </tr>
@@ -1246,6 +1277,7 @@ const Visualizer = () => {
                             blockNum,
                             chain,
                           } = transfer;
+                          console.log(transfer);
                           return (
                             <tr
                               key={index}
@@ -1255,7 +1287,9 @@ const Visualizer = () => {
                                 <img src={logo} alt={tokenName} />
                               </td>
                               <td className="px-4 text-green-500 me-3">
-                                {new Date(timestamp).toLocaleString("en-IN", {
+                                {!isAlgorand ? new Date(timestamp).toLocaleString("en-IN", {
+                                  timeZone: "Asia/Kolkata",
+                                }) : new Date(timestamp*1000).toLocaleString("en-IN", {
                                   timeZone: "Asia/Kolkata",
                                 })}
                               </td>
@@ -1263,9 +1297,14 @@ const Visualizer = () => {
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    handleLinkClick(
+                                    !isAlgorand ? handleLinkClick(
                                       from,
                                       blockNum,
+                                      false,
+                                      chain
+                                    ) : handleLinkClick(
+                                      from,
+                                      timestamp,
                                       false,
                                       chain
                                     )
@@ -1278,14 +1317,14 @@ const Visualizer = () => {
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    handleLinkClick(to, blockNum, true, chain)
+                                    !isAlgorand ? handleLinkClick(to, blockNum, true, chain) : handleLinkClick(to, timestamp, true, chain)
                                   }
                                 >
                                   {to.slice(0, 5) + "..." + to.slice(-4)}
                                 </button>
                               </td>
                               <td className="px-4 text-green-500">
-                                {parseFloat(tokenPrice).toFixed(2)}
+                                ${parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
                               <td className="px-4">
