@@ -301,30 +301,42 @@ const CreditScore = () => {
                         {creditScore.creditScore}
                       </p>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-4 px-10 mt-4">
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Tx Success %
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
-                          {creditScore.successPc} %
-                        </p>
+                    <div className="flex flex-col items-center px-10 mt-10 mb-10 text-left">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className=" bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Tx Success %
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Measures the ratio of successful transactions to total transactions executed by the smart contract.
+                          </p>
+                        </div>
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Verification Status
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Indicates whether the smart contract's source code is publicly verified and accessible.
+                          </p>
+                        </div>
                       </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Verification Status
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">
-                          {creditScore.verificationStatus}
-                        </p>
-                      </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Diversity Score
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
-                          {creditScore.diversityScore}
-                        </p>
+                      <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Diversity Score
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Evaluates the variety of unique interactions and addresses engaging with the smart contract.
+                          </p>
+                        </div>
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px] ">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Security Score
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Determining how secure the smart contract is by evaluating possible vulnerabilities.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
