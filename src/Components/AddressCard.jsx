@@ -74,7 +74,6 @@ const AddressCard = () => {
   const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
 
   const isValidEthereumAddressOrTxHash = (value) => {
-
     // return ethAddressRegex.test(value) || txHashRegex.test(value);
     return (
       ethAddressRegex.test(value) ||
@@ -134,7 +133,7 @@ const AddressCard = () => {
     }
 
     try {
-      if(ethAddressRegex.test(inputValue)){
+      if (ethAddressRegex.test(inputValue)) {
         const response1 = await axios.post(
           `${DevUrl}/token-transfers/`,
           {
@@ -143,14 +142,14 @@ const AddressCard = () => {
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
-  
+
               "Content-Type": "application/json",
             },
           }
         );
         const combinedTransfers = response1.data.from.concat(response1.data.to);
         setTransfers(combinedTransfers);
-      } else if(algoAddressRegex.test(inputValue)){
+      } else if (algoAddressRegex.test(inputValue)) {
         const response1 = await axios.post(
           `${DevUrl}/algo-transfers/`,
           {
@@ -159,7 +158,7 @@ const AddressCard = () => {
           {
             headers: {
               "ngrok-skip-browser-warning": "true",
-  
+
               "Content-Type": "application/json",
             },
           }
@@ -818,11 +817,19 @@ const AddressCard = () => {
                               </td>
                               {/* <td className="px-4 text-green-500 me-3">{timestamp}</td> */}
                               <td className="px-4 text-green-500 me-3">
-                                { chain === "algorand" ? new Date(timestamp*1000).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                }): new Date(timestamp).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                })}
+                                {chain === "algorand"
+                                  ? new Date(timestamp * 1000).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )
+                                  : new Date(timestamp).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )}
                               </td>
                               {/* <td className="px-4 me-3">{from}</td>
                                             <td className="px-4 me-3">{to}</td> */}
@@ -833,8 +840,9 @@ const AddressCard = () => {
                                 {to.slice(0, 5) + "..." + to.slice(-4)}
                               </td>
                               {/* <td className='text-green-500'>{transfer.value}</td> */}
-                              <td className="px-4 text-green-500"> $
-                                {parseFloat(tokenPrice).toFixed(2)}
+                              <td className="px-4 text-green-500">
+                                {" "}
+                                ${parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
                               <td className="px-4">

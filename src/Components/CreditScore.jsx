@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Footer from './Footer';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { DevUrl } from '../Constants';
+import React, { useState } from "react";
+import axios from "axios";
+import Footer from "./Footer";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { DevUrl } from "../Constants";
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -25,7 +25,10 @@ const CreditScore = () => {
   const fetchWalletCreditScore = async (address, chain) => {
     setIsLoading(true);
     try {
-      const endpoint = chain === "algorand" ? '/algo-wallet-credit-score' : '/wallet-credit-score';
+      const endpoint =
+        chain === "algorand"
+          ? "/algo-wallet-credit-score"
+          : "/wallet-credit-score";
       const { data } = await apiClient.post(endpoint, { address });
 
       console.log("score:", data);
@@ -34,7 +37,7 @@ const CreditScore = () => {
 
       return true;
     } catch (error) {
-      console.error('Error fetching credit score:', error);
+      console.error("Error fetching credit score:", error);
 
       let errorMessage = "Failed to fetch credit score. Please try again.";
 
@@ -44,16 +47,20 @@ const CreditScore = () => {
             errorMessage = "Credit score endpoint not found.";
             break;
           case 400:
-            errorMessage = error.response.data.message || "Invalid request. Please check your input.";
+            errorMessage =
+              error.response.data.message ||
+              "Invalid request. Please check your input.";
             break;
           case 500:
             errorMessage = "Server error. Please try again later.";
             break;
           default:
-            errorMessage = error.response.data.message || "An unexpected error occurred.";
+            errorMessage =
+              error.response.data.message || "An unexpected error occurred.";
         }
       } else if (error.request) {
-        errorMessage = "Could not connect to the server. Please check your connection.";
+        errorMessage =
+          "Could not connect to the server. Please check your connection.";
       }
 
       toast.error(errorMessage);
@@ -66,8 +73,12 @@ const CreditScore = () => {
   const fetchSCCreditScore = async (address, chain) => {
     setIsLoading(true);
     try {
-      const endpoint = chain === 'algorand' ? '/algo-sc-credit-score' : '/sc-credit-score';
-      const { data } = await apiClient.post(endpoint, { address: address, chain: chain });
+      const endpoint =
+        chain === "algorand" ? "/algo-sc-credit-score" : "/sc-credit-score";
+      const { data } = await apiClient.post(endpoint, {
+        address: address,
+        chain: chain,
+      });
 
       console.log("score:", data);
 
@@ -80,7 +91,7 @@ const CreditScore = () => {
 
       return true;
     } catch (error) {
-      console.error('Error fetching credit score:', error);
+      console.error("Error fetching credit score:", error);
 
       let errorMessage = "Failed to fetch credit score. Please try again.";
 
@@ -90,16 +101,20 @@ const CreditScore = () => {
             errorMessage = "Credit score endpoint not found.";
             break;
           case 400:
-            errorMessage = error.response.data.message || "Invalid request. Please check your input.";
+            errorMessage =
+              error.response.data.message ||
+              "Invalid request. Please check your input.";
             break;
           case 500:
             errorMessage = "Server error. Please try again later.";
             break;
           default:
-            errorMessage = error.response.data.message || "An unexpected error occurred.";
+            errorMessage =
+              error.response.data.message || "An unexpected error occurred.";
         }
       } else if (error.request) {
-        errorMessage = "Could not connect to the server. Please check your connection.";
+        errorMessage =
+          "Could not connect to the server. Please check your connection.";
       }
 
       toast.error(errorMessage);
@@ -125,7 +140,7 @@ const CreditScore = () => {
       }
     } else {
       isValid = walletRegex.test(inputValue);
-      if(!isValid && algoAddressRegex.test(inputValue)) {
+      if (!isValid && algoAddressRegex.test(inputValue)) {
         isValid = true;
         isAlgorand = true;
       } else if (!isValid) {
@@ -137,12 +152,17 @@ const CreditScore = () => {
 
     const scoresFetched =
       activeTab === "wallet"
-        ? await fetchWalletCreditScore(inputValue, isAlgorand ? "algorand" : "ethereum")
+        ? await fetchWalletCreditScore(
+            inputValue,
+            isAlgorand ? "algorand" : "ethereum"
+          )
         : await fetchSCCreditScore(inputValue, inputChain);
 
     if (scoresFetched) {
       toast.success(
-        `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
+        `${
+          activeTab === "wallet" ? "Wallet address" : "Smart Contract"
+        } is valid!`
       );
       setValidatedData({
         type: activeTab,
@@ -193,7 +213,11 @@ const CreditScore = () => {
       <div>
         {validatedData ? (
           <div className="my-20">
-            <div className="flex justify-center mb-4 text-4xl lg:mr-0 sm:mr-0 md:mr-0">
+            <div
+              className={`flex justify-center mb-4 text-4xl ${
+                validatedData.type === "wallet" ? "lg:mr-20" : "lg:mr-0"
+              } sm:mr-0 md:mr-0`}
+            >
               <p className="gap-4 font-semibold text-gray-700 dark:text-gray-200">
                 {validatedData.type === "wallet"
                   ? "Wallet Address"

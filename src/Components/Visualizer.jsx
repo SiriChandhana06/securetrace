@@ -51,7 +51,7 @@ const Visualizer = () => {
       setCurrentPage1(pageNumber);
     }
   };
-  
+
   const validateWalletAddress = (address) => isAddress(address);
   const validateAlgoAddress = (address) => /^[A-Z2-7]{58}$/.test(address);
   const validateAlgoTransactionId = (id) => /^[A-Z2-7]{52}$/.test(id);
@@ -241,30 +241,32 @@ const Visualizer = () => {
         setValidationMessage("Error retrieving data.");
       }
       setLoading(false);
-    } else if(validateAlgoAddress(address)) {
-        console.log("Scanning Algorand Address:", address);
+    } else if (validateAlgoAddress(address)) {
+      console.log("Scanning Algorand Address:", address);
 
-        const response = await axios.post(
-          `${DevUrl}/algo-transfers/`,
-          {
-            address: address,
-            timestamp: blockNum,
-            isOutgoing: isOutgoing,
+      const response = await axios.post(
+        `${DevUrl}/algo-transfers/`,
+        {
+          address: address,
+          timestamp: blockNum,
+          isOutgoing: isOutgoing,
+        },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
           },
-          {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(response.data);
+        }
+      );
+      console.log(response.data);
 
-        setTransfers(response.data.transfers);
-        renderGraph(address, response.data.transfers);
-        setValidationMessage("Valid Algorand address found!");
+      setTransfers(response.data.transfers);
+      renderGraph(address, response.data.transfers);
+      setValidationMessage("Valid Algorand address found!");
     } else {
-      setValidationMessage("Invalid input. Please enter a valid wallet address.");
+      setValidationMessage(
+        "Invalid input. Please enter a valid wallet address."
+      );
     }
   };
 
@@ -798,6 +800,12 @@ const Visualizer = () => {
     }).run();
   };
 
+  useEffect(() => {
+    if (currentPage1 > totalPages1 || totalPages1 === 0) {
+      setCurrentPage1(1); // Reset currentPage1 if needed
+    }
+  }, [currentPage1, totalPages1]);
+
   return (
     <div className="">
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
@@ -1040,9 +1048,7 @@ const Visualizer = () => {
             {validationMessage}
           </p>
         )}
-        <div
-          className="mt-10 overflow-x-hidden transition-all ease-in-out border-gray-400 rounded-md shadow-md "
-          >
+        <div className="mt-10 overflow-x-hidden transition-all ease-in-out rounded-md shadow-xl dark:border-gray-700 dark:border dark:shadow-xl">
           <div id="cy" className="h-[600px] w-[1200px]"></div>
         </div>
       </div>
@@ -1082,7 +1088,7 @@ const Visualizer = () => {
                       </svg>
                     </button>
                     <span className="text-xl font-bold">
-                      {currentPage1} / {totalPages1}
+                      {currentPage1} / {totalPages1 === 0 ? 1 : totalPages1}
                     </span>
                     <button
                       className={`px-4 py-2 font-bold ${
@@ -1287,27 +1293,37 @@ const Visualizer = () => {
                                 <img src={logo} alt={tokenName} />
                               </td>
                               <td className="px-4 text-green-500 me-3">
-                                {!isAlgorand ? new Date(timestamp).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                }) : new Date(timestamp*1000).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                })}
+                                {!isAlgorand
+                                  ? new Date(timestamp).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )
+                                  : new Date(timestamp * 1000).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )}
                               </td>
                               <td className="px-4 me-3">
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    !isAlgorand ? handleLinkClick(
-                                      from,
-                                      blockNum,
-                                      false,
-                                      chain
-                                    ) : handleLinkClick(
-                                      from,
-                                      timestamp,
-                                      false,
-                                      chain
-                                    )
+                                    !isAlgorand
+                                      ? handleLinkClick(
+                                          from,
+                                          blockNum,
+                                          false,
+                                          chain
+                                        )
+                                      : handleLinkClick(
+                                          from,
+                                          timestamp,
+                                          false,
+                                          chain
+                                        )
                                   }
                                 >
                                   {from.slice(0, 5) + "..." + from.slice(-4)}
@@ -1317,7 +1333,19 @@ const Visualizer = () => {
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    !isAlgorand ? handleLinkClick(to, blockNum, true, chain) : handleLinkClick(to, timestamp, true, chain)
+                                    !isAlgorand
+                                      ? handleLinkClick(
+                                          to,
+                                          blockNum,
+                                          true,
+                                          chain
+                                        )
+                                      : handleLinkClick(
+                                          to,
+                                          timestamp,
+                                          true,
+                                          chain
+                                        )
                                   }
                                 >
                                   {to.slice(0, 5) + "..." + to.slice(-4)}
