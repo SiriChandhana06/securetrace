@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 // import * as d3 from 'd3';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { isAddress } from "ethers";
 import axios from "axios";
 import { DevUrl } from "../Constants";
@@ -268,6 +270,57 @@ const Visualizer = () => {
         "Invalid input. Please enter a valid wallet address."
       );
     }
+  };
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+  
+    // Capture the graph
+    const graphElement = document.getElementById('cy');
+    if (graphElement) {
+      console.log('Graph element found');
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for the graph to render
+      const graphCanvas = await html2canvas(graphElement, { scale: 2 });
+      const graphImage = graphCanvas.toDataURL('image/png');
+  
+      // Add the graph image to the PDF
+      doc.addImage(graphImage, 'PNG', 10, 10, 190, 100);
+      doc.addPage();
+    } else {
+      console.error('Graph element not found');
+      return;
+    }
+  
+    // Capture each page of the table
+    const totalPages = Math.ceil(transfers.length / rowsPerPage1);
+    for (let page = 1; page <= totalPages; page++) {
+      await new Promise((resolve) => {
+        setCurrentPage1(page);
+        setTimeout(resolve, 500); // Wait for the table to render
+      });
+  
+      const tableElement = document.getElementById('table-container');
+      if (tableElement) {
+        console.log(`Table element found for page ${page}`);
+        const tableCanvas = await html2canvas(tableElement, { scale: 2 });
+        const tableImage = tableCanvas.toDataURL('image/png');
+  
+        if (page > 1) {
+          doc.addPage();
+        }
+        doc.addImage(tableImage, 'PNG', 10, 10, 190, 100);
+      } else {
+        console.error('Table element not found');
+        return;
+      }
+    }
+  
+    // Save the PDF
+    doc.save('graph_and_table.pdf');
+  };
+
+  const handleGeneratePDFClick = () => {
+    generatePDF();
   };
 
   const togglePopup = () => {
@@ -1048,6 +1101,7 @@ const Visualizer = () => {
             {validationMessage}
           </p>
         )}
+        <button onClick={handleGeneratePDFClick}>Generate PDF</button>
         <div className="mt-10 overflow-x-hidden transition-all ease-in-out rounded-md shadow-xl dark:border-gray-700 dark:border dark:shadow-xl">
           <div id="cy" className="h-[600px] w-[1200px]"></div>
         </div>
@@ -1055,7 +1109,7 @@ const Visualizer = () => {
       <div className="bg-white dark:bg-[#001938]">
         {isInputEntered && (
           // <div className="mx-20 mt-10">
-          <div className="pt-10 pb-20 mx-4 md:mx-32">
+          <div id="table-container" className="pt-10 pb-20 mx-4 md:mx-32">
             <div
               className="p-6 overflow-x-hidden bg-white border border-black shadow-md rounded-xl shadow-gray-500"
               id="hide-scrollbar"
