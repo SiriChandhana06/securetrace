@@ -6,14 +6,14 @@ import Visualizer from "./Components/Visualizer";
 import LoginPage from "./Components/LoginPage";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
+import CreditScore from "./Components/CreditScore";
 // import SecureTransaction from "./Components/SecureTransaction";
-
 
 function App() {
   return (
     <Router>
       {/* <Navbar /> */}
-      <div className='py-4 bg-white dark:bg-[#001938]'>
+      <div className="py-4 bg-white dark:bg-[#001938]">
         <Navbar />
       </div>
       <Routes>
@@ -22,6 +22,7 @@ function App() {
         <Route path="/visualizer/:txHash" component={<Visualizer />} />
         <Route path="/visualizer" element={<Visualizer />} />
         <Route path="/loginpage" element={<LoginPage />} />
+        <Route path="/creditscore" element={<CreditScore />} />
       </Routes>
     </Router>
   );
