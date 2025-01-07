@@ -293,11 +293,11 @@ const CreditScore = () => {
               ) : (
                 creditScore && (
                   <div className="">
-                    <div className="flex items-center justify-center gap-5 p-4 text-5xl lg:mr-60 sm:mr-0 md:mr-0">
-                      <h1 className="text-black dark:text-white">
+                    <div className="flex items-center justify-center gap-5 lg:mr-60 sm:mr-0 md:mr-0">
+                      <h1 className="text-5xl text-black dark:text-white">
                         Credit Score
                       </h1>
-                      <p className="mt-2 text-green-500 text-green dark:text-gray-300">
+                      <p className="text-6xl font-bold text-green-500">
                         {creditScore.creditScore}
                       </p>
                     </div>
