@@ -1118,7 +1118,7 @@ const Visualizer = () => {
         <div className="mt-10">
           <div
             id="cy"
-            className="border border-gray-800 rounded-md shadow-2xl dark:border-gray-300 dark:shadow-2xl"
+            className="border-gray-800 rounded-md shadow-2xl dark:border-gray-300 dark:shadow-2xl dark:border"
           ></div>
         </div>
       </div>
