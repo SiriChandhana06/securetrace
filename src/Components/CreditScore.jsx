@@ -183,7 +183,7 @@ const CreditScore = () => {
       <div className="flex justify-center gap-5 py-10">
         <div>
           <button
-            className={`relative py-6 px-10 shadow-xl text-2xl md:px-24  ${
+            className={`relative py-6 px-10 shadow-xl text-2xl md:px-24 ${
               activeTab === "wallet"
                 ? "bg-green-500 after:content-[''] after:absolute after:bottom-[-18px] after:left-1/2 after:-translate-x-1/2 after:border-l-[26px] after:border-l-transparent after:border-r-[26px] after:border-r-transparent after:border-t-[26px] after:border-t-green-500"
                 : "bg-gray-300"
@@ -212,7 +212,7 @@ const CreditScore = () => {
 
       <div>
         {validatedData ? (
-          <div className="my-20">
+          <div className="my-10">
             <div
               className={`flex justify-center mb-4 text-4xl ${
                 validatedData.type === "wallet" ? "lg:mr-20" : "lg:mr-0"
@@ -308,7 +308,8 @@ const CreditScore = () => {
                             Tx Success %
                           </h2>
                           <p className="mt-2 text-gray-700 dark:text-gray-300">
-                            Measures the ratio of successful transactions to total transactions executed by the smart contract.
+                            Measures the ratio of successful transactions to
+                            total transactions executed by the smart contract.
                           </p>
                         </div>
                         <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
@@ -316,7 +317,8 @@ const CreditScore = () => {
                             Verification Status
                           </h2>
                           <p className="mt-2 text-gray-700 dark:text-gray-300">
-                            Indicates whether the smart contract's source code is publicly verified and accessible.
+                            Indicates whether the smart contract's source code
+                            is publicly verified and accessible.
                           </p>
                         </div>
                       </div>
@@ -326,7 +328,8 @@ const CreditScore = () => {
                             Diversity Score
                           </h2>
                           <p className="mt-2 text-gray-700 dark:text-gray-300">
-                            Evaluates the variety of unique interactions and addresses engaging with the smart contract.
+                            Evaluates the variety of unique interactions and
+                            addresses engaging with the smart contract.
                           </p>
                         </div>
                         <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px] ">
@@ -334,7 +337,8 @@ const CreditScore = () => {
                             Security Score
                           </h2>
                           <p className="mt-2 text-gray-700 dark:text-gray-300">
-                            Determining how secure the smart contract is by evaluating possible vulnerabilities.
+                            Determining how secure the smart contract is by
+                            evaluating possible vulnerabilities.
                           </p>
                         </div>
                       </div>
@@ -348,7 +352,7 @@ const CreditScore = () => {
             </p>
           </div>
         ) : (
-          <div className="flex justify-center my-20">
+          <div className="flex justify-center my-10">
             <div className="items-center w-80 md:w-full md:max-w-3xl">
               <input
                 type="text"
