@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Footer from './Footer';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { DevUrl } from '../Constants';
+import React, { useState } from "react";
+import axios from "axios";
+import Footer from "./Footer";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { DevUrl } from "../Constants";
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -25,7 +25,10 @@ const CreditScore = () => {
   const fetchWalletCreditScore = async (address, chain) => {
     setIsLoading(true);
     try {
-      const endpoint = chain === "algorand" ? '/algo-wallet-credit-score' : '/wallet-credit-score';
+      const endpoint =
+        chain === "algorand"
+          ? "/algo-wallet-credit-score"
+          : "/wallet-credit-score";
       const { data } = await apiClient.post(endpoint, { address });
 
       console.log("score:", data);
@@ -34,7 +37,7 @@ const CreditScore = () => {
 
       return true;
     } catch (error) {
-      console.error('Error fetching credit score:', error);
+      console.error("Error fetching credit score:", error);
 
       let errorMessage = "Failed to fetch credit score. Please try again.";
 
@@ -44,16 +47,20 @@ const CreditScore = () => {
             errorMessage = "Credit score endpoint not found.";
             break;
           case 400:
-            errorMessage = error.response.data.message || "Invalid request. Please check your input.";
+            errorMessage =
+              error.response.data.message ||
+              "Invalid request. Please check your input.";
             break;
           case 500:
             errorMessage = "Server error. Please try again later.";
             break;
           default:
-            errorMessage = error.response.data.message || "An unexpected error occurred.";
+            errorMessage =
+              error.response.data.message || "An unexpected error occurred.";
         }
       } else if (error.request) {
-        errorMessage = "Could not connect to the server. Please check your connection.";
+        errorMessage =
+          "Could not connect to the server. Please check your connection.";
       }
 
       toast.error(errorMessage);
@@ -66,8 +73,12 @@ const CreditScore = () => {
   const fetchSCCreditScore = async (address, chain) => {
     setIsLoading(true);
     try {
-      const endpoint = chain === 'algorand' ? '/algo-sc-credit-score' : '/sc-credit-score';
-      const { data } = await apiClient.post(endpoint, { address: address, chain: chain });
+      const endpoint =
+        chain === "algorand" ? "/algo-sc-credit-score" : "/sc-credit-score";
+      const { data } = await apiClient.post(endpoint, {
+        address: address,
+        chain: chain,
+      });
 
       console.log("score:", data);
 
@@ -80,7 +91,7 @@ const CreditScore = () => {
 
       return true;
     } catch (error) {
-      console.error('Error fetching credit score:', error);
+      console.error("Error fetching credit score:", error);
 
       let errorMessage = "Failed to fetch credit score. Please try again.";
 
@@ -90,16 +101,20 @@ const CreditScore = () => {
             errorMessage = "Credit score endpoint not found.";
             break;
           case 400:
-            errorMessage = error.response.data.message || "Invalid request. Please check your input.";
+            errorMessage =
+              error.response.data.message ||
+              "Invalid request. Please check your input.";
             break;
           case 500:
             errorMessage = "Server error. Please try again later.";
             break;
           default:
-            errorMessage = error.response.data.message || "An unexpected error occurred.";
+            errorMessage =
+              error.response.data.message || "An unexpected error occurred.";
         }
       } else if (error.request) {
-        errorMessage = "Could not connect to the server. Please check your connection.";
+        errorMessage =
+          "Could not connect to the server. Please check your connection.";
       }
 
       toast.error(errorMessage);
@@ -125,7 +140,7 @@ const CreditScore = () => {
       }
     } else {
       isValid = walletRegex.test(inputValue);
-      if(!isValid && algoAddressRegex.test(inputValue)) {
+      if (!isValid && algoAddressRegex.test(inputValue)) {
         isValid = true;
         isAlgorand = true;
       } else if (!isValid) {
@@ -137,12 +152,17 @@ const CreditScore = () => {
 
     const scoresFetched =
       activeTab === "wallet"
-        ? await fetchWalletCreditScore(inputValue, isAlgorand ? "algorand" : "ethereum")
+        ? await fetchWalletCreditScore(
+            inputValue,
+            isAlgorand ? "algorand" : "ethereum"
+          )
         : await fetchSCCreditScore(inputValue, inputChain);
 
     if (scoresFetched) {
       toast.success(
-        `${activeTab === "wallet" ? "Wallet address" : "Smart Contract"} is valid!`
+        `${
+          activeTab === "wallet" ? "Wallet address" : "Smart Contract"
+        } is valid!`
       );
       setValidatedData({
         type: activeTab,
@@ -163,7 +183,7 @@ const CreditScore = () => {
       <div className="flex justify-center gap-5 py-10">
         <div>
           <button
-            className={`relative py-6 px-10 shadow-xl text-2xl md:px-24  ${
+            className={`relative py-6 px-10 shadow-xl text-2xl md:px-24 ${
               activeTab === "wallet"
                 ? "bg-green-500 after:content-[''] after:absolute after:bottom-[-18px] after:left-1/2 after:-translate-x-1/2 after:border-l-[26px] after:border-l-transparent after:border-r-[26px] after:border-r-transparent after:border-t-[26px] after:border-t-green-500"
                 : "bg-gray-300"
@@ -173,7 +193,7 @@ const CreditScore = () => {
               setInputChain("ethereum");
             }}
           >
-            Wallet 
+            Wallet
           </button>
         </div>
         <div>
@@ -192,9 +212,13 @@ const CreditScore = () => {
 
       <div>
         {validatedData ? (
-          <div className="my-20">
-            <div className="mb-10 ml-10 shadow-lg">
-              <p className="gap-4 text-lg font-semibold text-gray-700 dark:text-gray-200">
+          <div className="my-10">
+            <div
+              className={`flex justify-center mb-4 text-4xl ${
+                validatedData.type === "wallet" ? "lg:mr-20" : "lg:mr-0"
+              } sm:mr-0 md:mr-0`}
+            >
+              <p className="gap-4 font-semibold text-gray-700 dark:text-gray-200">
                 {validatedData.type === "wallet"
                   ? "Wallet Address"
                   : "Smart Contract Address"}
@@ -215,87 +239,108 @@ const CreditScore = () => {
                 </div>
               ) : activeTab === "wallet" ? (
                 <div>
-                  <h1 className="text-2xl text-black dark:text-white">
-                    Credit Score
-                  </h1>
-                  <h1 className="text-3xl font-bold text-green-500">
-                    {creditScore}
-                  </h1>
-                  <div className="grid grid-cols-1 gap-4 px-10 mt-10 mb-10 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-xl font-semibold text-black dark:text-white">
-                        Borrowing History
-                      </h2>
-                      <p className="mt-2 text-gray-700 dark:text-gray-300">
-                        Features linked to historical loan repayment
-                        performance.
-                      </p>
+                  <div className="flex items-center justify-center gap-5 lg:mr-44 sm:mr-0 md:mr-0">
+                    <h1 className="text-5xl text-black dark:text-white">
+                      Credit Score
+                    </h1>
+                    <h1 className="text-6xl font-bold text-green-500">
+                      {creditScore}
+                    </h1>
+                  </div>
+                  <div className="flex flex-col items-center px-10 mt-10 mb-10 text-left">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div className=" bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Borrowing History
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to historical loan repayment
+                          performance.
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Account Composition
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the asset breakdown within an
+                          account.
+                        </p>
+                      </div>
                     </div>
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-xl font-semibold text-black dark:text-white">
-                        Account Composition
-                      </h2>
-                      <p className="mt-2 text-gray-700 dark:text-gray-300">
-                        Features linked to the asset breakdown within an
-                        account.
-                      </p>
-                    </div>
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-xl font-semibold text-black dark:text-white">
-                        Account Health
-                      </h2>
-                      <p className="mt-2 text-gray-700 dark:text-gray-300">
-                        Features linked to the size and volume of activity
-                        within an account.
-                      </p>
-                    </div>
-                    <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-100">
-                      <h2 className="text-xl font-semibold text-black dark:text-white">
-                        Interactions
-                      </h2>
-                      <p className="mt-2 text-gray-700 dark:text-gray-300">
-                        Features linked to the account's involvement in the web3
-                        ecosystem.
-                      </p>
+                    <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Account Health
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the size and volume of activity
+                          within an account.
+                        </p>
+                      </div>
+                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px] ">
+                        <h2 className="text-xl font-semibold text-black dark:text-white">
+                          Interactions
+                        </h2>
+                        <p className="mt-2 text-gray-700 dark:text-gray-300">
+                          Features linked to the account's involvement in the
+                          web3 ecosystem.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               ) : (
                 creditScore && (
-                  <div className="mt-10 text-center">
-                    <h1 className="mb-10 text-2xl font-bold text-gray-700 dark:text-white">
-                      Smart Contract Analysis
-                    </h1>
-                    <div className="justify-center p-4 text-2xl">
-                      <p className="font-bold text-green-500">Credit Score</p>
-                      <p className="mt-2 text-gray-700 dark:text-gray-300">
+                  <div className="">
+                    <div className="flex items-center justify-center gap-5 lg:mr-60 sm:mr-0 md:mr-0">
+                      <h1 className="text-5xl text-black dark:text-white">
+                        Credit Score
+                      </h1>
+                      <p className="text-6xl font-bold text-green-500">
                         {creditScore.creditScore}
                       </p>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-4 px-10 mt-4">
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Tx Success %
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
-                          {creditScore.successPc} %
-                        </p>
+                    <div className="flex flex-col items-center px-10 mt-10 mb-10 text-left">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className=" bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Tx Success %
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Measures the ratio of successful transactions to
+                            total transactions executed by the smart contract.
+                          </p>
+                        </div>
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Verification Status
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Indicates whether the smart contract's source code
+                            is publicly verified and accessible.
+                          </p>
+                        </div>
                       </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Verification Status
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300">
-                          {creditScore.verificationStatus}
-                        </p>
-                      </div>
-                      <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 w-full sm:w-48 border border-gray-100">
-                        <p className="text-xl font-bold text-green-500">
-                          Diversity Score
-                        </p>
-                        <p className="mt-2 text-gray-700 dark:text-gray-300 pt-7">
-                          {creditScore.diversityScore}
-                        </p>
+                      <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px]">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Diversity Score
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Evaluates the variety of unique interactions and
+                            addresses engaging with the smart contract.
+                          </p>
+                        </div>
+                        <div className="bg-gray-100 dark:bg-[#001938] rounded-md shadow-md p-4 border border-gray-300 dark:border-gray-700 w-full max-w-[300px] ">
+                          <h2 className="text-xl font-semibold text-black dark:text-white">
+                            Security Score
+                          </h2>
+                          <p className="mt-2 text-gray-700 dark:text-gray-300">
+                            Determining how secure the smart contract is by
+                            evaluating possible vulnerabilities.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -307,7 +352,7 @@ const CreditScore = () => {
             </p>
           </div>
         ) : (
-          <div className="flex justify-center my-20">
+          <div className="flex justify-center my-10">
             <div className="items-center w-80 md:w-full md:max-w-3xl">
               <input
                 type="text"

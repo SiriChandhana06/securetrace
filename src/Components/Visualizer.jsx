@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 // import * as d3 from 'd3';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { isAddress } from "ethers";
 import axios from "axios";
 import { DevUrl } from "../Constants";
@@ -19,6 +21,7 @@ const Visualizer = () => {
   const [loading, setLoading] = useState(false);
   const svgRef = useRef(null);
   const [isInputEntered, setIsInputEntered] = useState(false);
+  const [isAlgorand, setIsAlgorand] = useState(false);
   const [currentPage1, setCurrentPage1] = useState(1);
   const rowsPerPage1 = 10;
   const [transfers, setTransfers] = useState([]);
@@ -52,6 +55,8 @@ const Visualizer = () => {
   };
 
   const validateWalletAddress = (address) => isAddress(address);
+  const validateAlgoAddress = (address) => /^[A-Z2-7]{58}$/.test(address);
+  const validateAlgoTransactionId = (id) => /^[A-Z2-7]{52}$/.test(id);
 
   const validateTransactionHash = (hash) => /^0x([A-Fa-f0-9]{64})$/.test(hash);
 
@@ -91,12 +96,12 @@ const Visualizer = () => {
       return;
     }
 
-    const algoAddressRegex = /^[A-Z2-7]{58}$/;
     const isAddress = validateWalletAddress(value);
     const isTxHash = validateTransactionHash(value);
-    const isAlgoAddress = algoAddressRegex.test(value);
+    const isAlgoAddress = validateAlgoAddress(value);
+    const isAlgoTxId = validateAlgoTransactionId(value);
 
-    if (!isAddress && !isTxHash && !isAlgoAddress) {
+    if (!isAddress && !isTxHash && !isAlgoAddress && !isAlgoTxId) {
       setValidationMessage(
         "Invalid input. Please enter a valid wallet address, transaction hash, or Algorand address."
       );
@@ -109,6 +114,7 @@ const Visualizer = () => {
       let response, combinedTransfers;
 
       if (isAddress) {
+        setIsAlgorand(false);
         console.log("Scanning Address:", value);
         console.log("Filters:", {
           fromDate: formData?.fromDate,
@@ -137,6 +143,7 @@ const Visualizer = () => {
         renderGraph(value, combinedTransfers);
         setValidationMessage("Valid wallet address found!");
       } else if (isTxHash) {
+        setIsAlgorand(false);
         console.log("Scanning Transaction Hash:", value);
 
         response = await axios.post(
@@ -153,12 +160,15 @@ const Visualizer = () => {
         renderGraphTxHash(value, response.data.transfers);
         setValidationMessage("Valid transaction hash found!");
       } else if (isAlgoAddress) {
+        setIsAlgorand(true);
         console.log("Scanning Algorand Address:", value);
 
         response = await axios.post(
           `${DevUrl}/algo-transfers/`,
           {
             address: value,
+            startDate: formData?.fromDate || null,
+            endDate: formData?.toDate || null,
           },
           {
             headers: {
@@ -169,9 +179,26 @@ const Visualizer = () => {
         );
         console.log(response.data);
 
-        setTransfers(response.data.fromTransfers);
-        renderGraph(value, response.data.fromTransfers);
+        setTransfers(response.data.transfers);
+        renderGraph(value, response.data.transfers);
         setValidationMessage("Valid Algorand address found!");
+      } else if (isAlgoTxId) {
+        setIsAlgorand(true);
+        console.log("Scanning Algorand Transaction ID:", value);
+
+        response = await axios.post(
+          `${DevUrl}/algo-transaction-details/`,
+          { txId: value },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setTransfers(response.data);
+        renderGraphTxHash(value, response.data);
       }
 
       setIsInputEntered(!!value);
@@ -184,6 +211,7 @@ const Visualizer = () => {
   };
 
   const handleLinkClick = async (address, blockNum, isOutgoing, chain) => {
+    console.log("Link clicked:", address, blockNum, isOutgoing, chain);
     if (validateWalletAddress(address)) {
       setLoading(true);
 
@@ -215,11 +243,84 @@ const Visualizer = () => {
         setValidationMessage("Error retrieving data.");
       }
       setLoading(false);
+    } else if (validateAlgoAddress(address)) {
+      console.log("Scanning Algorand Address:", address);
+
+      const response = await axios.post(
+        `${DevUrl}/algo-transfers/`,
+        {
+          address: address,
+          timestamp: blockNum,
+          isOutgoing: isOutgoing,
+        },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data);
+
+      setTransfers(response.data.transfers);
+      renderGraph(address, response.data.transfers);
+      setValidationMessage("Valid Algorand address found!");
     } else {
       setValidationMessage(
         "Invalid input. Please enter a valid wallet address."
       );
     }
+  };
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+
+    // Capture the graph
+    const graphElement = document.getElementById("cy");
+    if (graphElement) {
+      console.log("Graph element found");
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for the graph to render
+      const graphCanvas = await html2canvas(graphElement, { scale: 2 });
+      const graphImage = graphCanvas.toDataURL("image/png");
+
+      // Add the graph image to the PDF
+      doc.addImage(graphImage, "PNG", 10, 10, 190, 100);
+      doc.addPage();
+    } else {
+      console.error("Graph element not found");
+      return;
+    }
+
+    // Capture each page of the table
+    const totalPages = Math.ceil(transfers.length / rowsPerPage1);
+    for (let page = 1; page <= totalPages; page++) {
+      await new Promise((resolve) => {
+        setCurrentPage1(page);
+        setTimeout(resolve, 500); // Wait for the table to render
+      });
+
+      const tableElement = document.getElementById("table-container");
+      if (tableElement) {
+        console.log(`Table element found for page ${page}`);
+        const tableCanvas = await html2canvas(tableElement, { scale: 2 });
+        const tableImage = tableCanvas.toDataURL("image/png");
+
+        if (page > 1) {
+          doc.addPage();
+        }
+        doc.addImage(tableImage, "PNG", 10, 10, 190, 100);
+      } else {
+        console.error("Table element not found");
+        return;
+      }
+    }
+
+    // Save the PDF
+    doc.save("graph_and_table.pdf");
+  };
+
+  const handleGeneratePDFClick = () => {
+    generatePDF();
   };
 
   const togglePopup = () => {
@@ -250,8 +351,9 @@ const Visualizer = () => {
 
   const validateTxHash = (txhash) => {
     // Example validation: Tx Hash should be 64 characters long and hexadecimal
-    const hexRegex = /^[0-9a-fA-F]{64}$/;
-    if (!hexRegex.test(txhash)) {
+    const txRegex = /^[0-9a-fA-F]{64}$/;
+    const algoTxRegex = /^[A-Z2-7]{52}$/;
+    if (!txRegex.test(txhash) && !algoTxRegex.test(txhash)) {
       alert("Invalid Tx Hash. Ensure it is a 64-character hexadecimal string");
       return "Invalid Tx Hash. Ensure it is a 64-character hexadecimal string.";
     }
@@ -261,7 +363,8 @@ const Visualizer = () => {
   const validateAddress = (address) => {
     // Example validation: Ethereum addresses start with '0x' and are 42 characters long
     const addressRegex = /^0x[a-fA-F0-9]{40}$/;
-    if (!addressRegex.test(address)) {
+    const algoAddressRegex = /^[A-Z2-7]{58}$/;
+    if (!addressRegex.test(address) && !algoAddressRegex.test(address)) {
       return "Invalid Address. Ensure it starts with '0x' and is a valid Ethereum address.";
     }
     return "";
@@ -405,7 +508,7 @@ const Visualizer = () => {
             txHash: tx.txHash,
             type: isIncoming ? "incoming" : "outgoing",
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: isIncoming ? "incoming-node" : "outgoing-node",
@@ -420,7 +523,7 @@ const Visualizer = () => {
           hoverLabel: tx.txHash,
           type: isIncoming ? "incoming" : "outgoing",
           chain: tx.chain,
-          blockNum: tx.blockNum,
+          blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
           value: tx.value * tx.tokenPrice,
         },
         classes: isIncoming ? "incoming-edge" : "outgoing-edge",
@@ -581,7 +684,7 @@ const Visualizer = () => {
             id: source,
             label: shortenAddress(source),
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: "node",
@@ -594,7 +697,7 @@ const Visualizer = () => {
             id: target,
             label: shortenAddress(target),
             chain: tx.chain,
-            blockNum: tx.blockNum,
+            blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
             value: tx.value * tx.tokenPrice,
           },
           classes: "node",
@@ -607,7 +710,7 @@ const Visualizer = () => {
           target: target,
           hoverLabel: inputTxHash,
           chain: tx.chain,
-          blockNum: tx.blockNum,
+          blockNum: isAlgorand ? tx.timestamp : tx.blockNum,
           value: tx.value * tx.tokenPrice,
           label: tx.value * tx.tokenPrice,
         },
@@ -615,8 +718,14 @@ const Visualizer = () => {
       });
     });
 
+    const cyContainer = document.getElementById("cy");
+
+    // Set the dimensions of the Cytoscape container
+    cyContainer.style.height = "600px";
+    cyContainer.style.width = "1200px";
+
     const cy = cytoscape({
-      container: document.getElementById("cy"), // HTML element to attach the graph
+      container: cyContainer,
 
       elements: elements,
 
@@ -750,22 +859,28 @@ const Visualizer = () => {
     }).run();
   };
 
+  useEffect(() => {
+    if (currentPage1 > totalPages1 || totalPages1 === 0) {
+      setCurrentPage1(1); // Reset currentPage1 if needed
+    }
+  }, [currentPage1, totalPages1]);
+
   return (
     <div className="">
       <div className="flex flex-col items-center justify-center py-10 px-4 bg-white dark:bg-[#001938]">
         {!isInputEntered && (
           <>
-            <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
+            <h1 className="mb-6 text-3xl font-bold text-center text-black dark:text-white">
               SecureTrace Visualizer
             </h1>
-            <p className="max-w-2xl mb-6 font-semibold text-center text-gray-600 dark:text-gray-300">
+            <p className="max-w-2xl mb-10 font-semibold text-center text-gray-600 dark:text-gray-300">
               SecureTrace analyzes transaction data using blockchain forensic
               techniques, enhancing the detection of intricate patterns and
               potential vulnerabilities.
             </p>
           </>
         )}
-        <div className="flex flex-col items-center w-full sm:flex-row md:max-w-4xl ">
+        <div className="flex flex-col items-center w-full sm:flex-row md:max-w-4xl">
           <input
             type="text"
             value={inputValue}
@@ -992,12 +1107,25 @@ const Visualizer = () => {
             {validationMessage}
           </p>
         )}
-        <div id="cy" className="w-full h-[800px]"></div>
+        {isInputEntered && (
+          <button
+            onClick={handleGeneratePDFClick}
+            className="px-8 py-3 mt-2 font-semibold text-black transition-all duration-300 bg-green-500 shadow-md text w-50 rounded-xl hover:bg-green-600"
+          >
+            Generate PDF
+          </button>
+        )}
+        <div className="mt-10">
+          <div
+            id="cy"
+            className="border-gray-800 rounded-md shadow-2xl dark:border-gray-300 dark:shadow-2xl dark:border"
+          ></div>
+        </div>
       </div>
       <div className="bg-white dark:bg-[#001938]">
         {isInputEntered && (
           // <div className="mx-20 mt-10">
-          <div className="pt-10 pb-20 mx-4 md:mx-32">
+          <div id="table-container" className="pt-10 pb-20 mx-4 md:mx-32">
             <div
               className="p-6 overflow-x-hidden bg-white border border-black shadow-md rounded-xl shadow-gray-500"
               id="hide-scrollbar"
@@ -1030,7 +1158,7 @@ const Visualizer = () => {
                       </svg>
                     </button>
                     <span className="text-xl font-bold">
-                      {currentPage1} / {totalPages1}
+                      {currentPage1} / {totalPages1 === 0 ? 1 : totalPages1}
                     </span>
                     <button
                       className={`px-4 py-2 font-bold ${
@@ -1166,7 +1294,7 @@ const Visualizer = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Value</h1>
+                            <h1>Price</h1>
                           </div>
                         </th>
                         <th className="px-4 ">
@@ -1206,7 +1334,7 @@ const Visualizer = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Amount</h1>
+                            <h1>Quantity</h1>
                           </div>
                         </th>
                       </tr>
@@ -1225,6 +1353,7 @@ const Visualizer = () => {
                             blockNum,
                             chain,
                           } = transfer;
+                          console.log(transfer);
                           return (
                             <tr
                               key={index}
@@ -1234,20 +1363,37 @@ const Visualizer = () => {
                                 <img src={logo} alt={tokenName} />
                               </td>
                               <td className="px-4 text-green-500 me-3">
-                                {new Date(timestamp).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                })}
+                                {!isAlgorand
+                                  ? new Date(timestamp).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )
+                                  : new Date(timestamp * 1000).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )}
                               </td>
                               <td className="px-4 me-3">
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    handleLinkClick(
-                                      from,
-                                      blockNum,
-                                      false,
-                                      chain
-                                    )
+                                    !isAlgorand
+                                      ? handleLinkClick(
+                                          from,
+                                          blockNum,
+                                          false,
+                                          chain
+                                        )
+                                      : handleLinkClick(
+                                          from,
+                                          timestamp,
+                                          false,
+                                          chain
+                                        )
                                   }
                                 >
                                   {from.slice(0, 5) + "..." + from.slice(-4)}
@@ -1257,14 +1403,26 @@ const Visualizer = () => {
                                 <button
                                   className="text-center"
                                   onClick={() =>
-                                    handleLinkClick(to, blockNum, true, chain)
+                                    !isAlgorand
+                                      ? handleLinkClick(
+                                          to,
+                                          blockNum,
+                                          true,
+                                          chain
+                                        )
+                                      : handleLinkClick(
+                                          to,
+                                          timestamp,
+                                          true,
+                                          chain
+                                        )
                                   }
                                 >
                                   {to.slice(0, 5) + "..." + to.slice(-4)}
                                 </button>
                               </td>
                               <td className="px-4 text-green-500">
-                                {parseFloat(tokenPrice).toFixed(2)}
+                                ${parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
                               <td className="px-4">

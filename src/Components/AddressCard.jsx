@@ -51,7 +51,10 @@ const AddressCard = () => {
   const [transfers, setTransfers] = useState([]);
 
   const totalPages1 = Math.ceil(transfers.length / rowsPerPage1);
-  const currentRows1 = transfers.slice(
+  const sortedTransfers = transfers.sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
+  const currentRows1 = sortedTransfers.slice(
     (currentPage1 - 1) * rowsPerPage1,
     currentPage1 * rowsPerPage1
   );
@@ -68,12 +71,12 @@ const AddressCard = () => {
     },
   };
 
-  const isValidEthereumAddressOrTxHash = (value) => {
-    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
-    const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
-    const algoAddressRegex = /^[A-Z2-7]{58}$/;
-    const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
+  const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/; // For Ethereum address (42 characters, starts with 0x)
+  const txHashRegex = /^0x([A-Fa-f0-9]{64})$/; // For Transaction hash (66 characters, starts with 0x)
+  const algoAddressRegex = /^[A-Z2-7]{58}$/;
+  const algoTxHashRegex = /^[A-Za-z0-9+/]{44}$/;
 
+  const isValidEthereumAddressOrTxHash = (value) => {
     // return ethAddressRegex.test(value) || txHashRegex.test(value);
     return (
       ethAddressRegex.test(value) ||
@@ -106,7 +109,7 @@ const AddressCard = () => {
       return;
     }
 
-    const apiEndpoint = /^[A-Z2-7]{58}$/.test(inputValue)
+    const apiEndpoint = algoAddressRegex.test(inputValue)
       ? `${DevUrl}/fetch-algorand-details/`
       : `${DevUrl}/fetch-address-details/`;
 
@@ -133,22 +136,38 @@ const AddressCard = () => {
     }
 
     try {
-      const response1 = await axios.post(
-        // `https://caiman-wanted-fox.ngrok-free.app/token-transfers/`,
-        `${DevUrl}/token-transfers/`,
-        {
-          address: inputValue,
-        },
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-
-            "Content-Type": "application/json",
+      if (ethAddressRegex.test(inputValue)) {
+        const response1 = await axios.post(
+          `${DevUrl}/token-transfers/`,
+          {
+            address: inputValue,
           },
-        }
-      );
-      const combinedTransfers = response1.data.from.concat(response1.data.to);
-      setTransfers(combinedTransfers);
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const combinedTransfers = response1.data.from.concat(response1.data.to);
+        setTransfers(combinedTransfers);
+      } else if (algoAddressRegex.test(inputValue)) {
+        const response1 = await axios.post(
+          `${DevUrl}/algo-transfers/`,
+          {
+            address: inputValue,
+          },
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true",
+
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setTransfers(response1.data.transfers);
+      }
     } catch (error) {
       console.error("Error fetching transfers:", error);
     }
@@ -263,7 +282,7 @@ const AddressCard = () => {
   return (
     <div className="bg-white dark:bg-[#001938]">
       <div className="flex items-center justify-center overflow-x-hidden ">
-        <div className="mt-10 md:mt-20">
+        <div className="lg:mt-10 md:mt-20">
           <h1 className="mb-4 text-3xl font-bold text-center text-black dark:text-white">
             SecureTrace PortfolioTracker
           </h1>
@@ -302,34 +321,27 @@ const AddressCard = () => {
         </div>
       )}
       {isPortfolioVisible && !loading && (
-        <div className="flex flex-col items-center gap-4 p-4 mx-4 my-10 bg-white border border-black rounded-lg shadow-lg md:mx-32 shadow-gray-500 lg:flex-row">
+        <div className="flex flex-col items-center p-4 my-10 bg-white border border-black rounded-lg shadow-lg 4mx-4 gap- md:mx-32 shadow-gray-500 lg:flex-row">
           <div className="flex-1 ml-0 md:ml-4">
-            <div className="flex items-center">
-              <span className="text-sm font-semibold text-black md:text-xl">
+            <div className="flex items-center justify-center">
+              <span className="text-sm text-black lg:text-2xl md:text-xl">
                 {localStorage.getItem("inputValue")}
               </span>
               <button
                 onClick={copyToClipboard}
-                className="ml-2 text-sm text-black md:text-xl hover:text-gray-600"
+                className="ml-4 text-sm text-black md:text-xl hover:text-gray-600"
               >
                 <FaRegCopy />
               </button>
             </div>
-            <div className="items-center mt-2 md:flex">
+            <div className="flex items-center justify-center p-4 mt-2 md:flex">
               <h1 className="ml-2 text-4xl lg:ml-0">{`$${totalValue}`}</h1>
               <span className="mt-2 ml-2 text-2xl text-green-500">{`$${totalValue}`}</span>
               <button className="mt-2 ml-2 text-black text-md md:text-xl hover:text-gray-600">
                 <FaShareNodes />
               </button>
             </div>
-            <p className="mt-1 ml-2 text-xl text-gray-400 lg:ml-0">
-              Ethereum First Funder:{" "}
-              <span className="text-sm font-semibold text-black md:text-xl">
-                {localStorage.getItem("inputValue")}
-              </span>
-            </p>
           </div>
-          <img src={img} alt="img" />
         </div>
       )}
 
@@ -634,7 +646,7 @@ const AddressCard = () => {
                   <table className="w-full text-center">
                     <thead className="">
                       <tr className="h-10 text-gray-500">
-                        <th className="flex items-center justify-center px-4 space-x-2">
+                        <th className="flex items-center justify-center px-4 space-x-2 lg:mt-2 sm:mt-0">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="1em"
@@ -740,7 +752,7 @@ const AddressCard = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Value</h1>
+                            <h1>Price</h1>
                           </div>
                         </th>
                         <th className="px-4 ">
@@ -780,7 +792,7 @@ const AddressCard = () => {
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
-                            <h1>Amount</h1>
+                            <h1>Quantity</h1>
                           </div>
                         </th>
                       </tr>
@@ -796,6 +808,7 @@ const AddressCard = () => {
                             value,
                             tokenName,
                             tokenPrice,
+                            chain,
                           } = transfer;
                           return (
                             <tr
@@ -803,13 +816,27 @@ const AddressCard = () => {
                               className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
                             >
                               <td className="flex items-center justify-center px-4 mt-2">
-                                <img src={logo} alt={tokenName} />
+                                <img
+                                  src={logo}
+                                  alt={tokenName}
+                                  className="h-9"
+                                />
                               </td>
                               {/* <td className="px-4 text-green-500 me-3">{timestamp}</td> */}
                               <td className="px-4 text-green-500 me-3">
-                                {new Date(timestamp).toLocaleString("en-IN", {
-                                  timeZone: "Asia/Kolkata",
-                                })}
+                                {chain === "algorand"
+                                  ? new Date(timestamp * 1000).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )
+                                  : new Date(timestamp).toLocaleString(
+                                      "en-IN",
+                                      {
+                                        timeZone: "Asia/Kolkata",
+                                      }
+                                    )}
                               </td>
                               {/* <td className="px-4 me-3">{from}</td>
                                             <td className="px-4 me-3">{to}</td> */}
@@ -820,8 +847,9 @@ const AddressCard = () => {
                                 {to.slice(0, 5) + "..." + to.slice(-4)}
                               </td>
                               {/* <td className='text-green-500'>{transfer.value}</td> */}
-                              <td className="px-4 text-green-500"> $
-                                {parseFloat(tokenPrice).toFixed(2)}
+                              <td className="px-4 text-green-500">
+                                {" "}
+                                ${parseFloat(tokenPrice).toFixed(2)}
                               </td>
                               <td className="px-4">{tokenName}</td>
                               <td className="px-4">
