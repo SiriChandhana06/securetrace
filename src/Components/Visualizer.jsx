@@ -9,8 +9,10 @@ import { DevUrl } from "../Constants";
 import btc from "../Assests/Bitcoin.png";
 import { useParams } from "react-router-dom";
 import Footer from "./Footer";
+import algo from "../Assests/algologo1.png";
 // import Navbar from './Navbar';
 import cytoscape from "cytoscape";
+import "jspdf-autotable";
 
 const Visualizer = () => {
   const location = useLocation();
@@ -57,7 +59,6 @@ const Visualizer = () => {
   const validateWalletAddress = (address) => isAddress(address);
   const validateAlgoAddress = (address) => /^[A-Z2-7]{58}$/.test(address);
   const validateAlgoTransactionId = (id) => /^[A-Z2-7]{52}$/.test(id);
-
   const validateTransactionHash = (hash) => /^0x([A-Fa-f0-9]{64})$/.test(hash);
 
   useEffect(() => {
@@ -87,6 +88,17 @@ const Visualizer = () => {
   }, [inputValue, isFromSecureTransaction]);
 
   const handleScanClick = async () => {
+    const jwtToken = localStorage.getItem("jwt_token");
+
+    if (!jwtToken) {
+      toast.error("You need to log in to access this feature.");
+      setTimeout(() => {
+        navigate("/");
+      }, 4000);
+      return;
+    }
+    console.log("Search submitted!");
+
     const value = formData?.txhash || formData?.address || inputValue;
 
     if (!value) {
@@ -273,54 +285,483 @@ const Visualizer = () => {
   };
 
   const generatePDF = async () => {
-    const doc = new jsPDF();
+    try {
+      const doc = new jsPDF("p", "mm", "a4");
 
-    // Capture the graph
-    const graphElement = document.getElementById("cy");
-    if (graphElement) {
-      console.log("Graph element found");
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for the graph to render
-      const graphCanvas = await html2canvas(graphElement, { scale: 2 });
-      const graphImage = graphCanvas.toDataURL("image/png");
-
-      // Add the graph image to the PDF
-      doc.addImage(graphImage, "PNG", 10, 10, 190, 100);
-      doc.addPage();
-    } else {
-      console.error("Graph element not found");
-      return;
-    }
-
-    // Capture each page of the table
-    const totalPages = Math.ceil(transfers.length / rowsPerPage1);
-    for (let page = 1; page <= totalPages; page++) {
-      await new Promise((resolve) => {
-        setCurrentPage1(page);
-        setTimeout(resolve, 500); // Wait for the table to render
+      const logo = "../Assests/securedapp-logo-light.svg";
+      const date = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
 
-      const tableElement = document.getElementById("table-container");
-      if (tableElement) {
-        console.log(`Table element found for page ${page}`);
-        const tableCanvas = await html2canvas(tableElement, { scale: 2 });
-        const tableImage = tableCanvas.toDataURL("image/png");
+      // First page
+      doc.setFillColor(4, 170, 109);
+      doc.rect(0, 0, 50, doc.internal.pageSize.getHeight(), "F");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const rightRectWidth = pageWidth - 50;
 
-        if (page > 1) {
-          doc.addPage();
-        }
-        doc.addImage(tableImage, "PNG", 10, 10, 190, 100);
-      } else {
-        console.error("Table element not found");
-        return;
+      doc.setFillColor(255, 255, 255);
+      doc.rect(50, 0, rightRectWidth, doc.internal.pageSize.getHeight(), "F");
+      doc.setFontSize(10);
+      doc.setFont("times", "bold");
+      doc.setTextColor(100, 100, 100);
+
+      // First page header and footer
+      doc.text("SecureDapp", 185, 275);
+      doc.setFont("times", "normal");
+      doc.text(
+        "235, 2nd & 3rd Floor, 13th Cross Rd, Indira Nagar II Stage,",
+        120,
+        280,
+        null,
+        null,
+        "left"
+      );
+      doc.text(
+        "Hoysala Nagar, Indiranagar, Bengaluru, Karnataka 560038",
+        120,
+        285,
+        null,
+        null,
+        "left"
+      );
+      doc.text("hello@securedapp.in", 120, 290, null, null, "left");
+
+      doc.setFontSize(12);
+      doc.text(date, 170, 140);
+      doc.setFontSize(50);
+      doc.addImage(logo, "JPEG", 89, 108, 15, 15);
+      doc.text("SecureDApp", 105, 120);
+      doc.line(50, 0, 50, 300);
+
+      // Previous code remains the same until the graph page section...
+
+      // Second page - Graph
+      doc.addPage();
+      doc.setFontSize(18);
+      doc.setFont("times", "bold");
+      doc.text("SecureTrace Visualizer", 75, 20);
+      doc.setDrawColor(4, 170, 109);
+      doc.line(10, 25, 200, 25);
+
+      // Add input value display with gray background
+      // First draw the gray background rectangle
+      doc.setFillColor(240, 240, 240); // Light gray color
+      doc.rect(10, 33, 190, 8, "F"); // x, y, width, height, 'F' for filled
+
+      // Add input value text
+      doc.setFontSize(16);
+      doc.setFont("times", "bold");
+
+      // Calculate text width to center it
+      const displayValue =
+        option === "address"
+          ? formData.address
+          : option === "txhash"
+          ? formData.txhash
+          : inputValue;
+
+      // Static part of the text
+      const staticText = "Input Value: ";
+      const staticTextWidth =
+        (doc.getStringUnitWidth(staticText) * 16) / doc.internal.scaleFactor;
+
+      // Dynamic part of the text (value)
+      let dynamicText = displayValue;
+      let dynamicTextWidth =
+        (doc.getStringUnitWidth(dynamicText) * 16) / doc.internal.scaleFactor;
+
+      // Maximum allowed width for dynamic text (gray background width - static text width - padding)
+      const maxDynamicTextWidth = 190 - staticTextWidth - 20; // 20px padding
+
+      // Truncate dynamic text if it exceeds the maximum allowed width
+      if (dynamicTextWidth > maxDynamicTextWidth) {
+        // Calculate the maximum number of characters that can fit
+        const avgCharWidth = dynamicTextWidth / dynamicText.length;
+        const maxChars = Math.floor(maxDynamicTextWidth / avgCharWidth);
+
+        // Truncate the dynamic text and add ellipsis
+        dynamicText = dynamicText.substring(0, maxChars - 3) + "...";
+        dynamicTextWidth =
+          (doc.getStringUnitWidth(dynamicText) * 16) / doc.internal.scaleFactor;
       }
+
+      // Total text width
+      const totalTextWidth = staticTextWidth + dynamicTextWidth;
+
+      // Calculate starting X position to center the text
+      const textX = (210 - totalTextWidth) / 2;
+
+      // Render static text in gray
+      doc.setTextColor(100, 100, 100); // Gray color for static text
+      doc.text(staticText, textX, 39);
+
+      // Render dynamic text in green-500
+      doc.setTextColor(34, 197, 94); // Green-500 color (#22C55E) for dynamic text
+      doc.text(dynamicText, textX + staticTextWidth, 39);
+
+      // Reset text color for rest of the document
+      doc.setTextColor(100, 100, 100);
+
+      // Graph capture
+      const graphElement = document.getElementById("cy");
+      if (graphElement) {
+        try {
+          const graphCanvas = await html2canvas(graphElement, {
+            scale: 2,
+            backgroundColor: "#ffffff",
+            logging: false,
+            useCORS: true,
+          });
+          const graphImage = graphCanvas.toDataURL("image/png");
+          doc.addImage(graphImage, "PNG", 0, 100, 210, 100);
+        } catch (error) {
+          console.error("Error capturing graph:", error);
+        }
+      }
+
+      // Add footer
+      doc.setFontSize(10);
+      doc.setFont("times", "bold");
+      doc.setTextColor(100, 100, 100);
+      doc.text(date, 175, 275);
+      doc.text("SecureDapp", 10, 275);
+      doc.setFont("times", "normal");
+      doc.text(
+        "235, 2nd & 3rd Floor, 13th Cross Rd, Indira Nagar II Stage,",
+        10,
+        280,
+        null,
+        null,
+        "left"
+      );
+      doc.text(
+        "Hoysala Nagar, Indiranagar, Bengaluru, Karnataka 560038",
+        10,
+        285,
+        null,
+        null,
+        "left"
+      );
+      doc.text("hello@securedapp.in", 10, 290, null, null, "left");
+      doc.line(10, 270, 200, 270);
+
+      // Validate transfers data
+      if (!transfers || !Array.isArray(transfers)) {
+        console.error("Invalid transfers data:", transfers);
+        throw new Error("Invalid or missing transfers data");
+      }
+
+      // Function to format transfer data
+      const formatTransferData = (transfer, globalIndex) => {
+        if (!transfer) return null;
+
+        return {
+          sno: (globalIndex + 1).toString(),
+          timestamp: transfer.timestamp
+            ? new Date(transfer.timestamp).toLocaleString()
+            : "N/A",
+          from: transfer.from
+            ? transfer.from.slice(0, 5) + "..." + transfer.from.slice(-4)
+            : "N/A",
+          to: transfer.to
+            ? transfer.to.slice(0, 5) + "..." + transfer.to.slice(-4)
+            : "N/A",
+          tokenPrice: transfer.tokenPrice
+            ? parseFloat(transfer.tokenPrice).toFixed(2)
+            : "N/A",
+          tokenName: transfer.tokenName || "N/A",
+          value: transfer.value ? parseFloat(transfer.value).toFixed(2) : "N/A",
+        };
+      };
+
+      // Transaction History Pages
+      const rowsPerPage1 = 10;
+      const totalPages = Math.ceil(transfers.length / rowsPerPage1);
+
+      for (let page = 1; page <= totalPages; page++) {
+        if (page % 2 === 1) {
+          doc.addPage();
+          doc.setFontSize(18);
+          doc.setFont("times", "bold");
+          doc.text("SecureTrace Transaction History", 65, 20);
+          doc.setDrawColor(4, 170, 109);
+          doc.line(10, 25, 200, 25);
+        }
+
+        const startIdx = (page - 1) * rowsPerPage1;
+        const endIdx = Math.min(page * rowsPerPage1, transfers.length);
+        const currentPageData = transfers
+          .slice(startIdx, endIdx)
+          .map((transfer, index) =>
+            formatTransferData(transfer, startIdx + index)
+          )
+          .filter(Boolean);
+
+        if (currentPageData.length === 0) continue;
+
+ // Create table element
+const table = document.createElement("table");
+table.style.width = "100%";
+table.style.borderCollapse = "collapse";
+table.style.marginBottom = "20px";
+table.style.tableLayout = "fixed";
+
+// Add headers with reduced padding
+const headers = [
+  "S.No",
+  "Timestamp",
+  "From",
+  "To",
+  "Price",
+  "Token",
+  "Quantity",
+];
+const thead = document.createElement("thead");
+const headerRow = document.createElement("tr");
+headers.forEach((header, index) => {
+  const th = document.createElement("th");
+  th.style.padding = "6px"; // Reduced from 8px
+  th.style.backgroundColor = "#f4f4f4";
+  th.style.border = "1px solid #ddd";
+  th.style.fontSize = "11px"; // Reduced from 12px
+  th.style.fontWeight = "bold";
+  th.style.textAlign = "left";
+
+  // Adjust column widths
+  if (index === 0) {
+    th.style.width = "5%"; // Slightly reduce S.No width
+  } else if (index === 1) {
+    th.style.width = "20%"; // Increase Timestamp width
+  } else {
+    th.style.width = "auto"; // Default width for other columns
+  }
+
+  th.textContent = header;
+  headerRow.appendChild(th);
+});
+thead.appendChild(headerRow);
+table.appendChild(thead);
+
+// Add data rows with reduced padding
+const tbody = document.createElement("tbody");
+const totalRows = 10; // Fixed number of rows
+for (let i = 0; i < totalRows; i++) {
+  const row = document.createElement("tr");
+  // Set alternating background colors
+  row.style.backgroundColor = i % 2 === 0 ? "#ffffff" : "#f4f4f4";
+
+  // Use actual data if available, otherwise create an empty row
+  const transfer = currentPageData[i] || {};
+  const rowData = [
+    transfer.sno || "", // S.No
+    transfer.timestamp || "", // Timestamp
+    transfer.from || "", // From
+    transfer.to || "", // To
+    transfer.tokenPrice || "", // Price
+    transfer.tokenName || "", // Token
+    transfer.value || "", // Quantity
+  ];
+
+  rowData.forEach((cellData, cellIndex) => {
+    const td = document.createElement("td");
+    td.style.padding = "6px";
+    td.style.fontSize = "10px";
+    td.style.textAlign = cellIndex === 0 ? "center" : "left";
+
+    // Apply white background if cell data is empty
+    if (cellData === "") {
+      td.style.backgroundColor = "#ffffff";
+      td.style.border = "none"; // Remove border for empty cells
+    } else {
+      td.style.backgroundColor = i % 2 === 0 ? "#ffffff" : "#f4f4f4"; // Ensure consistent background within cells
+      td.style.border = "1px solid #ddd"; // Add border for non-empty cells
     }
 
-    // Save the PDF
-    doc.save("graph_and_table.pdf");
+    // Apply green color to timestamp and tokenPrice
+    if (cellIndex === 1 || cellIndex === 4) {
+      td.style.color = "#22C55E"; // Green-500 color
+    }
+
+    // Leave cell blank if data is empty
+    td.textContent = cellData === "" ? "" : cellData;
+    row.appendChild(td);
+  });
+  tbody.appendChild(row);
+}
+table.appendChild(tbody);
+
+// Create temporary container
+const container = document.createElement("div");
+container.style.position = "absolute";
+container.style.left = "-9999px";
+container.style.width = "800px";
+container.style.backgroundColor = "#ffffff";
+container.appendChild(table);
+document.body.appendChild(container);
+
+try {
+  // Capture table with adjusted height
+  const canvas = await html2canvas(container, {
+    scale: 2,
+    backgroundColor: "#ffffff",
+    logging: false,
+    width: 800,
+    height: Math.min(600, totalRows * 40 + 40), // Slightly increase table height
+    useCORS: true,
+  });
+
+  // Add table to PDF with same overall height but adjusted internal proportions
+  const yPosition = page % 2 === 1 ? 35 : 150;
+  const tableImage = canvas.toDataURL("image/png");
+  doc.addImage(tableImage, "PNG", 10, yPosition, 190, 110); // Adjust height to 110
+  document.body.removeChild(container);
+} catch (error) {
+  console.error(`Error capturing table page ${page}:`, error);
+  document.body.removeChild(container);
+}
+
+        // Add footer
+        doc.line(10, 270, 200, 270);
+        doc.setFontSize(10);
+        doc.setFont("times", "bold");
+        doc.setTextColor(100, 100, 100);
+        doc.text(date, 175, 275);
+        doc.text("SecureDapp", 10, 275);
+        doc.setFont("times", "normal");
+        doc.text(
+          "235, 2nd & 3rd Floor, 13th Cross Rd, Indira Nagar II Stage,",
+          10,
+          280,
+          null,
+          null,
+          "left"
+        );
+        doc.text(
+          "Hoysala Nagar, Indiranagar, Bengaluru, Karnataka 560038",
+          10,
+          285,
+          null,
+          null,
+          "left"
+        );
+        doc.text("hello@securedapp.in", 10, 290, null, null, "left");
+      }
+
+      // Disclaimer page
+      doc.addPage();
+
+      // Add header to disclaimer page
+      doc.setFontSize(10);
+      doc.setFont("times", "bold");
+      doc.setTextColor(100, 100, 100);
+      doc.text("SecureDapp", 10, 15);
+      doc.text(date, 175, 15);
+      doc.setDrawColor(4, 170, 109);
+      doc.line(10, 20, 200, 20);
+
+      // Continue with disclaimer content
+      doc.setFontSize(18);
+      doc.setFont("times", "bold");
+      doc.text("Disclaimer", 82, 35);
+
+      const disclaimerData = [
+        [
+          "Intellectual Property",
+          "SecureTrace is the exclusive intellectual property of SecureDapp. Unauthorized use, reproduction, or distribution is strictly prohibited.",
+        ],
+        [
+          "Intended Use",
+          "SecureTrace is designed for fraud detection and security analysis. Any other use is not authorized and may result in legal action.",
+        ],
+        [
+          "Accuracy and Liability",
+          "Information provided by SecureTrace is for reference only. SecureDapp does not guarantee accuracy and is not liable for any decisions made based on this information.",
+        ],
+        [
+          "Ethical and Legal Compliance",
+          "Users must ensure their use of SecureTrace complies with all applicable laws and ethical standards. SecureDapp is not responsible for misuse.",
+        ],
+        [
+          "No Guaranteed Outcomes",
+          "SecureTrace aids in security efforts but does not guarantee specific results. Users are responsible for applying findings appropriately.",
+        ],
+      ];
+
+      doc.autoTable({
+        head: [["Topic", "Description"]],
+        body: disclaimerData,
+        startY: 40,
+        styles: { fillColor: [211, 211, 211] },
+        headStyles: { fillColor: [4, 170, 109] },
+      });
+
+      // Contact section
+      doc.setFontSize(18);
+      doc.setFont("times", "bold");
+      doc.text("Contact Us", 82, doc.previousAutoTable.finalY + 20);
+
+      const contactData = [
+        ["Email", "hello@securedapp.in"],
+        ["Phone", "9606015868"],
+        [
+          "Address",
+          "SecureDApp Solutions Pvt. Ltd. 235, 2nd & 3rd Floor,13th Cross Rd, Indira Nagar II Stage,Hoysala Nagar, Indiranagar, Bengaluru, Karnataka 560038",
+        ],
+        ["Website", "securedapp.io"],
+        ["Business Hours", "Monday to Friday, 9 AM - 6 PM IST"],
+      ];
+
+      doc.autoTable({
+        head: [["", ""]],
+        body: contactData,
+        startY: doc.previousAutoTable.finalY + 25,
+        styles: { fillColor: [211, 211, 211] },
+        headStyles: { fillColor: [4, 170, 109] },
+      });
+
+      // Add footer to disclaimer page
+      doc.line(10, 270, 200, 270);
+      doc.setFontSize(10);
+      doc.setFont("times", "bold");
+      doc.setTextColor(100, 100, 100);
+      doc.text(date, 175, 275);
+      doc.text("SecureDapp", 10, 275);
+      doc.setFont("times", "normal");
+      doc.text(
+        "235, 2nd & 3rd Floor, 13th Cross Rd, Indira Nagar II Stage,",
+        10,
+        280,
+        null,
+        null,
+        "left"
+      );
+      doc.text(
+        "Hoysala Nagar, Indiranagar, Bengaluru, Karnataka 560038",
+        10,
+        285,
+        null,
+        null,
+        "left"
+      );
+      doc.text("hello@securedapp.in", 10, 290, null, null, "left");
+
+      // Save PDF
+      doc.save(
+        "SecureTrace_ Advanced AI for Blockchain Investigation & Forensic Analysis.pdf"
+      );
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   const handleGeneratePDFClick = () => {
-    generatePDF();
+    setLoading(true);
+    setTimeout(() => {
+      generatePDF();
+      setLoading(false);
+    }, 10000);
   };
 
   const togglePopup = () => {
@@ -530,9 +971,17 @@ const Visualizer = () => {
       });
     });
 
-    const cy = cytoscape({
-      container: document.getElementById("cy"), // HTML element to attach the graph
+    // const cyContainer = document.getElementById("cy");
 
+    // // Set the dimensions of the Cytoscape container
+    // cyContainer.style.height = "600px";
+    // cyContainer.style.width = "1200px";
+
+    // const cy = cytoscape({
+    //   container: cyContainer, // HTML element to attach the graph
+
+    const cy = cytoscape({
+      container: document.getElementById("cy"),
       elements: elements,
 
       style: [
@@ -718,14 +1167,16 @@ const Visualizer = () => {
       });
     });
 
-    const cyContainer = document.getElementById("cy");
+    // const cyContainer = document.getElementById("cy");
 
     // Set the dimensions of the Cytoscape container
-    cyContainer.style.height = "600px";
-    cyContainer.style.width = "1200px";
+    // cyContainer.style.height = "600px";
+    // cyContainer.style.width = "1200px";
 
+    // const cy = cytoscape({
+    //   container: cyContainer,
     const cy = cytoscape({
-      container: cyContainer,
+      container: document.getElementById("cy"),
 
       elements: elements,
 
@@ -909,188 +1360,191 @@ const Visualizer = () => {
             </button>
 
             {isPopupOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="fixed inset-0 z-50 flex items-start p-2 bg-black bg-opacity-50 sm:items-center sm:justify-center sm:p-0">
                 <div
-                  className="bg-white w-[90%] md:w-[40%] rounded-lg shadow-lg p-8 relative overflow-y-scroll"
+                  className="bg-white w-[45%] sm:w-[85%] md:w-[75%] lg:w-[65%] xl:w-[55%] rounded-lg shadow-lg relative overflow-y-scroll ml-2 sm:mx-auto lg:mt-0 sm:mt-10 md:mt-0 mt-28"
                   style={{ maxHeight: "90vh" }}
                   id="hide-scrollbar"
                 >
-                  <button
-                    className="absolute text-gray-600 top-4 right-4 hover:text-gray-800"
-                    onClick={togglePopup}
-                  >
-                    ✖
-                  </button>
-                  <h2 className="mb-4 text-xl font-semibold">
-                    Advanced Scan Option
-                  </h2>
+                  <div className="p-3 md:p-6">
+                    <button
+                      className="absolute text-gray-600 top-2 right-2 md:top-4 md:right-4 hover:text-gray-800"
+                      onClick={togglePopup}
+                    >
+                      ✖
+                    </button>
+                    <h2 className="mb-4 text-lg font-semibold md:text-xl">
+                      Advanced Scan Option
+                    </h2>
 
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                      <label className="font-medium text-gray-700">
-                        Choose Option:
-                      </label>
-                      <div className="flex gap-4 mt-2">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="filterOption"
-                            value="txhash"
-                            checked={option === "txhash"}
-                            onChange={handleOptionChange}
-                            className="mr-2"
-                          />
-                          Tx Hash
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="filterOption"
-                            value="address"
-                            checked={option === "address"}
-                            onChange={handleOptionChange}
-                            className="mr-2"
-                          />
-                          Address
-                        </label>
-                      </div>
-                    </div>
-
-                    {option === "txhash" && (
+                    <form onSubmit={handleSubmit} className="w-full">
+                      {/* Rest of the form content remains the same */}
+                      {/* ... */}
                       <div className="mb-4">
                         <label className="font-medium text-gray-700">
-                          Tx Hash:
+                          Choose Option:
                         </label>
-                        <input
-                          type="text"
-                          name="txhash"
-                          value={formData.txhash}
-                          onChange={handleChange}
-                          placeholder="Enter Tx Hash"
-                          className="w-full p-3 mt-2 border rounded-lg"
-                        />
+                        <div className="flex gap-2 mt-2 md:gap-4">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="filterOption"
+                              value="txhash"
+                              checked={option === "txhash"}
+                              onChange={handleOptionChange}
+                              className="mr-2"
+                            />
+                            Tx Hash
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="filterOption"
+                              value="address"
+                              checked={option === "address"}
+                              onChange={handleOptionChange}
+                              className="mr-2"
+                            />
+                            Address
+                          </label>
+                        </div>
                       </div>
-                    )}
 
-                    {option === "address" && (
-                      <>
+                      {option === "txhash" && (
                         <div className="mb-4">
                           <label className="font-medium text-gray-700">
-                            Address:
+                            Tx Hash:
                           </label>
                           <input
                             type="text"
-                            name="address"
-                            value={formData.address}
+                            name="txhash"
+                            value={formData.txhash}
                             onChange={handleChange}
-                            placeholder="Enter Address"
-                            className="w-full p-3 mt-2 border rounded-lg"
+                            placeholder="Enter Tx Hash"
+                            className="w-full p-2 mt-2 border rounded-lg md:p-3"
                           />
                         </div>
-                        <div className="mb-4">
-                          <label className="font-medium text-gray-700">
-                            From Date:
-                          </label>
-                          <input
-                            type="date"
-                            name="fromDate"
-                            value={formData.fromDate}
-                            onChange={handleChange}
-                            className="w-full p-3 mt-2 border rounded-lg"
-                          />
-                        </div>
-                        <div className="mb-4">
-                          <label className="font-medium text-gray-700">
-                            To Date:
-                          </label>
-                          <input
-                            type="date"
-                            name="toDate"
-                            value={formData.toDate}
-                            onChange={handleChange}
-                            className="w-full p-3 mt-2 border rounded-lg"
-                          />
-                        </div>
-                        <div className="relative mb-4">
-                          <label className="font-medium text-gray-700">
-                            Tokens:
-                          </label>
-                          <div className="mt-2">
-                            {/* Display Selected Tokens */}
-                            {formData.tokens.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {formData.tokens.map((tokenAddress, index) => {
-                                  // Find the corresponding token object using the address
-                                  const token = tokensList.find(
-                                    (t) => t.address === tokenAddress
-                                  );
+                      )}
 
-                                  return token ? (
-                                    <span
-                                      key={index}
-                                      className="flex items-center gap-2 px-2 py-1 text-blue-800 bg-blue-100 rounded-lg"
-                                    >
-                                      {token.name} - {token.chain}
-                                      <button
-                                        onClick={() =>
-                                          handleTokenSelection(token)
-                                        }
-                                        className="text-red-500 hover:text-red-700"
-                                      >
-                                        ✖
-                                      </button>
-                                    </span>
-                                  ) : null; // Skip if the token is not found
-                                })}
-                              </div>
-                            )}
-
-                            {/* Search Bar */}
+                      {option === "address" && (
+                        <>
+                          <div className="mb-4">
+                            <label className="font-medium text-gray-700">
+                              Address:
+                            </label>
                             <input
                               type="text"
-                              placeholder="Search tokens..."
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              className="w-full p-3 mb-2 bg-white border rounded-lg"
+                              name="address"
+                              value={formData.address}
+                              onChange={handleChange}
+                              placeholder="Enter Address"
+                              className="w-full p-2 mt-2 border rounded-lg md:p-3"
                             />
+                          </div>
+                          <div className="mb-4">
+                            <label className="font-medium text-gray-700">
+                              From Date:
+                            </label>
+                            <input
+                              type="date"
+                              name="fromDate"
+                              value={formData.fromDate}
+                              onChange={handleChange}
+                              className="w-full p-2 mt-2 border rounded-lg md:p-3"
+                            />
+                          </div>
+                          <div className="mb-4">
+                            <label className="font-medium text-gray-700">
+                              To Date:
+                            </label>
+                            <input
+                              type="date"
+                              name="toDate"
+                              value={formData.toDate}
+                              onChange={handleChange}
+                              className="w-full p-2 mt-2 border rounded-lg md:p-3"
+                            />
+                          </div>
+                          <div className="relative mb-4">
+                            <label className="font-medium text-gray-700">
+                              Tokens:
+                            </label>
+                            <div className="mt-2">
+                              {formData.tokens.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                  {formData.tokens.map(
+                                    (tokenAddress, index) => {
+                                      const token = tokensList.find(
+                                        (t) => t.address === tokenAddress
+                                      );
 
-                            {/* Dropdown */}
-                            <div className="overflow-y-auto bg-white border rounded-lg shadow-lg max-h-48">
-                              {filteredTokens.length > 0 ? (
-                                filteredTokens.map((token, index) => (
-                                  <div
-                                    key={index}
-                                    onClick={() => handleTokenSelection(token)}
-                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${
-                                      formData.tokens.includes(token.address)
-                                        ? "bg-gray-200 font-bold"
-                                        : ""
-                                    }`}
-                                  >
-                                    {token.name} - {token.chain}{" "}
-                                    {/* Display token name and chain */}
-                                  </div>
-                                ))
-                              ) : (
-                                <div className="p-3 text-gray-500">
-                                  No tokens found
+                                      return token ? (
+                                        <span
+                                          key={index}
+                                          className="flex items-center gap-1 px-2 py-1 text-sm text-blue-800 bg-blue-100 rounded-lg md:gap-2 md:text-base"
+                                        >
+                                          {token.name} - {token.chain}
+                                          <button
+                                            onClick={() =>
+                                              handleTokenSelection(token)
+                                            }
+                                            className="text-red-500 hover:text-red-700"
+                                          >
+                                            ✖
+                                          </button>
+                                        </span>
+                                      ) : null;
+                                    }
+                                  )}
                                 </div>
                               )}
+
+                              <input
+                                type="text"
+                                placeholder="Search tokens..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full p-2 mb-2 bg-white border rounded-lg md:p-3"
+                              />
+
+                              <div className="overflow-y-auto bg-white border rounded-lg shadow-lg max-h-48">
+                                {filteredTokens.length > 0 ? (
+                                  filteredTokens.map((token, index) => (
+                                    <div
+                                      key={index}
+                                      onClick={() =>
+                                        handleTokenSelection(token)
+                                      }
+                                      className={`p-2 md:p-3 text-sm md:text-base cursor-pointer hover:bg-gray-100 ${
+                                        formData.tokens.includes(token.address)
+                                          ? "bg-gray-200 font-bold"
+                                          : ""
+                                      }`}
+                                    >
+                                      {token.name} - {token.chain}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="p-2 text-sm text-gray-500 md:p-3 md:text-base">
+                                    No tokens found
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
 
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        className="px-6 py-2 font-semibold text-white transition-all duration-300 bg-green-500 rounded-lg hover:bg-green-600"
-                      >
-                        {option === "txHash" ? "Scan Now" : "Submit"}
-                      </button>
-                    </div>
-                  </form>
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 text-sm font-semibold text-white transition-all duration-300 bg-green-500 rounded-lg md:px-6 md:text-base hover:bg-green-600"
+                        >
+                          {option === "txHash" ? "Scan Now" : "Submit"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
               </div>
             )}
@@ -1118,7 +1572,7 @@ const Visualizer = () => {
         <div className="mt-10">
           <div
             id="cy"
-            className="border-gray-800 rounded-md shadow-2xl dark:border-gray-300 dark:shadow-2xl dark:border"
+            className="border-gray-800 rounded-md shadow-2xl h-[600px] w-[1200px]"
           ></div>
         </div>
       </div>
@@ -1158,7 +1612,7 @@ const Visualizer = () => {
                       </svg>
                     </button>
                     <span className="text-xl font-bold">
-                      {currentPage1} / {totalPages1 === 0 ? 1 : totalPages1}
+                      {Math.max(1, currentPage1)} / {Math.max(1, totalPages1)}
                     </span>
                     <button
                       className={`px-4 py-2 font-bold ${
@@ -1177,7 +1631,7 @@ const Visualizer = () => {
                       >
                         <path
                           fill="black"
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414"
                         />
                       </svg>
@@ -1198,9 +1652,9 @@ const Visualizer = () => {
                             <path
                               fill="none"
                               stroke="black"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="32"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="32"
                               d="M32 144h448M112 256h288M208 368h96"
                             />
                           </svg>
@@ -1230,7 +1684,7 @@ const Visualizer = () => {
                             >
                               <path
                                 fill="black"
-                                fill-rule="evenodd"
+                                fillRule="evenodd"
                                 d="m12.6 11.503l3.891 3.891l-.848.849L11.4 12V6h1.2zM12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-1.2a8.8 8.8 0 1 0 0-17.6a8.8 8.8 0 0 0 0 17.6"
                               />
                             </svg>
@@ -1248,9 +1702,9 @@ const Visualizer = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -1268,9 +1722,9 @@ const Visualizer = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -1288,9 +1742,9 @@ const Visualizer = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -1308,9 +1762,9 @@ const Visualizer = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -1328,9 +1782,9 @@ const Visualizer = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -1339,7 +1793,7 @@ const Visualizer = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="text-center ">
+                    <tbody className="text-center">
                       {currentRows1 && currentRows1.length > 0 ? (
                         currentRows1.map((transfer, index) => {
                           const {
@@ -1354,13 +1808,25 @@ const Visualizer = () => {
                             chain,
                           } = transfer;
                           console.log(transfer);
+
+                          // Determine the logo to display
+                          const displayLogo =
+                            transfer.logo === "https://algorand.org/logo.png"
+                              ? algo
+                              : transfer.logo;
                           return (
                             <tr
                               key={index}
                               className="border-t h-12 text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
                             >
                               <td className="flex items-center justify-center px-4 mt-2">
-                                <img src={logo} alt={tokenName} />
+                                {displayLogo && ( // Only render the image if displayLogo is not null
+                                  <img
+                                    src={displayLogo}
+                                    alt={tokenName}
+                                    className="rounded-full h-9"
+                                  />
+                                )}
                               </td>
                               <td className="px-4 text-green-500 me-3">
                                 {!isAlgorand
@@ -1442,9 +1908,6 @@ const Visualizer = () => {
                           <td className="text-center">0000....000</td>
                           <td className="text-center">0000....000</td>
                           <td className="text-green-500">0.00</td>
-                          {/* <td className="text-green-500">
-                                            0.00
-                                        </td> */}
                           <td>BTC</td>
                           <td>$0.00</td>
                         </tr>
