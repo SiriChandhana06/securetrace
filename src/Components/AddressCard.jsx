@@ -1,7 +1,6 @@
 import React from "react";
 import { FaRegCopy } from "react-icons/fa";
 import img from "../Assests/person.png";
-import { FaShareNodes } from "react-icons/fa6";
 import { useState, useEffect, useRef } from "react";
 import Port from "../Assests/Portfolio.png";
 import { TiArrowSortedDown } from "react-icons/ti";
@@ -10,8 +9,12 @@ import btc from "../Assests/Bitcoin.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DevUrl } from "../Constants";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
+import algo from "../Assests/algologo1.png";
+import opulouslogo from "../Assests/opulouslogo.png";
+import goralogo from "../Assests/goralogo.png";
+import realiologo from "../Assests/realiologo.png";
 
 const AddressCard = () => {
   // const defaultCardData = {
@@ -21,6 +24,7 @@ const AddressCard = () => {
   //   greenAmount: "$10,491.48",
   // };
   const location = useLocation();
+  const navigate = useNavigate();
   const [cardData, setCardData] = useState(null);
   const [inputValue, setInputValue] = useState("");
   const [isPortfolioVisible, setIsPortfolioVisible] = useState(false);
@@ -45,6 +49,8 @@ const AddressCard = () => {
       usd: "$0.00K",
     },
   ];
+
+  
 
   const [currentPage1, setCurrentPage1] = useState(1);
   const rowsPerPage1 = 10;
@@ -86,6 +92,9 @@ const AddressCard = () => {
     );
   };
 
+const isInputValid =
+  algoAddressRegex.test(inputValue) || algoTxHashRegex.test(inputValue);
+  
   const copyToClipboard = () => {
     navigator.clipboard.writeText(localStorage.getItem("inputValue"));
     toast.success("You Have Copied the Address");
@@ -93,6 +102,18 @@ const AddressCard = () => {
 
   const handleScanNow = async () => {
     setLoading(true);
+
+    const jwtToken = localStorage.getItem("jwt_token");
+
+    if (!jwtToken) {
+      toast.error("You need to log in to access this feature.");
+      setTimeout(() => {
+        navigate("/");
+      }, 4000);
+      return;
+    }
+    console.log("Search submitted!");
+
     setSelectedChain(null);
 
     if (!inputValue) {
@@ -279,6 +300,10 @@ const AddressCard = () => {
     };
   }, []);
 
+  const handleNavigateToVisualizer = () => {
+    navigate("/visualizer", { state: { inputValue } }); // Pass inputValue to the Visualizer page
+  };
+
   return (
     <div className="bg-white dark:bg-[#001938]">
       <div className="flex items-center justify-center overflow-x-hidden ">
@@ -337,9 +362,6 @@ const AddressCard = () => {
             <div className="flex items-center justify-center p-4 mt-2 md:flex">
               <h1 className="ml-2 text-4xl lg:ml-0">{`$${totalValue}`}</h1>
               <span className="mt-2 ml-2 text-2xl text-green-500">{`$${totalValue}`}</span>
-              <button className="mt-2 ml-2 text-black text-md md:text-xl hover:text-gray-600">
-                <FaShareNodes />
-              </button>
             </div>
           </div>
         </div>
@@ -383,7 +405,9 @@ const AddressCard = () => {
                       </svg>
                     </button>
                     <span className="text-xl font-bold">
-                      {currentPage} / {totalPages}
+                      <span className="text-xl font-bold">
+                        {Math.max(1, currentPage)} / {Math.max(1, totalPages)}
+                      </span>
                     </span>
                     <button
                       className={`px-4 py-2 font-bold ${
@@ -402,7 +426,7 @@ const AddressCard = () => {
                       >
                         <path
                           fill="black"
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414"
                         />
                       </svg>
@@ -412,16 +436,21 @@ const AddressCard = () => {
 
                 <div className="flex justify-end">
                   <div className="flex gap-4">
-                    <button className="px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition">
+                    <button
+                      className="px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition"
+                      onClick={handleNavigateToVisualizer}
+                    >
                       <span className="font-semibold">View In Visualizer</span>
                     </button>
-                    <button
-                      onClick={() => setIsOpen(!isOpen)}
-                      className="flex gap-2 md:gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition"
-                    >
-                      <span className="font-semibold">Filter by Chain</span>
-                      <TiArrowSortedDown />
-                    </button>
+                    {!isInputValid && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex gap-2 md:gap-6 items-center px-3 py-2 bg-gradient-to-t from-[#d3d3d3] to-white text-black rounded-lg border border-black shadow-md hover:bg-gray-300 transition"
+        >
+          <span className="font-semibold">Filter by Chain</span>
+          <TiArrowSortedDown />
+        </button>
+      )}
                   </div>
                   {/* {isOpen && (
                       <div className="absolute mt-12 bg-white border border-gray-300 rounded-lg shadow-lg" ref={dropdownRef} >
@@ -479,9 +508,9 @@ const AddressCard = () => {
                             <path
                               fill="none"
                               stroke="black"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="32"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="32"
                               d="M32 144h448M112 256h288M208 368h96"
                             />
                           </svg>
@@ -499,9 +528,9 @@ const AddressCard = () => {
                             <path
                               fill="none"
                               stroke="black"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="32"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="32"
                               d="M32 144h448M112 256h288M208 368h96"
                             />
                           </svg>
@@ -519,9 +548,9 @@ const AddressCard = () => {
                             <path
                               fill="none"
                               stroke="black"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="32"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="32"
                               d="M32 144h448M112 256h288M208 368h96"
                             />
                           </svg>
@@ -533,7 +562,17 @@ const AddressCard = () => {
                   <tbody>
                     {currentRows && currentRows.length > 0
                       ? currentRows.map((item, index) => {
-                          const logo = item.logo;
+                          // Mapping of tokenName to logo
+                          const logoMapping = {
+                            algorand: algo,
+                            opulous: opulouslogo,
+                            realiotoken: realiologo,
+                            gora: goralogo,
+                          };
+                          const logo =
+                            logoMapping[
+                              item.tokenName.toLowerCase().replace(/\s+/g, "")
+                            ] || item.logo;
                           const asset = item.tokenName;
                           const price = parseFloat(item.tokenPrice).toFixed(2);
                           const holdings = parseFloat(
@@ -546,14 +585,14 @@ const AddressCard = () => {
                               key={index}
                               className="border-t h-12 odd:bg-[#F4F4F4] even:bg-white"
                             >
-                              <td className="flex items-center justify-center ">
+                              <td className="flex items-center justify-center">
                                 <div className="flex items-center w-48 gap-5">
                                   <img
-                                    src={logo}
+                                    src={logo} // Use the resolved logo here
                                     alt={asset}
-                                    className="mt-2 h-7 w-7 "
+                                    className="w-8 h-8 mt-2 rounded-full"
                                   />
-                                  <p className="text-nowrap"> {asset}</p>
+                                  <p className="text-nowrap">{asset}</p>
                                 </div>
                               </td>
                               <td className="px-4">${price}</td>
@@ -616,8 +655,9 @@ const AddressCard = () => {
                       </svg>
                     </button>
                     <span className="text-xl font-bold">
-                      {currentPage1} / {totalPages1}
+                      {Math.max(1, currentPage1)} / {Math.max(1, totalPages1)}
                     </span>
+
                     <button
                       className={`px-4 py-2 font-bold ${
                         currentPage1 === totalPages1
@@ -635,7 +675,7 @@ const AddressCard = () => {
                       >
                         <path
                           fill="black"
-                          fill-rule="evenodd"
+                          fillRule="evenodd"
                           d="M10.157 12.711L4.5 18.368l-1.414-1.414l4.95-4.95l-4.95-4.95L4.5 5.64l5.657 5.657a1 1 0 0 1 0 1.414"
                         />
                       </svg>
@@ -656,9 +696,9 @@ const AddressCard = () => {
                             <path
                               fill="none"
                               stroke="black"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="32"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="32"
                               d="M32 144h448M112 256h288M208 368h96"
                             />
                           </svg>
@@ -688,7 +728,7 @@ const AddressCard = () => {
                             >
                               <path
                                 fill="black"
-                                fill-rule="evenodd"
+                                fillRule="evenodd"
                                 d="m12.6 11.503l3.891 3.891l-.848.849L11.4 12V6h1.2zM12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m0-1.2a8.8 8.8 0 1 0 0-17.6a8.8 8.8 0 0 0 0 17.6"
                               />
                             </svg>
@@ -706,9 +746,9 @@ const AddressCard = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -726,9 +766,9 @@ const AddressCard = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -746,9 +786,9 @@ const AddressCard = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -766,9 +806,9 @@ const AddressCard = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -786,9 +826,9 @@ const AddressCard = () => {
                               <path
                                 fill="none"
                                 stroke="black"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="32"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="32"
                                 d="M32 144h448M112 256h288M208 368h96"
                               />
                             </svg>
@@ -810,17 +850,26 @@ const AddressCard = () => {
                             tokenPrice,
                             chain,
                           } = transfer;
+
+                          // Determine the logo to display
+                          const displayLogo =
+                            transfer.logo === "https://algorand.org/logo.png"
+                              ? algo
+                              : transfer.logo;
+
                           return (
                             <tr
                               key={index}
                               className="border-t  h-12  text-center bg-red-600 odd:bg-[#F4F4F4] even:bg-white px-2 py-2"
                             >
                               <td className="flex items-center justify-center px-4 mt-2">
-                                <img
-                                  src={logo}
-                                  alt={tokenName}
-                                  className="h-9"
-                                />
+                                {displayLogo && ( // Only render the image if displayLogo is not null
+                                  <img
+                                    src={displayLogo}
+                                    alt={tokenName}
+                                    className="rounded-full h-9"
+                                  />
+                                )}
                               </td>
                               {/* <td className="px-4 text-green-500 me-3">{timestamp}</td> */}
                               <td className="px-4 text-green-500 me-3">

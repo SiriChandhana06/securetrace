@@ -18,8 +18,8 @@ import share from "../Assests/share.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { DevUrl } from "../Constants";
 import { useTheme } from "./ThemeContext";
 
@@ -40,6 +40,17 @@ const SecureTransaction = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
 
+    const jwtToken = localStorage.getItem("jwt_token");
+    
+        if (!jwtToken) {
+          toast.error("You need to log in to access this feature.");
+          setTimeout(() => {
+            navigate("/"); 
+          }, 4000);
+          return;
+        }
+        console.log("Search submitted!");
+
     if (!inputValue) {
       toast.error("Please enter a valid input.");
       return;
@@ -48,12 +59,26 @@ const SecureTransaction = () => {
     // Check if the input is a valid Ethereum address or transaction hash
     const isAddress = /^0x[a-fA-F0-9]{40}$/.test(inputValue); // Ethereum address
     const isTxHash = /^0x([A-Fa-f0-9]{64})$/.test(inputValue); // Transaction hash
+    const isAlgoAddress = /^[A-Z2-7]{58}$/.test(inputValue); // Algorand address
+    const isAlgoTxId = /^[A-Z2-7]{52}$/.test(inputValue); // Algorand transaction ID
 
-    if (isAddress) {
+    // if (isAddress) {
+    //   // Navigate to the portfolio-tracker page with the input value
+    //   navigate("/portfoliotracker", { state: { inputValue } });
+    // } else if (isTxHash) {
+    //   // Navigate to the visualizer page with the input value
+    //   navigate("/visualizer", { state: { inputValue } });
+    // } else {
+    //   // Show an error message for invalid input
+    //   toast.error(
+    //     "Invalid input. Please enter a valid Ethereum address or transaction hash."
+    //   );
+    // }
+
+    if (isAddress || isAlgoAddress) {
       // Navigate to the portfolio-tracker page with the input value
       navigate("/portfoliotracker", { state: { inputValue } });
-    } else if (isTxHash) {
-      // Navigate to the visualizer page with the input value
+    } else if (isTxHash || isAlgoTxId) {
       navigate("/visualizer", { state: { inputValue } });
     } else {
       // Show an error message for invalid input
@@ -61,6 +86,7 @@ const SecureTransaction = () => {
         "Invalid input. Please enter a valid Ethereum address or transaction hash."
       );
     }
+    
   };
 
   useEffect(() => {
@@ -210,7 +236,7 @@ const SecureTransaction = () => {
                   return (
                     <div>
                       <div className="border border-green-500 rounded-xl p-4 sm:p-6 shadow-md w-[97%] md:w-[610px]  mb-4 mx-auto">
-                         <h3 className="mb-4 text-xl font-semibold text-green-500">
+                        <h3 className="mb-4 text-xl font-semibold text-green-500">
                           TRENDING TOKEN PAGES
                         </h3>
 
@@ -275,9 +301,9 @@ const SecureTransaction = () => {
               ) : (
                 <div className="flex justify-center">
                   <div className="border border-green-500 rounded-xl p-6 shadow-md w-[330px] md:w-[640px] ml-1 md:ml-20 lg:ml-12">
-                      <h3 className="mb-4 text-xl font-semibold text-green-500">
-                        TRENDING TOKEN PAGES
-                      </h3> 
+                    <h3 className="mb-4 text-xl font-semibold text-green-500">
+                      TRENDING TOKEN PAGES
+                    </h3>
 
                     <div className="gap-10 md:flex">
                       <div className="mt-6">
